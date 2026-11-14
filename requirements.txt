@@ -3,5 +3,4 @@ shazamio
 google-api-python-client
 google-auth-oauthlib
 google-auth-httplib2
-browser-cookie3
 pytest
