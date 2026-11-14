@@ -1,3 +1,4 @@
+import time
 from igtoyt.processed_store import ProcessedStore
 
 
@@ -22,8 +23,16 @@ def add_video_to_playlist(youtube, playlist_id: str, video_id: str, store: Proce
     if store.has_video(video_id):
         return False
 
-    youtube.playlistItems().insert(
-        part="snippet",
-        body={"snippet": {"playlistId": playlist_id, "resourceId": {"kind": "youtube#video", "videoId": video_id}}},
-    ).execute()
-    return True
+    for attempt in range(3):
+        try:
+            youtube.playlistItems().insert(
+                part="snippet",
+                body={"snippet": {"playlistId": playlist_id, "resourceId": {"kind": "youtube#video", "videoId": video_id}}},
+            ).execute()
+            return True
+        except Exception:
+            if attempt < 2:
+                time.sleep(2)
+                continue
+            raise
+    return False

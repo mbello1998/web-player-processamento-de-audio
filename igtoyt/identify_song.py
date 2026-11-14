@@ -82,7 +82,10 @@ def shazamio_recognize(audio_path: Path) -> Optional[dict]:
         finally:
             await shazam.close()
 
-    result = asyncio.run(_recognize())
+    try:
+        result = asyncio.run(_recognize())
+    except Exception:
+        return None
     track = result.get("track") if result else None
     if not track:
         return None
