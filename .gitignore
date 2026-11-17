@@ -5,3 +5,24 @@ client_secret.json
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Credenciais e dados pessoais - nunca versionar
+cookies.txt
+user_youtube_playlists.json
+
+# Estado de runtime / cache - regenerado pelo app, nao e codigo-fonte
+playback_history.json
+saved_audios_all.json
+processed_categorized.json
+seen_suggested_ids.json
+pending_queue.json
+recommendations_found.json
+cumbia_tracks_cache.json
+audio_catalog_resolved.json
+genre_rotation.json
+suggested_tracks.json
+
+# Lixo de teste/backup
+*.bak
+test_init.txt
+

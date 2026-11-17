@@ -1,4 +1,5 @@
 import http.cookiejar
+import json
 import re
 import time
 from dataclasses import dataclass
@@ -40,14 +41,25 @@ def _extract_playwright_cookies(cookies_txt_path: Path) -> list[dict]:
 
 
 def _fetch_saved_audios_via_playwright(
-    cookies_txt_path: Path, max_scrolls: int = 25
+    cookies_txt_path: Path, max_scrolls: int = 150
 ) -> list[dict]:
-    """Extract all saved audios/songs from instagram.com/<username>/saved/audio/"""
-    playwright_cookies = _extract_playwright_cookies(cookies_txt_path)
-    print("Conectando ao Instagram para carregar suas MÚSICAS SALVAS (saved/audio)...")
+    """Deep-scroll instagram.com/<username>/saved/audio/ to retrieve 100% of saved songs."""
+    cache_path = Path("saved_audios_all.json")
+    if cache_path.exists():
+        try:
+            with cache_path.open("r", encoding="utf-8") as f:
+                cached = json.load(f)
+                if len(cached) >= 100:
+                    print(f"Carregando {len(cached)} músicas salvas do catálogo...")
+                    return cached
+        except Exception:
+            pass
 
-    saved_audios: list[dict] = []
-    seen_ids: set[str] = set()
+    playwright_cookies = _extract_playwright_cookies(cookies_txt_path)
+    print("Conectando ao Instagram para carregar TODAS as suas MÚSICAS SALVAS (saved/audio)...")
+
+    seen: dict[str, dict] = {}
+    stagnant_rounds = 0
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -61,11 +73,9 @@ def _fetch_saved_audios_via_playwright(
         context.add_cookies(playwright_cookies)
         page = context.new_page()
 
-        # Direct navigation to the saved audio collection
         saved_audio_url = "https://www.instagram.com/matheus.b.p/saved/audio/"
         page.goto(saved_audio_url, wait_until="networkidle")
 
-        no_new_count = 0
         for _ in range(max_scrolls):
             anchors = page.query_selector_all('a[href*="/reels/audio/"]')
             for a in anchors:
@@ -74,9 +84,8 @@ def _fetch_saved_audios_via_playwright(
                 if not m:
                     continue
                 audio_id = m.group(1)
-                if audio_id in seen_ids:
+                if audio_id in seen:
                     continue
-                seen_ids.add(audio_id)
 
                 text = a.inner_text().strip()
                 parent = a.evaluate_handle('el => el.closest("div[role=button], li, div")')
@@ -98,33 +107,42 @@ def _fetch_saved_audios_via_playwright(
                 elif len(lines) > 0 and lines[0] != title:
                     artist = lines[0]
 
-                # Clean up "Original audio"
                 if title.lower() == "original audio" and artist:
                     title = f"Áudio original de {artist}"
 
-                saved_audios.append(
-                    {
-                        "audio_id": audio_id,
-                        "title": title,
-                        "artist": artist,
-                        "url": href,
-                    }
-                )
+                seen[audio_id] = {
+                    "id": audio_id,
+                    "title": title,
+                    "artist": artist,
+                    "url": href,
+                }
 
-            prev_len = len(seen_ids)
+            before = len(seen)
             page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-            time.sleep(1.2)
-            if len(seen_ids) == prev_len:
-                no_new_count += 1
-                if no_new_count >= 3:
+            page.wait_for_timeout(2000)
+            page.evaluate("window.scrollBy(0, -400)")
+            page.wait_for_timeout(500)
+            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            page.wait_for_timeout(1500)
+
+            if len(seen) == before:
+                stagnant_rounds += 1
+                if stagnant_rounds >= 6:
                     break
             else:
-                no_new_count = 0
+                stagnant_rounds = 0
 
         browser.close()
 
-    print(f"Total de MÚSICAS SALVAS encontradas: {len(saved_audios)}")
-    return saved_audios
+    audios = list(seen.values())
+    try:
+        with cache_path.open("w", encoding="utf-8") as f:
+            json.dump(audios, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+    print(f"Total definitivo de MÚSICAS SALVAS encontradas: {len(audios)}")
+    return audios
 
 
 def iter_saved_posts(
@@ -134,11 +152,6 @@ def iter_saved_posts(
     posts_iterable=None,
     cookies_txt_path: Optional[Path] = None,
 ) -> Iterator[SavedPost]:
-    """Yield SavedPost for every saved music track from Instagram Saved Audio.
-
-    When *posts_iterable* is provided (unit tests), iterates that instead.
-    In production, retrieves the saved audios from instagram.com/<username>/saved/audio/.
-    """
     if posts_iterable is not None:
         for post in posts_iterable:
             audio_title = audio_artist = None
@@ -158,13 +171,12 @@ def iter_saved_posts(
             )
         return
 
-    # Production path: Saved Audios
     c_path = cookies_txt_path or Path("cookies.txt")
     audios = _fetch_saved_audios_via_playwright(c_path)
 
-    for i, item in enumerate(audios, 1):
+    for item in audios:
         yield SavedPost(
-            shortcode=item["audio_id"],
+            shortcode=item["id"],
             caption="",
             hashtags=[],
             is_video=True,
