@@ -8769,12 +8769,15 @@ let studioSettings = {
     reverbPreDelay: 0.02,
     reverbDecay: 1.8,
     reverbMix: 22,
-    // Módulo 2: Delay
+    // Módulo 2: Delay (mudo por padrão - um send de 240ms com 28% de feedback
+    // é um eco repetido audível, não "masterização"; some usuários abrindo o
+    // Studio Pro pela 1a vez com esses valores reportaram "fico em eco". O
+    // módulo continua funcional para quem quiser ligar via UI/outro preset.)
     delayPreset: "1/4",
     delayTime: 0.24,
     delayHiCut: 3500,
-    delayFeedback: 28,
-    delayMix: 18,
+    delayFeedback: 0,
+    delayMix: 0,
     // Módulo 3: Compressor SSL Bus
     compThreshold: -14,
     compRatio: 4.0,
@@ -8805,7 +8808,7 @@ const STUDIO_PRESETS = {
     mastering: {
         name: "Neve Warmth",
         reverbType: "hall", reverbPreDelay: 0.02, reverbDecay: 1.8, reverbMix: 20,
-        delayPreset: "1/4", delayTime: 0.24, delayHiCut: 3500, delayFeedback: 25, delayMix: 14,
+        delayPreset: "1/4", delayTime: 0.24, delayHiCut: 3500, delayFeedback: 0, delayMix: 0,
         compThreshold: -14, compRatio: 3.5, compAttack: 0.008, compRelease: 0.15, compSidechainHpf: 80,
         warmthColor: "tube", warmthDrive: 30, stereoWidth: 130,
         airFreq: 12000, airBoost: 3.5, airSparkle: 30,
@@ -8941,8 +8944,14 @@ let studioWarmthNode = null;
 let studioCompNode = null;
 let studioSplitterNode = null;
 let studioMergerNode = null;
-let studioDelayLeft = null;
-let studioDelayRight = null;
+let studioMidGain = null;
+let studioMidGainL = null;
+let studioMidGainR = null;
+let studioSideGainL = null;
+let studioSideGainR = null;
+let studioSideBus = null;
+let studioSideWidthGainPos = null;
+let studioSideWidthGainNeg = null;
 let studioMaximizerGain = null;
 let studioLimiterNode = null;
 
@@ -9090,13 +9099,24 @@ function initStudioDsp() {
         studioCompNode.release.value = studioSettings.compRelease;
         studioCompNode.knee.value = 6.0;
 
-        // 6. MÓDULO ESPACIALIZADOR ESTÉREO 3D (HAAS WIDENER)
+        // 6. MÓDULO ESPACIALIZADOR ESTÉREO (MID/SIDE WIDTH)
+        // Antes era um "Haas Widener" por delay (5-10ms só no canal direito).
+        // Um delay puro de um lado só sem nenhuma mistura de volta é ouvido como
+        // eco/duplicação em fone de ouvido (sem o crosstalk natural dos auto-
+        // falantes que funde delays curtos em "largura"), e também só conseguia
+        // alargar - nunca estreitar (o clamp Math.max(0,...) zerava qualquer
+        // stereoWidth abaixo de 100). Trocado por Mid/Side: sem atraso, sem
+        // risco de cancelamento de fase, e simétrico (estreita e alarga).
         studioSplitterNode = audioCtx.createChannelSplitter(2);
         studioMergerNode = audioCtx.createChannelMerger(2);
-        studioDelayLeft = audioCtx.createDelay();
-        studioDelayRight = audioCtx.createDelay();
-        studioDelayLeft.delayTime.value = 0.0;
-        studioDelayRight.delayTime.value = 0.008;
+        studioMidGainL = audioCtx.createGain(); studioMidGainL.gain.value = 0.5;
+        studioMidGainR = audioCtx.createGain(); studioMidGainR.gain.value = 0.5;
+        studioMidGain = audioCtx.createGain(); // soma = (L+R)*0.5 = Mid
+        studioSideGainL = audioCtx.createGain(); studioSideGainL.gain.value = 0.5;
+        studioSideGainR = audioCtx.createGain(); studioSideGainR.gain.value = -0.5;
+        studioSideBus = audioCtx.createGain(); // soma = (L-R)*0.5 = Side
+        studioSideWidthGainPos = audioCtx.createGain(); studioSideWidthGainPos.gain.value = 1.0; // +largura no canal L
+        studioSideWidthGainNeg = audioCtx.createGain(); studioSideWidthGainNeg.gain.value = -1.0; // -largura no canal R
 
         // 7. MÓDULO MASTER MAXIMIZER & BRICKWALL LIMITER
         studioMaximizerGain = audioCtx.createGain();
@@ -9154,11 +9174,26 @@ function initStudioDsp() {
         studioAirFilter.connect(studioWarmthNode);
         studioWarmthNode.connect(studioCompNode);
 
+        // Largura estéreo via Mid/Side (sem delay): Mid = (L+R)*0.5, Side = (L-R)*0.5;
+        // L' = Mid + Side*w, R' = Mid - Side*w. Em w=1 (stereoWidth=100) reconstrói
+        // o estéreo original exatamente; w=0 é mono puro; w>1 alarga sem atraso.
         studioCompNode.connect(studioSplitterNode);
-        studioSplitterNode.connect(studioDelayLeft, 0);
-        studioSplitterNode.connect(studioDelayRight, 1);
-        studioDelayLeft.connect(studioMergerNode, 0, 0);
-        studioDelayRight.connect(studioMergerNode, 0, 1);
+        studioSplitterNode.connect(studioMidGainL, 0);
+        studioSplitterNode.connect(studioMidGainR, 1);
+        studioMidGainL.connect(studioMidGain);
+        studioMidGainR.connect(studioMidGain);
+
+        studioSplitterNode.connect(studioSideGainL, 0);
+        studioSplitterNode.connect(studioSideGainR, 1);
+        studioSideGainL.connect(studioSideBus);
+        studioSideGainR.connect(studioSideBus);
+
+        studioMidGain.connect(studioMergerNode, 0, 0);
+        studioMidGain.connect(studioMergerNode, 0, 1);
+        studioSideBus.connect(studioSideWidthGainPos);
+        studioSideBus.connect(studioSideWidthGainNeg);
+        studioSideWidthGainPos.connect(studioMergerNode, 0, 0);
+        studioSideWidthGainNeg.connect(studioMergerNode, 0, 1);
 
         studioMergerNode.connect(studioMaximizerGain);
         studioMaximizerGain.connect(studioLimiterNode);
@@ -9253,10 +9288,11 @@ function applyStudioDspParams() {
         studioWarmthNode.curve = makeStudioWarmthCurve(studioSettings.warmthDrive, studioSettings.warmthColor);
     }
 
-    // 5. Haas Stereo 3D
-    if (studioDelayRight) {
-        const offset = Math.max(0, (studioSettings.stereoWidth - 100) / 100) * 0.016;
-        studioDelayRight.delayTime.setValueAtTime(offset, now);
+    // 5. Largura Estéreo (Mid/Side, sem delay - ver initStudioDsp)
+    if (studioSideWidthGainPos && studioSideWidthGainNeg) {
+        const w = Math.max(0, (studioSettings.stereoWidth || 100) / 100);
+        studioSideWidthGainPos.gain.setValueAtTime(w, now);
+        studioSideWidthGainNeg.gain.setValueAtTime(-w, now);
     }
 
     // 6. Air Band & Exciter
@@ -9337,9 +9373,11 @@ function toggleStudioMonoCheck() {
     if (dot) dot.classList.toggle("active", studioMonoCheck);
     if (label) label.textContent = studioMonoCheck ? "MONO ATIVO" : "STEREO";
 
-    if (studioDelayRight) {
-        // No modo mono, cancela qualquer defasagem estéreo
-        studioDelayRight.delayTime.setValueAtTime(studioMonoCheck ? 0.0 : Math.max(0, (studioSettings.stereoWidth - 100) / 100) * 0.016, audioCtx ? audioCtx.currentTime : 0);
+    if (studioSideWidthGainPos && studioSideWidthGainNeg && audioCtx) {
+        // No modo mono, zera o componente Side (soma pura L+R = mono real)
+        const w = studioMonoCheck ? 0 : Math.max(0, (studioSettings.stereoWidth || 100) / 100);
+        studioSideWidthGainPos.gain.setValueAtTime(w, audioCtx.currentTime);
+        studioSideWidthGainNeg.gain.setValueAtTime(-w, audioCtx.currentTime);
     }
 }
 
