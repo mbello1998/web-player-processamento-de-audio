@@ -133,6 +133,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         let deckGainLowA = null;
         let deckGainMidA = null;
         let deckGainHighA = null;
+        let deckGainBypassA = null;
         let deckSumA = null;
 
         // DJ 3-BAND CROSSOVER & STEMS NODES (DECK B: BAIXOS, MÉDIOS, AGUDOS)
@@ -142,10 +143,12 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         let deckGainLowB = null;
         let deckGainMidB = null;
         let deckGainHighB = null;
+        let deckGainBypassB = null;
         let deckSumB = null;
 
         let eqFilters = [];
         let compressorNode = null;
+        let safetyClipNode = null;
         let masterGainNode = null;
         let analyserNode = null;
         let transitionOutgoingTrack = null;
@@ -169,6 +172,26 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         let radioSuggestionsCache = {};
         let pendingQueue = [];
 
+        // Curva de segurança "brickwall": transparente (y=x) abaixo de ~90% da escala,
+        // e só então satura suavemente até ~0.976, nunca alcançando ±1.0. O compressor/
+        // limiter principal (DynamicsCompressorNode) não tem lookahead - com attack de
+        // 1ms, transientes rápidos (kick/808) ainda furam o teto antes dele reagir. Esta
+        // é a rede de segurança final: nenhuma amostra sai estourada, e abaixo do joelho
+        // o áudio normal passa inalterado (sem coloração perceptível).
+        function makeSafetyClipCurve(threshold = 0.9) {
+            const n = 2048;
+            const curve = new Float32Array(n);
+            for (let i = 0; i < n; i++) {
+                const x = (i / (n - 1)) * 2 - 1;
+                const ax = Math.abs(x);
+                const sign = x < 0 ? -1 : 1;
+                curve[i] = ax <= threshold
+                    ? x
+                    : sign * (threshold + (1 - threshold) * Math.tanh((ax - threshold) / (1 - threshold)));
+            }
+            return curve;
+        }
+
         // Inicializar Web Audio HD Engine
         function initWebAudio() {
             if (audioCtx) return;
@@ -191,9 +214,16 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 // ==========================================================
                 // DJ 3-BAND EQUAL-POWER CROSSOVER NETWORK (DECK A)
                 // ==========================================================
+                // Nota: Q em lowpass/highpass no Web Audio controla o pico de ressonância
+                // na frequência de corte (medido: dB no corte == valor de Q, para Q>=0).
+                // Q=0.7071 (o "Butterworth" clássico analógico) aqui produz +0.7dB de pico,
+                // não um corte plano -3dB. Usamos Q baixo para um joelho limpo sem ressonância.
+                const DECK_XOVER_Q = 0.05;
+
                 deckFilterLowA = audioCtx.createBiquadFilter();
                 deckFilterLowA.type = "lowpass";
                 deckFilterLowA.frequency.value = 280;
+                deckFilterLowA.Q.value = DECK_XOVER_Q;
 
                 deckFilterMidA = audioCtx.createBiquadFilter();
                 deckFilterMidA.type = "bandpass";
@@ -203,13 +233,23 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 deckFilterHighA = audioCtx.createBiquadFilter();
                 deckFilterHighA.type = "highpass";
                 deckFilterHighA.frequency.value = 3200;
+                deckFilterHighA.Q.value = DECK_XOVER_Q;
 
                 deckGainLowA = audioCtx.createGain();
                 deckGainMidA = audioCtx.createGain();
                 deckGainHighA = audioCtx.createGain();
-                deckGainLowA.gain.value = 1.0;
-                deckGainMidA.gain.value = 1.0;
-                deckGainHighA.gain.value = 1.0;
+                // As 3 bandas só ficam ativas durante uma transição (ver triggerCrossfade /
+                // applyTransitionCrossover). Em reprodução normal, deckGainBypassA carrega
+                // o sinal sozinho: medimos (getFrequencyResponse) que somar low+mid+high o
+                // tempo todo, mesmo fora de transição, cava um buraco de até -20dB entre
+                // ~500Hz e ~2400Hz (a faixa onde vive a maior parte da voz e dos instrumentos),
+                // que era a causa raiz do som "estourado e distorcido" em toda a reprodução.
+                deckGainLowA.gain.value = 0.0;
+                deckGainMidA.gain.value = 0.0;
+                deckGainHighA.gain.value = 0.0;
+
+                deckGainBypassA = audioCtx.createGain();
+                deckGainBypassA.gain.value = 1.0;
 
                 sourceNodeA.connect(deckFilterLowA);
                 deckFilterLowA.connect(deckGainLowA);
@@ -220,10 +260,13 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 sourceNodeA.connect(deckFilterHighA);
                 deckFilterHighA.connect(deckGainHighA);
 
+                sourceNodeA.connect(deckGainBypassA);
+
                 deckSumA = audioCtx.createGain();
                 deckGainLowA.connect(deckSumA);
                 deckGainMidA.connect(deckSumA);
                 deckGainHighA.connect(deckSumA);
+                deckGainBypassA.connect(deckSumA);
 
                 deckGainA = audioCtx.createGain();
                 deckGainA.gain.value = (activeDeck === "A") ? 1.0 : 0.0;
@@ -235,6 +278,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 deckFilterLowB = audioCtx.createBiquadFilter();
                 deckFilterLowB.type = "lowpass";
                 deckFilterLowB.frequency.value = 280;
+                deckFilterLowB.Q.value = DECK_XOVER_Q;
 
                 deckFilterMidB = audioCtx.createBiquadFilter();
                 deckFilterMidB.type = "bandpass";
@@ -244,13 +288,17 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 deckFilterHighB = audioCtx.createBiquadFilter();
                 deckFilterHighB.type = "highpass";
                 deckFilterHighB.frequency.value = 3200;
+                deckFilterHighB.Q.value = DECK_XOVER_Q;
 
                 deckGainLowB = audioCtx.createGain();
                 deckGainMidB = audioCtx.createGain();
                 deckGainHighB = audioCtx.createGain();
-                deckGainLowB.gain.value = 1.0;
-                deckGainMidB.gain.value = 1.0;
-                deckGainHighB.gain.value = 1.0;
+                deckGainLowB.gain.value = 0.0;
+                deckGainMidB.gain.value = 0.0;
+                deckGainHighB.gain.value = 0.0;
+
+                deckGainBypassB = audioCtx.createGain();
+                deckGainBypassB.gain.value = 1.0;
 
                 sourceNodeB.connect(deckFilterLowB);
                 deckFilterLowB.connect(deckGainLowB);
@@ -261,10 +309,13 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 sourceNodeB.connect(deckFilterHighB);
                 deckFilterHighB.connect(deckGainHighB);
 
+                sourceNodeB.connect(deckGainBypassB);
+
                 deckSumB = audioCtx.createGain();
                 deckGainLowB.connect(deckSumB);
                 deckGainMidB.connect(deckSumB);
                 deckGainHighB.connect(deckSumB);
+                deckGainBypassB.connect(deckSumB);
 
                 deckGainB = audioCtx.createGain();
                 deckGainB.gain.value = (activeDeck === "B") ? 1.0 : 0.0;
@@ -326,8 +377,24 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 compressorNode.ratio.value = 20.0; // Brickwall Limiter
                 compressorNode.attack.value = 0.001; // Resposta ultrarrápida (1ms) evita qualquer estouro de transiente
                 compressorNode.release.value = 0.08;
+                safetyClipNode = audioCtx.createWaveShaper();
+                safetyClipNode.curve = makeSafetyClipCurve(0.9);
+                safetyClipNode.oversample = "4x";
+
                 masterGainNode.connect(compressorNode);
-                compressorNode.connect(audioCtx.destination);
+                compressorNode.connect(safetyClipNode);
+                safetyClipNode.connect(audioCtx.destination);
+                window.masterGainNode = masterGainNode;
+                window.compressorNode = compressorNode;
+                window.safetyClipNode = safetyClipNode;
+                window.deckFilterLowA = deckFilterLowA;
+                window.deckFilterMidA = deckFilterMidA;
+                window.deckFilterHighA = deckFilterHighA;
+                window.deckGainBypassA = deckGainBypassA;
+                window.deckGainBypassB = deckGainBypassB;
+                window.deckGainLowA = deckGainLowA;
+                window.deckGainMidA = deckGainMidA;
+                window.deckGainHighA = deckGainHighA;
 
                 // Configura ouvintes dos decks HTML5
                 setupAudioEvents(audioDeckA, "A");
@@ -3376,6 +3443,7 @@ function updateUpcomingTrackUI() {
             isTransitioning = false;
             hideCrossfadeIndicator();
             resetDecksContourUI();
+            setDeckCrossoverEngaged(false);
         }
 
         // Executar faixa instantânea
@@ -3879,6 +3947,7 @@ function triggerCrossfade(nextTrack) {
                     isTransitioning = false;
                     hasFadedCurrentTrack = false;
                     resetDecksContourUI();
+                    setDeckCrossoverEngaged(false);
                     renderAllActiveLists();
                     updateUpcomingTrackUI();
                 }
@@ -3994,6 +4063,10 @@ function triggerCrossfade(nextTrack) {
                 const outgoingDeckName = activeDeck;
                 const incomingDeckName = activeDeck === "A" ? "B" : "A";
 
+                // Liga as 3 bandas (bass swap) e tira o bypass flat de cena só durante a transição.
+                setDeckCrossoverEngaged(true);
+                applyTransitionCrossover(0, outgoingDeckName, incomingDeckName);
+
                 crossfadeTimer = setInterval(() => {
                     currentStep++;
                     const progress = currentStep / totalSteps;
@@ -4045,6 +4118,7 @@ function triggerCrossfade(nextTrack) {
                         hasFadedCurrentTrack = false;
                         prewarmedUpcomingId = "";
                         resetDecksContourUI();
+                        setDeckCrossoverEngaged(false);
                         startTimeMonitor();
                         if (typeof recordTrackInHistory === "function") recordTrackInHistory(incomingTrack);
                         if (typeof calculateDjModeNextTrack === "function") calculateDjModeNextTrack(incomingTrack);
@@ -4143,6 +4217,7 @@ function triggerCrossfade(nextTrack) {
                         hasFadedCurrentTrack = false;
                         prewarmedUpcomingId = "";
                         resetDecksContourUI();
+                        setDeckCrossoverEngaged(false);
                         startTimeMonitor();
                         if (typeof recordTrackInHistory === "function") recordTrackInHistory(incomingTrack);
                         if (typeof calculateDjModeNextTrack === "function") calculateDjModeNextTrack(incomingTrack);
@@ -5126,15 +5201,22 @@ function triggerCrossfade(nextTrack) {
                 // ==========================================================
                 // STEM 1: VOCAL (ACAPELLA) - PURE NATIVE DSP GRAPH
                 // ==========================================================
-                stemVocalHp1 = audioCtx.createBiquadFilter(); stemVocalHp1.type = "highpass"; stemVocalHp1.frequency.value = p.vocalHp; stemVocalHp1.Q.value = 0.7071;
-                stemVocalHp2 = audioCtx.createBiquadFilter(); stemVocalHp2.type = "highpass"; stemVocalHp2.frequency.value = p.vocalHp; stemVocalHp2.Q.value = 0.7071;
-                stemVocalHp3 = audioCtx.createBiquadFilter(); stemVocalHp3.type = "highpass"; stemVocalHp3.frequency.value = p.vocalHp; stemVocalHp3.Q.value = 0.7071;
-                stemVocalHp4 = audioCtx.createBiquadFilter(); stemVocalHp4.type = "highpass"; stemVocalHp4.frequency.value = p.vocalHp; stemVocalHp4.Q.value = 0.7071;
+                // Q=0.7071 em lowpass/highpass do Web Audio gera ~+0.7dB de pico na frequência
+                // de corte (medido com getFrequencyResponse), não um corte plano; 4 estágios em
+                // cascata com esse Q somavam ~+3dB de ressonância audível no joelho de cada
+                // filtro. Q baixo dá um joelho limpo, sem coloração, mesma inclinação (~12dB/oct
+                // por estágio), o que deixa o isolamento mais fiel ao original mesmo sem eliminar
+                // 100% do vazamento (isso é um limite do filtro, não deste ajuste - ver stems docs).
+                const STEM_XOVER_Q = 0.05;
+                stemVocalHp1 = audioCtx.createBiquadFilter(); stemVocalHp1.type = "highpass"; stemVocalHp1.frequency.value = p.vocalHp; stemVocalHp1.Q.value = STEM_XOVER_Q;
+                stemVocalHp2 = audioCtx.createBiquadFilter(); stemVocalHp2.type = "highpass"; stemVocalHp2.frequency.value = p.vocalHp; stemVocalHp2.Q.value = STEM_XOVER_Q;
+                stemVocalHp3 = audioCtx.createBiquadFilter(); stemVocalHp3.type = "highpass"; stemVocalHp3.frequency.value = p.vocalHp; stemVocalHp3.Q.value = STEM_XOVER_Q;
+                stemVocalHp4 = audioCtx.createBiquadFilter(); stemVocalHp4.type = "highpass"; stemVocalHp4.frequency.value = p.vocalHp; stemVocalHp4.Q.value = STEM_XOVER_Q;
 
-                stemVocalLp1 = audioCtx.createBiquadFilter(); stemVocalLp1.type = "lowpass"; stemVocalLp1.frequency.value = p.vocalLp; stemVocalLp1.Q.value = 0.7071;
-                stemVocalLp2 = audioCtx.createBiquadFilter(); stemVocalLp2.type = "lowpass"; stemVocalLp2.frequency.value = p.vocalLp; stemVocalLp2.Q.value = 0.7071;
-                stemVocalLp3 = audioCtx.createBiquadFilter(); stemVocalLp3.type = "lowpass"; stemVocalLp3.frequency.value = p.vocalLp; stemVocalLp3.Q.value = 0.7071;
-                stemVocalLp4 = audioCtx.createBiquadFilter(); stemVocalLp4.type = "lowpass"; stemVocalLp4.frequency.value = p.vocalLp; stemVocalLp4.Q.value = 0.7071;
+                stemVocalLp1 = audioCtx.createBiquadFilter(); stemVocalLp1.type = "lowpass"; stemVocalLp1.frequency.value = p.vocalLp; stemVocalLp1.Q.value = STEM_XOVER_Q;
+                stemVocalLp2 = audioCtx.createBiquadFilter(); stemVocalLp2.type = "lowpass"; stemVocalLp2.frequency.value = p.vocalLp; stemVocalLp2.Q.value = STEM_XOVER_Q;
+                stemVocalLp3 = audioCtx.createBiquadFilter(); stemVocalLp3.type = "lowpass"; stemVocalLp3.frequency.value = p.vocalLp; stemVocalLp3.Q.value = STEM_XOVER_Q;
+                stemVocalLp4 = audioCtx.createBiquadFilter(); stemVocalLp4.type = "lowpass"; stemVocalLp4.frequency.value = p.vocalLp; stemVocalLp4.Q.value = STEM_XOVER_Q;
 
                 stemVocalNotch1 = audioCtx.createBiquadFilter(); stemVocalNotch1.type = "notch"; stemVocalNotch1.frequency.value = 210; stemVocalNotch1.Q.value = 3.5;
                 stemVocalNotch2 = audioCtx.createBiquadFilter(); stemVocalNotch2.type = "notch"; stemVocalNotch2.frequency.value = 420; stemVocalNotch2.Q.value = 3.0;
@@ -5200,10 +5282,10 @@ function triggerCrossfade(nextTrack) {
                 // ==========================================================
                 // STEM 3: BASS (SUB & GRAVE) - 8ª ORDEM (48 dB/oct @ 175Hz)
                 // ==========================================================
-                stemBassLp1 = audioCtx.createBiquadFilter(); stemBassLp1.type = "lowpass"; stemBassLp1.frequency.value = p.bassCut; stemBassLp1.Q.value = 0.7071;
-                stemBassLp2 = audioCtx.createBiquadFilter(); stemBassLp2.type = "lowpass"; stemBassLp2.frequency.value = p.bassCut; stemBassLp2.Q.value = 0.7071;
-                stemBassLp3 = audioCtx.createBiquadFilter(); stemBassLp3.type = "lowpass"; stemBassLp3.frequency.value = p.bassCut; stemBassLp3.Q.value = 0.7071;
-                stemBassLp4 = audioCtx.createBiquadFilter(); stemBassLp4.type = "lowpass"; stemBassLp4.frequency.value = p.bassCut; stemBassLp4.Q.value = 0.7071;
+                stemBassLp1 = audioCtx.createBiquadFilter(); stemBassLp1.type = "lowpass"; stemBassLp1.frequency.value = p.bassCut; stemBassLp1.Q.value = STEM_XOVER_Q;
+                stemBassLp2 = audioCtx.createBiquadFilter(); stemBassLp2.type = "lowpass"; stemBassLp2.frequency.value = p.bassCut; stemBassLp2.Q.value = STEM_XOVER_Q;
+                stemBassLp3 = audioCtx.createBiquadFilter(); stemBassLp3.type = "lowpass"; stemBassLp3.frequency.value = p.bassCut; stemBassLp3.Q.value = STEM_XOVER_Q;
+                stemBassLp4 = audioCtx.createBiquadFilter(); stemBassLp4.type = "lowpass"; stemBassLp4.frequency.value = p.bassCut; stemBassLp4.Q.value = STEM_XOVER_Q;
 
                 stemBassBoost = audioCtx.createBiquadFilter(); stemBassBoost.type = "peaking"; stemBassBoost.frequency.value = p.bassBoost; stemBassBoost.Q.value = 1.4; stemBassBoost.gain.value = 3.5;
 
@@ -5641,6 +5723,30 @@ function triggerCrossfade(nextTrack) {
                 stemsMeterAnimId = null;
             }
         }
+
+        // ==========================================================
+        // LIGA/DESLIGA O CROSSOVER DE 3 BANDAS DOS DECKS
+        // ==========================================================
+        // Fora de uma transição, o áudio deve passar pelo caminho "bypass" (flat,
+        // sem filtros) das duas decks - é isso que evita o buraco de ~-20dB no
+        // médio (500Hz-2400Hz) que a soma permanente das 3 bandas causava.
+        // Engajar liga as 3 bandas (que applyTransitionCrossover then controla)
+        // e desliga o bypass; desengajar faz o inverso, restaurando o som plano.
+        function setDeckCrossoverEngaged(engaged) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const rampTime = 0.015; // rápido o bastante p/ não atrasar a transição, lento o bastante p/ não estalar
+            const bypassTarget = engaged ? 0.0001 : 1.0;
+            if (deckGainBypassA) deckGainBypassA.gain.setTargetAtTime(bypassTarget, now, rampTime);
+            if (deckGainBypassB) deckGainBypassB.gain.setTargetAtTime(bypassTarget, now, rampTime);
+            if (!engaged) {
+                // Zera as 3 bandas das duas decks; em reprodução normal só o bypass deve soar.
+                [deckGainLowA, deckGainMidA, deckGainHighA, deckGainLowB, deckGainMidB, deckGainHighB].forEach(g => {
+                    if (g) g.gain.setTargetAtTime(0.0, now, rampTime);
+                });
+            }
+        }
+        window.setDeckCrossoverEngaged = setDeckCrossoverEngaged;
 
         // ==========================================================
         // MOTOR DE TRANSIÇÃO COM CASAMENTO DE GRAVES, MÉDIOS E AGUDOS
@@ -8863,23 +8969,38 @@ function makeStudioWarmthCurve(driveAmount, colorType = "tube") {
             curve[i] = Math.tanh(x * (1 + k)) / (Math.tanh(1 + k) || 1);
         }
     } else if (colorType === "germanium") {
-        // Transistor germânio com harmônicos pares e corte assimétrico
+        // Transistor germânio com harmônicos pares e corte assimétrico.
+        // Normalizado por pico (curve(±1) = ±1): a fórmula original não era
+        // level-matched e chegava a +43,8% de overshoot no lado positivo em
+        // drive alto (usado nos presets "club" e "subpunch"), empurrando o
+        // sinal para além de 0dBFS antes mesmo do limiter de masterização.
         const k = drive * 4.0;
+        const shapeG = (v) => (v >= 0)
+            ? (Math.PI / 2) * Math.atan(v * (1 + k)) / 1.5
+            : v / (1 + Math.abs(v * k * 0.5));
+        const posPeakG = shapeG(1) || 1;
+        const negPeakG = shapeG(-1) || -1;
         for (let i = 0; i < n_samples; ++i) {
             const x = (i * 2) / n_samples - 1;
-            if (x >= 0) {
-                curve[i] = (Math.PI / 2) * Math.atan(x * (1 + k)) / 1.5;
-            } else {
-                curve[i] = x / (1 + Math.abs(x * k * 0.5));
-            }
+            const y = shapeG(x);
+            curve[i] = x >= 0 ? y / posPeakG : -(y / negPeakG);
         }
     } else {
-        // Válvula 6L6 clássica suave (Tube Warmth)
-        const k = drive * 2.8;
-        const deg = Math.PI / 180;
+        // Válvula 6L6 clássica suave (Tube Warmth): tanh com leve viés de 2º
+        // harmônico, normalizado por pico (curve(±1) = ±1). A fórmula anterior
+        // não era level-matched e atenuava o sinal para ~34% do nível original
+        // em x=1 (drive=30, o padrão do preset "mastering") em vez de aplicar
+        // uma saturação suave de ganho quase unitário, como faz um estágio
+        // valvulado real - por isso soava "infiel" ao hardware físico.
+        const k = drive * 2.5;
+        const biasT = drive * 0.15;
+        const shapeT = (v) => Math.tanh(v * (1 + k) + biasT * v * v);
+        const posPeakT = shapeT(1) || 1;
+        const negPeakT = shapeT(-1) || -1;
         for (let i = 0; i < n_samples; ++i) {
             const x = (i * 2) / n_samples - 1;
-            curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+            const y = shapeT(x);
+            curve[i] = x >= 0 ? y / posPeakT : -(y / negPeakT);
         }
     }
     return curve;
