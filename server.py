@@ -106,6 +106,19 @@ GENRE_BPM_RANGES = {
     "Outros": (115, 130, 124)
 }
 
+# Termos que denunciam conteúdo que não é música de verdade (timers de treino, vídeo
+# infantil, coletâneas genéricas de playlist de academia) - usados para filtrar resultados
+# de busca das sugestões de IA, que vinham trazendo esse tipo de coisa como "parecida".
+JUNK_CONTENT_MARKERS = (
+    "countdown timer", "workout timer", "timer de treino", "para academia", "para treino",
+    "kids", "infantil", "desenho animado", "compilation", "coletanea", "coletânea",
+)
+
+def is_junk_suggestion_title(title: str) -> bool:
+    lower = (title or "").lower()
+    return any(marker in lower for marker in JUNK_CONTENT_MARKERS)
+
+
 def detect_or_estimate_bpm(title: str, category: str = "Outros") -> int:
     import re, hashlib
     if not title:
@@ -345,6 +358,8 @@ def discover_tracks(category: str, custom_query: str = None, seed_bpm: int = Non
                     continue
                 if any(r["video_id"] == v_id for r in results):
                     continue
+                if is_junk_suggestion_title(t_title):
+                    continue
 
                 track_bpm = detect_or_estimate_bpm(t_title, category)
                 results.append({
@@ -407,40 +422,27 @@ def discover_related_tracks(title: str, artist: str, category: str, current_vide
     raw_words = re.findall(r'[a-zA-Z0-9áéíóúâêîôûãõçÁÉÍÓÚÂÊÎÔÛÃÕÇ]{3,}', clean_title.lower())
     title_keywords = [w for w in raw_words if w not in stop_words]
 
-    # Queries no estilo Spotify AI Recommendation (Mesmo ritmo, gênero e BPM sincronizado)
-    # Com referências profissionais de Treino / Academia / Motivação / Cardio
-    is_high_energy = seed_bpm >= 125 or any(c in category.lower() for c in ["mega", "funk", "eletr", "desande", "trap", "ritm", "treino"])
-    
-    queries = []
-    if is_high_energy:
-        queries.extend([
-            f"{category} treino pesado motivacao {seed_bpm} bpm",
-            f"musica para treino academia pump {seed_bpm} bpm",
-            f"cardio {seed_bpm} bpm bass boost treino",
-            f"set treino musculacao {category} {seed_bpm} bpm som pesado",
-            f"{category} {seed_bpm} bpm lancamento"
-        ])
-    else:
-        queries.extend([
-            f"{category} {seed_bpm} bpm lancamento",
-            f"ritmo {category} {seed_bpm} bpm",
-            f"set {category} {seed_bpm} bpm",
-            f"novidades {category} {seed_bpm} bpm hits 2024"
-        ])
+    # Queries no estilo Spotify AI Recommendation (Mesmo ritmo e gênero da faixa de origem).
+    # Importante: NÃO usar termos de "treino/academia/motivação/cardio" aqui - eles levam o
+    # YouTube a devolver coletâneas de playlist de academia (timers, infantil, compilações de
+    # 30min+ de qualquer gênero) que não têm nada a ver com o estilo da música buscada. A busca
+    # tem que ficar ancorada no gênero/artista real da faixa, não num contexto de uso genérico.
+    queries = [
+        f"{category} {seed_bpm} bpm lancamento",
+        f"ritmo {category} {seed_bpm} bpm",
+        f"set {category} {seed_bpm} bpm",
+        f"novidades {category} {seed_bpm} bpm hits 2024"
+    ]
 
     genre_list = GENRE_SEARCH_QUERIES.get(category, [])
     import random
     if genre_list:
-        sample_queries = random.sample(genre_list, min(2, len(genre_list)))
+        sample_queries = random.sample(genre_list, min(3, len(genre_list)))
         queries.extend(sample_queries)
 
     if clean_artist:
-        if is_high_energy:
-            queries.insert(0, f"{clean_artist} treino motivacao ritmo {seed_bpm} bpm")
-            queries.append(f"artistas parecidos com {clean_artist} {seed_bpm} bpm treino")
-        else:
-            queries.insert(0, f"artistas parecidos com {clean_artist} {seed_bpm} bpm")
-            queries.append(f"{clean_artist} ritmo {category} {seed_bpm} bpm")
+        queries.insert(0, f"artistas parecidos com {clean_artist}")
+        queries.append(f"{clean_artist} remix {seed_bpm} bpm")
 
     results = []
     ydl_opts = {
@@ -469,6 +471,9 @@ def discover_related_tracks(title: str, artist: str, category: str, current_vide
                     if v_id in excluded_ids:
                         continue
                     if any(r["video_id"] == v_id for r in results):
+                        continue
+
+                    if is_junk_suggestion_title(t_title):
                         continue
 
                     # FILTRO DE CONTEÚDO: Descarta se tiver o mesmo nome da música atual
