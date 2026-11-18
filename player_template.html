@@ -499,7 +499,7 @@
                             <span id="searchBadgeCount" class="search-badge"></span>
                             <button id="btnClearSearch" class="btn-clear-search" onclick="clearLibrarySearch()" title="Limpar busca" style="display: none;">✕</button>
                         </div>
-                        <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube com IA">
+                        <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube e SoundCloud com IA">
                             ⚡ Pesquisa Livre
                         </button>
                     </div>
@@ -592,7 +592,7 @@
                     <div class="search-bar-row">
                         <div class="search-input-box">
                             <span class="search-icon">🔍</span>
-                            <input type="text" id="freeSearchInput" class="search-input-field" placeholder="Pesquise qualquer música, artista, ritmo ou BPM no YouTube e Biblioteca..." oninput="handleFreeSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeFreeSearch(this.value)">
+                            <input type="text" id="freeSearchInput" class="search-input-field" placeholder="Pesquise qualquer música, artista, ritmo ou BPM na Biblioteca, YouTube e SoundCloud..." oninput="handleFreeSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeFreeSearch(this.value)">
                             <button id="btnFreeSearchClear" class="btn-clear-search" onclick="clearFreeSearch()" title="Limpar busca" style="display: none;">✕</button>
                         </div>
                         <button class="btn-search-ia-action" onclick="executeFreeSearch(document.getElementById('freeSearchInput').value)">
@@ -612,7 +612,7 @@
                     <div class="search-filters-bar" id="searchFiltersBar" style="display: flex;">
                         <button class="filter-tab-btn active" id="tabFilterAll" onclick="setSearchFilter('all')">Todas (<span id="countSearchAll">0</span>)</button>
                         <button class="filter-tab-btn" id="tabFilterLib" onclick="setSearchFilter('library')">📚 Na Biblioteca (<span id="countSearchLib">0</span>)</button>
-                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades YouTube (<span id="countSearchNew">0</span>)</button>
+                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades (<span id="countSearchNew">0</span>)</button>
                     </div>
 
                     <!-- Banner de Transição Suave Crossfade em Tempo Real na Pesquisa -->
@@ -634,8 +634,8 @@
                 <div class="track-list" id="searchResultsList">
                     <div class="search-empty-state">
                         <div class="search-empty-icon">🔍</div>
-                        <div class="search-empty-title">Pesquisa Livre no YouTube & Biblioteca</div>
-                        <div class="search-empty-desc">Digite qualquer título, artista, ritmo ou BPM para encontrar instantaneamente na biblioteca ou descobrir novas faixas no YouTube com transição Crossfade e adição com um clique!</div>
+                        <div class="search-empty-title">Pesquisa Livre na Biblioteca, YouTube & SoundCloud</div>
+                        <div class="search-empty-desc">Digite qualquer título, artista, ritmo ou BPM para encontrar instantaneamente na biblioteca ou descobrir novas faixas no YouTube e SoundCloud com transição Crossfade e adição com um clique!</div>
                     </div>
                 </div>
             </div>
@@ -662,7 +662,7 @@
                     <div class="search-bar-row" style="margin-top: 6px; margin-bottom: 6px;">
                         <div class="search-input-box">
                             <span class="search-icon">✨</span>
-                            <input type="text" id="suggSearchInput" class="search-input-field" placeholder="Buscar novas músicas no YouTube por ritmo, artista ou BPM (ex: 135 bpm, mandelao)..." onkeydown="if(event.key==='Enter') executeCustomSuggestionSearch(this.value)">
+                            <input type="text" id="suggSearchInput" class="search-input-field" placeholder="Buscar novas músicas por ritmo, artista ou BPM (ex: 135 bpm, mandelao)..." onkeydown="if(event.key==='Enter') executeCustomSuggestionSearch(this.value)">
                         </div>
                         <button class="btn-search-ia-action" onclick="executeCustomSuggestionSearch(document.getElementById('suggSearchInput').value)">
                             ⚡ Buscar IA
@@ -675,7 +675,7 @@
                             <span id="suggestionCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px; font-size: 11px;">0 inéditas</span>
                         </div>
                         <div class="queue-desc" id="suggestionSubtext">
-                            Músicas buscadas em tempo real no YouTube para este estilo e ritmo. <strong>Nunca se repetem</strong>.
+                            Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. <strong>Nunca se repetem</strong>.
                         </div>
                         <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
                             <button class="btn-sync-yt" id="btnRefreshSuggestions" onclick="fetchFreshSuggestionsForCurrentGenre()" style="flex: 1; margin-top: 0; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; padding: 7px 12px; font-size: 12px;">
@@ -1233,6 +1233,8 @@
         window.SPOTIFY_PLAYLISTS = __SPOTIFY_PLAYLISTS_JSON__;
     </script>
     <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
     <script src="/assets/js/player.js?v=20261117_03"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     

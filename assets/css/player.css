@@ -3646,6 +3646,41 @@
             align-items: center;
         }
 
+        /* Tag de origem da faixa (YouTube / SoundCloud) nos cards de sugestão e pesquisa */
+        .badge-track-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            padding: 2px 7px 2px 6px;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .badge-track-source::before {
+            font-size: 7px;
+            line-height: 1;
+        }
+        .badge-track-source--yt {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.22), rgba(255, 0, 0, 0.08));
+            border: 1px solid rgba(255, 0, 0, 0.4);
+            color: #ff5c5c;
+        }
+        .badge-track-source--yt::before {
+            content: "▶";
+        }
+        .badge-track-source--sc {
+            background: linear-gradient(135deg, rgba(255, 85, 0, 0.28), rgba(255, 85, 0, 0.1));
+            border: 1px solid rgba(255, 85, 0, 0.45);
+            color: #ff8a4c;
+        }
+        .badge-track-source--sc::before {
+            content: "☁";
+            font-size: 9px;
+        }
+
 
         /* ==========================================================
            EFEITO DINÂMICO AO CLICAR EM QUALQUER BOTÃO OU OPÇÃO DO PLAYER

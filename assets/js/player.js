@@ -121,6 +121,11 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         let audioCtx = null;
         let audioDeckA = null;
         let audioDeckB = null;
+        // Instâncias do hls.js por deck - faixas do SoundCloud (prefixo "sc:") só são
+        // servidas em HLS publicamente, e <audio src="..."> sozinho não toca .m3u8 no
+        // Chrome/Edge/Firefox (só o Safari toca nativo). Precisa de uma por deck porque
+        // o hls.js assume dono exclusivo do MediaSource do elemento enquanto anexado.
+        const hlsInstances = { A: null, B: null };
         let sourceNodeA = null;
         let sourceNodeB = null;
         let deckGainA = null;
@@ -545,16 +550,25 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             setEngineMode(engineMode === "audio" ? "video" : "audio", isPlaying, resumeAtSec);
         }
 
-        // Mantém o motor ANTIGO tocando audível até o motor NOVO realmente começar a
-        // produzir som no ponto retomado, e só então corta o antigo. Sem isso, a troca de
-        // motor é um corte seco: silêncio total enquanto o novo motor carrega/rebufferiza
-        // (até ~1-2s no YouTube, ou o tempo de um novo Range request no Áudio HD) - essa
-        // janela de silêncio era o "travamento" que o usuário sentia ao trocar de modo.
-        function crossoverEngineHandoff(prevMode, newMode) {
+        // Mantém o motor ANTIGO tocando audível (e visível) até o motor NOVO realmente
+        // começar a produzir som no ponto retomado, e só então troca os dois juntos. Sem
+        // isso, a troca de motor corta: silêncio e tela em branco enquanto o novo motor
+        // carrega/rebufferiza (até ~1-2s no YouTube, ou o tempo de um novo Range request no
+        // Áudio HD) - essa janela era o "atraso" perceptível que o usuário sentia ao trocar
+        // de modo, mesmo já sem corte de áudio (a tela já tinha trocado, mas o vídeo ainda
+        // estava em branco carregando).
+        function crossoverEngineHandoff(prevMode, newMode, visScreen, ytOverlay) {
             let handed = false;
             const cutOldEngine = () => {
                 if (handed) return;
                 handed = true;
+                if (newMode === "audio") {
+                    if (visScreen) visScreen.style.display = "flex";
+                    if (ytOverlay) ytOverlay.style.display = "none";
+                } else {
+                    if (visScreen) visScreen.style.display = "none";
+                    if (ytOverlay) ytOverlay.style.display = "block";
+                }
                 if (prevMode === "video") {
                     if (playerA && typeof playerA.pauseVideo === "function") { try { playerA.pauseVideo(); playerA.setVolume(0); } catch (e) {} }
                     if (playerB && typeof playerB.pauseVideo === "function") { try { playerB.pauseVideo(); playerB.setVolume(0); } catch (e) {} }
@@ -627,10 +641,15 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             }
             updateVolumeUI();
 
+            // Num handoff, a tela só troca junto com o áudio (dentro de crossoverEngineHandoff),
+            // no instante em que o motor novo já está tocando de verdade - trocar a tela na hora
+            // deixava a área de vídeo em branco por ~1s enquanto o YouTube ainda bufferizava,
+            // mesmo com o áudio já contínuo. Sem handoff (nada tocando ainda) não tem o que
+            // esperar, troca na hora mesmo.
             if (mode === "audio") {
-                if (visScreen) visScreen.style.display = "flex";
-                if (ytOverlay) ytOverlay.style.display = "none";
                 if (!isHandoff) {
+                    if (visScreen) visScreen.style.display = "flex";
+                    if (ytOverlay) ytOverlay.style.display = "none";
                     if (playerA && typeof playerA.pauseVideo === "function") {
                         try { playerA.pauseVideo(); playerA.setVolume(0); } catch (e) {}
                     }
@@ -640,9 +659,9 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 }
                 showToast("🎵 Áudio HD ativo: Equalizador Spotify, 200% VLC e ZERO bloqueios!");
             } else {
-                if (visScreen) visScreen.style.display = "none";
-                if (ytOverlay) ytOverlay.style.display = "block";
                 if (!isHandoff) {
+                    if (visScreen) visScreen.style.display = "none";
+                    if (ytOverlay) ytOverlay.style.display = "block";
                     if (audioDeckA) audioDeckA.pause();
                     if (audioDeckB) audioDeckB.pause();
                 }
@@ -654,7 +673,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 if (autoPlay) {
                     playTrackInstant(nowPlayingTrack, resumeAtSec, isHandoff);
                     if (isHandoff) {
-                        crossoverEngineHandoff(prevMode, mode);
+                        crossoverEngineHandoff(prevMode, mode, visScreen, ytOverlay);
                     }
                 }
             }
@@ -1946,6 +1965,13 @@ function updateUpcomingTrackUI() {
         }
 
         let isFetchingSuggestions = false;
+        // Categorias com uma busca em andamento no momento. Precisa ser por categoria (não só
+        // um booleano global) senão trocar de gênero enquanto o anterior ainda está buscando
+        // simplesmente cancelava o fetch do gênero novo (bloqueado pelo "if já tá buscando,
+        // sai"), e quando a resposta do gênero ANTIGO chegava, ela era salva e mostrada sob o
+        // rótulo do gênero NOVO (currentSuggestionCategory já tinha mudado) - era exatamente
+        // o "selecionei Reggaeton e voltou Mega Funk" que o usuário reportou com print.
+        const suggestionsFetchingCategories = new Set();
 
         function updateSuggestionHeader() {
             const titleEl = document.getElementById("suggestionActiveGenreTitle");
@@ -1956,7 +1982,7 @@ function updateUpcomingTrackUI() {
             if (isRadioActive) return;
 
             if (titleEl) titleEl.textContent = `✨ Novidades: ${currentSuggestionCategory}`;
-            if (subEl) subEl.innerHTML = `Músicas buscadas em tempo real no YouTube para este estilo e ritmo. <strong>Nunca se repetem</strong>.`;
+            if (subEl) subEl.innerHTML = `Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. <strong>Nunca se repetem</strong>.`;
             const currentList = suggestionsByGenre[currentSuggestionCategory] || [];
             if (badge) {
                 if (isFetchingSuggestions) {
@@ -1990,7 +2016,13 @@ function updateUpcomingTrackUI() {
                 return;
             }
 
-            if (isFetchingSuggestions) return;
+            // Captura o gênero pedido AGORA. Se o usuário trocar de aba antes da resposta
+            // chegar, currentSuggestionCategory já terá outro valor - usar a variável global
+            // lá na frente (em vez desta cópia) é o que causava mostrar/gravar as faixas do
+            // gênero antigo sob o rótulo do gênero novo.
+            const requestedCategory = currentSuggestionCategory;
+            if (suggestionsFetchingCategories.has(requestedCategory)) return;
+            suggestionsFetchingCategories.add(requestedCategory);
             isFetchingSuggestions = true;
 
             const container = document.getElementById("suggestionsList");
@@ -1998,28 +2030,37 @@ function updateUpcomingTrackUI() {
             const btn = document.getElementById("btnRefreshSuggestions");
 
             if (badge) badge.textContent = "Buscando...";
-            if (btn) btn.innerHTML = `<span>⏳ Buscando no YouTube...</span>`;
+            if (btn) btn.innerHTML = `<span>⏳ Buscando...</span>`;
             showSuggestionsSkeleton();
 
             try {
                 const res = await fetch("/api/suggestions/discover", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ category: currentSuggestionCategory })
+                    body: JSON.stringify({ category: requestedCategory })
                 });
                 const data = await res.json();
                 const freshTracks = data.tracks || [];
 
-                suggestionsByGenre[currentSuggestionCategory] = freshTracks;
-                renderSuggestionsList(freshTracks);
+                suggestionsByGenre[requestedCategory] = freshTracks;
 
-                if (badge) badge.textContent = freshTracks.length > 0 ? `${freshTracks.length} inéditas` : "0 inéditas";
+                // Só atualiza a tela se o usuário ainda estiver vendo esse mesmo gênero -
+                // senão a resposta de uma busca antiga sobrescreveria o que ele já trocou pra ver.
+                if (requestedCategory === currentSuggestionCategory) {
+                    renderSuggestionsList(freshTracks);
+                    if (badge) badge.textContent = freshTracks.length > 0 ? `${freshTracks.length} inéditas` : "0 inéditas";
+                }
             } catch (e) {
-                if (badge) badge.textContent = "0 inéditas";
-                if (container) container.innerHTML = `<div style="color: #ff5555; text-align: center; padding: 25px;">Erro ao carregar sugestões. Clique no botão acima para tentar novamente.</div>`;
+                if (requestedCategory === currentSuggestionCategory) {
+                    if (badge) badge.textContent = "0 inéditas";
+                    if (container) container.innerHTML = `<div style="color: #ff5555; text-align: center; padding: 25px;">Erro ao carregar sugestões. Clique no botão acima para tentar novamente.</div>`;
+                }
             } finally {
-                isFetchingSuggestions = false;
-                if (btn) btn.innerHTML = `<span>🔄 Buscar Mais Novas Músicas (Sem Repetir)</span>`;
+                suggestionsFetchingCategories.delete(requestedCategory);
+                if (suggestionsFetchingCategories.size === 0) isFetchingSuggestions = false;
+                if (requestedCategory === currentSuggestionCategory && btn) {
+                    btn.innerHTML = `<span>🔄 Buscar Mais Novas Músicas (Sem Repetir)</span>`;
+                }
             }
         }
 
@@ -2603,7 +2644,7 @@ function updateUpcomingTrackUI() {
                                 </button>
                             ` : ''}
                             <button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(spotifySearchQuery)}')" style="margin: 0; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); color: var(--accent); font-size: 12px; padding: 8px 14px;">
-                                ⚡ Buscar no YouTube / Pesquisa Livre
+                                ⚡ Pesquisa Livre com IA
                             </button>
                         </div>
                     </div>
@@ -2818,7 +2859,7 @@ function updateUpcomingTrackUI() {
 
             listContainer.innerHTML = "";
             if (globalMatches.length === 0) {
-                listContainer.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-dim);">Nenhuma música encontrada em nenhuma das 111 playlists para "${escapeHtml(q)}". <br><button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(q)}')" style="margin-top:12px;">⚡ Buscar no YouTube</button></div>`;
+                listContainer.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-dim);">Nenhuma música encontrada em nenhuma das 111 playlists para "${escapeHtml(q)}". <br><button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(q)}')" style="margin-top:12px;">⚡ Pesquisa Livre</button></div>`;
                 return;
             }
 
@@ -3394,7 +3435,7 @@ function updateUpcomingTrackUI() {
             if (artistEl) artistEl.textContent = displayArtist;
             if (catEl) catEl.textContent = displayCat;
             if (thumbEl && vid) {
-                thumbEl.src = `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
+                thumbEl.src = vid.startsWith("sc:") ? SOUNDCLOUD_GENERIC_ICON : `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
             }
 
             if (modal) {
@@ -3531,6 +3572,79 @@ function updateUpcomingTrackUI() {
             setDeckCrossoverEngaged(false);
         }
 
+        function isSoundCloudTrack(track) {
+            return !!(track && typeof track.video_id === "string" && track.video_id.startsWith("sc:"));
+        }
+
+        function teardownHlsForDeck(deckName) {
+            const existing = hlsInstances[deckName];
+            if (existing) {
+                try { existing.destroy(); } catch (e) {}
+                hlsInstances[deckName] = null;
+            }
+        }
+
+        // Carrega a fonte de áudio no deck e resolve quando já dá pra definir currentTime/play().
+        // YouTube: proxy direto do servidor, como sempre. SoundCloud: só serve HLS publicamente
+        // (confirmado testando várias faixas - nenhuma tinha formato progressivo), então
+        // <audio src="..."> sozinho não toca; usa hls.js, com fallback pro HLS nativo do Safari.
+        function loadAudioSourceForDeck(audioEl, deckName, track) {
+            if (!isSoundCloudTrack(track)) {
+                teardownHlsForDeck(deckName);
+                audioEl.src = `/api/audio/stream?id=${track.video_id}`;
+                return Promise.resolve();
+            }
+
+            return fetch(`/api/audio/info?id=${encodeURIComponent(track.video_id)}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data || !data.url) {
+                        throw new Error("SoundCloud: URL de stream indisponível para " + track.video_id);
+                    }
+                    const manifestUrl = data.url;
+
+                    // hls.js primeiro, como a própria documentação do hls.js recomenda: NÃO dá
+                    // pra confiar em canPlayType("application/vnd.apple.mpegurl") como sinal de
+                    // "sim, toca nativo" - testado ao vivo e o Chrome retorna "maybe" (truthy em
+                    // JS!) pra esse MIME type mesmo sem tocar HLS de verdade. Só usa o HLS nativo
+                    // como último recurso, quando hls.js genuinamente não roda no navegador.
+                    if (typeof Hls !== "undefined" && Hls.isSupported()) {
+                        teardownHlsForDeck(deckName);
+                        const hls = new Hls({ maxBufferLength: 30 });
+                        hlsInstances[deckName] = hls;
+                        hls.loadSource(manifestUrl);
+                        hls.attachMedia(audioEl);
+
+                        return new Promise((resolve, reject) => {
+                            hls.once(Hls.Events.MANIFEST_PARSED, () => resolve());
+                            hls.on(Hls.Events.ERROR, (event, errData) => {
+                                if (errData && errData.fatal) {
+                                    reject(new Error("hls.js: erro fatal ao carregar SoundCloud (" + errData.type + ")"));
+                                }
+                            });
+                        });
+                    }
+
+                    const canPlayNative = audioEl.canPlayType && audioEl.canPlayType("application/vnd.apple.mpegurl") === "probably";
+                    if (!canPlayNative) {
+                        throw new Error("Este navegador não consegue tocar faixas do SoundCloud (sem hls.js nem HLS nativo)");
+                    }
+
+                    teardownHlsForDeck(deckName);
+                    audioEl.src = manifestUrl;
+                    return new Promise((resolve, reject) => {
+                        const cleanup = () => {
+                            audioEl.removeEventListener("loadedmetadata", onReady);
+                            audioEl.removeEventListener("error", onErr);
+                        };
+                        const onReady = () => { cleanup(); resolve(); };
+                        const onErr = () => { cleanup(); reject(new Error("Falha ao carregar HLS nativo (Safari)")); };
+                        audioEl.addEventListener("loadedmetadata", onReady, { once: true });
+                        audioEl.addEventListener("error", onErr, { once: true });
+                    });
+                });
+        }
+
         // Executar faixa instantânea
         function playTrackInstant(track, resumeAtSec = null, keepOtherEngineAlive = false) {
             if (!track) return;
@@ -3595,25 +3709,32 @@ function updateUpcomingTrackUI() {
                 }
 
                 if (curAudio) {
-                    curAudio.src = `/api/audio/stream?id=${track.video_id}`;
-                    curAudio.currentTime = startSec;
                     const initialRate = currentPitchAdjustment !== 0 ? (currentPlaybackSpeed * (1.0 + currentPitchAdjustment / 100)) : currentPlaybackSpeed;
-                    curAudio.playbackRate = initialRate;
-                    curAudio.preservesPitch = true;
-                    curAudio.play().then(() => {
-                        if (startSec > 0 && Math.abs(curAudio.currentTime - startSec) > 0.6) {
-                            curAudio.currentTime = startSec;
-                        }
+                    loadAudioSourceForDeck(curAudio, activeDeck, track).then(() => {
+                        curAudio.currentTime = startSec;
                         curAudio.playbackRate = initialRate;
                         curAudio.preservesPitch = true;
-                        updatePlayPauseButtons(true);
-                        if (currentPitchAdjustment !== 0) {
-                            rampBpmToOriginal(curAudio, initialRate, currentPlaybackSpeed, track.bpm || 128, 3500);
-                        } else {
-                            updateLiveBpmPanel();
-                        }
+                        curAudio.play().then(() => {
+                            if (startSec > 0 && Math.abs(curAudio.currentTime - startSec) > 0.6) {
+                                curAudio.currentTime = startSec;
+                            }
+                            curAudio.playbackRate = initialRate;
+                            curAudio.preservesPitch = true;
+                            updatePlayPauseButtons(true);
+                            if (currentPitchAdjustment !== 0) {
+                                rampBpmToOriginal(curAudio, initialRate, currentPlaybackSpeed, track.bpm || 128, 3500);
+                            } else {
+                                updateLiveBpmPanel();
+                            }
+                        }).catch(err => {
+                            console.warn("Autoplay aguardando interação do usuário:", err);
+                        });
                     }).catch(err => {
-                        console.warn("Autoplay aguardando interação do usuário:", err);
+                        console.warn("Falha ao carregar a fonte de áudio:", err);
+                        showToast("⚠️ Não foi possível tocar esta faixa. Pulando para a próxima...");
+                        setTimeout(() => {
+                            if (typeof autoAdvanceWithFade === "function") autoAdvanceWithFade();
+                        }, 900);
                     });
                 }
 
@@ -3626,17 +3747,21 @@ function updateUpcomingTrackUI() {
                     }
                 }
 
-                const visScreen = document.getElementById("visualizerScreen");
-                if (visScreen) visScreen.style.display = "flex";
+                // Num handoff, quem troca a tela é crossoverEngineHandoff() - no momento
+                // certo, junto com o áudio - não aqui na hora (senão a área de vídeo fica
+                // em branco por ~1s enquanto ainda carrega, mesmo com o som contínuo).
+                if (!keepOtherEngineAlive) {
+                    const visScreen = document.getElementById("visualizerScreen");
+                    if (visScreen) visScreen.style.display = "flex";
+                }
             } else {
                 // Modo Vídeo Clipe YouTube (idem: mantém o Áudio HD tocando se for handoff)
                 if (!keepOtherEngineAlive) {
                     if (audioDeckA) audioDeckA.pause();
                     if (audioDeckB) audioDeckB.pause();
+                    const visScreen = document.getElementById("visualizerScreen");
+                    if (visScreen) visScreen.style.display = "none";
                 }
-
-                const visScreen = document.getElementById("visualizerScreen");
-                if (visScreen) visScreen.style.display = "none";
 
                 const activeP = getActivePlayer();
                 const standbyP = getStandbyPlayer();
@@ -4137,17 +4262,21 @@ function triggerCrossfade(nextTrack) {
                 }
 
                 if (toAudio) {
-                    toAudio.src = `/api/audio/stream?id=${nextTrack.video_id}`;
-                    toAudio.currentTime = startSec;
-                    toAudio.playbackRate = beatmatchRate;
-                    toAudio.preservesPitch = true;
-                    toAudio.play().then(() => {
-                        if (startSec > 0 && Math.abs(toAudio.currentTime - startSec) > 0.6) {
-                            toAudio.currentTime = startSec;
-                        }
+                    const toDeckName = activeDeck === "A" ? "B" : "A";
+                    loadAudioSourceForDeck(toAudio, toDeckName, nextTrack).then(() => {
+                        toAudio.currentTime = startSec;
                         toAudio.playbackRate = beatmatchRate;
                         toAudio.preservesPitch = true;
-                    }).catch(() => {});
+                        toAudio.play().then(() => {
+                            if (startSec > 0 && Math.abs(toAudio.currentTime - startSec) > 0.6) {
+                                toAudio.currentTime = startSec;
+                            }
+                            toAudio.playbackRate = beatmatchRate;
+                            toAudio.preservesPitch = true;
+                        }).catch(() => {});
+                    }).catch(err => {
+                        console.warn("Falha ao carregar a próxima faixa no crossfade:", err);
+                    });
                 }
 
                 // Dispara efeitos sonoros DJ FX quando o Modo Balada & Club DJ ou Modo Drop Hunter estiver ativo!
@@ -4333,9 +4462,22 @@ function triggerCrossfade(nextTrack) {
         
         // SPOTIFY DJ MIXER INTERFACE CONTROLLER
         // Helper para obter URL da capa do álbum com fallback inteligente
+        // Ícone genérico (ondas de áudio em laranja) usado como capa de faixas vindas do
+        // SoundCloud sem thumbnail - a busca rápida (scsearch) não retorna capa, e buscar a
+        // capa real música por música dobraria o número de chamadas de rede por busca.
+        const SOUNDCLOUD_GENERIC_ICON = "data:image/svg+xml," + encodeURIComponent(
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>" +
+            "<rect width='64' height='64' rx='10' fill='#ff5500'/>" +
+            "<path d='M15 38h4v10h-4zM21 33h4v15h-4zM27 28h4v20h-4zM33 25h4v23h-4zM39 30h4v18h-4zM45 35h4v13h-4z' fill='#fff'/>" +
+            "</svg>"
+        );
+
         function getTrackThumbnailUrl(track) {
             if (!track) return "";
             if (track.thumbnail) return track.thumbnail;
+            if (typeof track.video_id === "string" && track.video_id.startsWith("sc:")) {
+                return SOUNDCLOUD_GENERIC_ICON;
+            }
             if (track.video_id) return `https://i.ytimg.com/vi/${track.video_id}/mqdefault.jpg`;
             return "";
         }
@@ -7027,7 +7169,7 @@ function triggerCrossfade(nextTrack) {
             const visArt = document.getElementById("visAlbumArt");
             const visBlur = document.getElementById("visBgBlur");
 
-            const thumbUrl = (track && track.video_id) ? `https://i.ytimg.com/vi/${track.video_id}/mqdefault.jpg` : DEFAULT_COVER_SVG;
+            const thumbUrl = (track && track.video_id) ? getTrackThumbnailUrl(track) : DEFAULT_COVER_SVG;
 
             if (tTitle) tTitle.textContent = track.title || "Central de Músicas";
             if (tArtist) tArtist.textContent = track.artist || track.category || "";
@@ -7184,10 +7326,10 @@ function triggerCrossfade(nextTrack) {
                             Nenhuma música com "<em>${escapeHtml(rawQ)}</em>" na sua biblioteca
                         </div>
                         <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 18px;">
-                            Quer que a IA busque novas músicas com esse nome, ritmo ou artista no YouTube?
+                            Quer que a IA busque novas músicas com esse nome, ritmo ou artista no YouTube e SoundCloud?
                         </div>
                         <button class="btn-sync-yt" onclick="searchExternalYouTube('${escapeQuotes(rawQ)}')" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #ff0055, #ff5500); padding: 10px 22px; font-size: 13px; font-weight: 800; border-radius: 24px; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); margin: 0 auto;">
-                            <span>✨ Buscar "${escapeHtml(rawQ)}" no YouTube com IA</span>
+                            <span>✨ Buscar "${escapeHtml(rawQ)}" com IA</span>
                         </button>
                     </div>
                 `;
@@ -7211,7 +7353,7 @@ function triggerCrossfade(nextTrack) {
 
             if (badge) badge.textContent = "Buscando com IA...";
             if (titleEl) titleEl.innerHTML = `🔍 Busca com IA: <em>${escapeHtml(q)}</em>`;
-            if (subEl) subEl.innerHTML = `Buscando novidades no YouTube baseadas no ritmo, BPM e estilo de <strong>${escapeHtml(q)}</strong>.`;
+            if (subEl) subEl.innerHTML = `Buscando novidades no YouTube e SoundCloud baseadas no ritmo, BPM e estilo de <strong>${escapeHtml(q)}</strong>.`;
             showSuggestionsSkeleton();
 
             try {
@@ -7226,7 +7368,7 @@ function triggerCrossfade(nextTrack) {
                 renderSuggestionsList(tracks);
                 if (badge) badge.textContent = `${tracks.length} encontradas`;
             } catch (e) {
-                if (container) container.innerHTML = `<div style="color: #ff5555; text-align: center; padding: 25px;">Erro ao buscar novidades no YouTube. Tente novamente.</div>`;
+                if (container) container.innerHTML = `<div style="color: #ff5555; text-align: center; padding: 25px;">Erro ao buscar novidades. Tente novamente.</div>`;
             }
         }
 
@@ -7478,6 +7620,16 @@ function triggerCrossfade(nextTrack) {
         let currentActiveSuggestions = [];
 
         // Renderiza lista de sugestões com badges ao vivo (TOCANDO AGORA, A SEGUIR, ADICIONADA AGORA) e todas as ferramentas
+        // Tag mostrando se a faixa veio do YouTube ou do SoundCloud (identificado pelo
+        // prefixo "sc:" no video_id - ver SOUNDCLOUD_ID_PREFIX no server.py).
+        function getTrackSourceBadgeHtml(track) {
+            if (!track) return "";
+            const isSC = typeof track.video_id === "string" && track.video_id.startsWith("sc:");
+            return isSC
+                ? `<span class="badge-track-source badge-track-source--sc" title="Faixa do SoundCloud">SoundCloud</span>`
+                : `<span class="badge-track-source badge-track-source--yt" title="Faixa do YouTube">YouTube</span>`;
+        }
+
         function renderSuggestionsList(tracks) {
             currentActiveSuggestions = tracks || [];
             const container = document.getElementById("suggestionsList");
@@ -7488,7 +7640,7 @@ function triggerCrossfade(nextTrack) {
                     <div style="color: var(--text-dim); text-align: center; padding: 40px 20px;">
                         <div style="font-size: 28px; margin-bottom: 8px;">✨</div>
                         <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">Nenhuma sugestão carregada no momento para este gênero.</div>
-                        <div style="font-size: 12px; margin-bottom: 14px;">Clique no botão abaixo para buscar músicas inéditas em tempo real no YouTube!</div>
+                        <div style="font-size: 12px; margin-bottom: 14px;">Clique no botão abaixo para buscar músicas inéditas em tempo real no YouTube e SoundCloud!</div>
                         <button class="btn-sync-yt" onclick="fetchFreshSuggestionsForCurrentGenre()" style="margin: 0 auto; display: inline-flex; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; font-weight: 700; font-size: 12px; padding: 8px 16px;">
                             🔄 Buscar Novidades com IA Agora
                         </button>
@@ -7512,6 +7664,7 @@ function triggerCrossfade(nextTrack) {
                 const bpm = item.bpm || detectBpmJs(item.title, item.category);
                 const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>`;
                 const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">🏷️ ${item.category}</span>` : "";
+                const sourceBadgeHtml = getTrackSourceBadgeHtml(item);
 
                 let idealBadgeHtml = "";
                 if (nowPlayingTrack && item.video_id !== nowPlayingTrack.video_id) {
@@ -7540,6 +7693,7 @@ function triggerCrossfade(nextTrack) {
                             <span class="track-card-artist" title="${escapeHtml(item.artist || item.category || '')}">${escapeHtml(item.artist || item.category || '')}</span>
                             ${bpmBadgeHtml}
                             ${catBadgeHtml}
+                            ${sourceBadgeHtml}
                         </div>
                     </div>
                     <div class="card-actions">
@@ -7654,7 +7808,7 @@ function triggerCrossfade(nextTrack) {
                     <div class="search-empty-state">
                         <div class="search-empty-icon" style="animation: pulseDot 1s infinite;">🔍</div>
                         <div class="search-empty-title">Pesquisando "${query}"...</div>
-                        <div class="search-empty-desc">Procurando na biblioteca e minerando novidades no YouTube com IA...</div>
+                        <div class="search-empty-desc">Procurando na biblioteca e minerando novidades no YouTube e SoundCloud com IA...</div>
                     </div>
                 `;
             }
@@ -7810,9 +7964,9 @@ function triggerCrossfade(nextTrack) {
                 const bpm = item.bpm || detectBpmJs(item.title, item.category);
                 const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>`;
                 const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">🏷️ ${item.category}</span>` : "";
-                const sourceBadge = inLibrary 
+                const sourceBadge = inLibrary
                     ? `<span class="badge-source" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);">✓ Na Biblioteca</span>`
-                    : `<span class="badge-source" style="background: rgba(0, 242, 254, 0.15); color: var(--accent);">✨ YouTube Novidade</span>`;
+                    : `<span class="badge-source" style="background: rgba(0, 242, 254, 0.15); color: var(--accent);">✨ Novidade</span> ${getTrackSourceBadgeHtml(item)}`;
 
                 let idealBadgeHtml = "";
                 if (nowPlayingTrack && item.video_id !== nowPlayingTrack.video_id) {
@@ -8646,7 +8800,7 @@ function triggerCrossfade(nextTrack) {
                     <div class="history-track-card" id="historyCard_${track.video_id}">
                         <div class="history-card-left">
                             <div class="history-thumb-box">
-                                <img src="https://i.ytimg.com/vi/${track.video_id}/mqdefault.jpg" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                                <img src="${getTrackThumbnailUrl(track)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
                             </div>
                             <div class="history-info">
                                 <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
