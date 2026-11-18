@@ -550,17 +550,15 @@
                         <button class="sp-genre-chip" id="spChip_treino" onclick="filterSpotifyPlaylistsByGenre('treino')">🏋️ Treino & Vibe</button>
                     </div>
 
-                    <div class="tabs-nav-outer" id="spotifyTabsNavOuter">
-                        <button class="tabs-scroll-btn left" id="spotifyTabsScrollLeft" title="Rolar para a esquerda" aria-label="Rolar para a esquerda">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <div class="tabs-wrapper" id="spotifyTabsWrapper">
-                            <div class="tabs" id="spotifyTabsContainer"></div>
-                        </div>
-                        <button class="tabs-scroll-btn right" id="spotifyTabsScrollRight" title="Rolar para a direita" aria-label="Rolar para a direita">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                    </div>
+                    <!-- Grade de Playlists estilo Spotify (capa + nome), muito mais fácil de
+                         escanear visualmente do que uma fileira de 150 abas rolando na horizontal -->
+                    <div class="sp-playlist-grid" id="spotifyPlaylistGrid"></div>
+
+                    <!-- Botão de voltar, visível só quando uma playlist está aberta -->
+                    <button class="sp-back-to-grid" id="spotifyBackToGrid" onclick="showSpotifyGrid()" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Todas as Playlists
+                    </button>
 
                     <!-- Card em Destaque da Playlist Selecionada com Botões de Ação Rápida -->
                     <div class="spotify-featured-card" id="spotifyFeaturedCard"></div>

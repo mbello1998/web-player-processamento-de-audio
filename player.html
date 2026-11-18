@@ -499,7 +499,7 @@
                             <span id="searchBadgeCount" class="search-badge"></span>
                             <button id="btnClearSearch" class="btn-clear-search" onclick="clearLibrarySearch()" title="Limpar busca" style="display: none;">✕</button>
                         </div>
-                        <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube com IA">
+                        <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube e SoundCloud com IA">
                             ⚡ Pesquisa Livre
                         </button>
                     </div>
@@ -550,17 +550,15 @@
                         <button class="sp-genre-chip" id="spChip_treino" onclick="filterSpotifyPlaylistsByGenre('treino')">🏋️ Treino & Vibe</button>
                     </div>
 
-                    <div class="tabs-nav-outer" id="spotifyTabsNavOuter">
-                        <button class="tabs-scroll-btn left" id="spotifyTabsScrollLeft" title="Rolar para a esquerda" aria-label="Rolar para a esquerda">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <div class="tabs-wrapper" id="spotifyTabsWrapper">
-                            <div class="tabs" id="spotifyTabsContainer"></div>
-                        </div>
-                        <button class="tabs-scroll-btn right" id="spotifyTabsScrollRight" title="Rolar para a direita" aria-label="Rolar para a direita">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                    </div>
+                    <!-- Grade de Playlists estilo Spotify (capa + nome), muito mais fácil de
+                         escanear visualmente do que uma fileira de 150 abas rolando na horizontal -->
+                    <div class="sp-playlist-grid" id="spotifyPlaylistGrid"></div>
+
+                    <!-- Botão de voltar, visível só quando uma playlist está aberta -->
+                    <button class="sp-back-to-grid" id="spotifyBackToGrid" onclick="showSpotifyGrid()" style="display: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Todas as Playlists
+                    </button>
 
                     <!-- Card em Destaque da Playlist Selecionada com Botões de Ação Rápida -->
                     <div class="spotify-featured-card" id="spotifyFeaturedCard"></div>
@@ -592,7 +590,7 @@
                     <div class="search-bar-row">
                         <div class="search-input-box">
                             <span class="search-icon">🔍</span>
-                            <input type="text" id="freeSearchInput" class="search-input-field" placeholder="Pesquise qualquer música, artista, ritmo ou BPM no YouTube e Biblioteca..." oninput="handleFreeSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeFreeSearch(this.value)">
+                            <input type="text" id="freeSearchInput" class="search-input-field" placeholder="Pesquise qualquer música, artista, ritmo ou BPM na Biblioteca, YouTube e SoundCloud..." oninput="handleFreeSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeFreeSearch(this.value)">
                             <button id="btnFreeSearchClear" class="btn-clear-search" onclick="clearFreeSearch()" title="Limpar busca" style="display: none;">✕</button>
                         </div>
                         <button class="btn-search-ia-action" onclick="executeFreeSearch(document.getElementById('freeSearchInput').value)">
@@ -612,7 +610,7 @@
                     <div class="search-filters-bar" id="searchFiltersBar" style="display: flex;">
                         <button class="filter-tab-btn active" id="tabFilterAll" onclick="setSearchFilter('all')">Todas (<span id="countSearchAll">0</span>)</button>
                         <button class="filter-tab-btn" id="tabFilterLib" onclick="setSearchFilter('library')">📚 Na Biblioteca (<span id="countSearchLib">0</span>)</button>
-                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades YouTube (<span id="countSearchNew">0</span>)</button>
+                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades (<span id="countSearchNew">0</span>)</button>
                     </div>
 
                     <!-- Banner de Transição Suave Crossfade em Tempo Real na Pesquisa -->
@@ -634,8 +632,8 @@
                 <div class="track-list" id="searchResultsList">
                     <div class="search-empty-state">
                         <div class="search-empty-icon">🔍</div>
-                        <div class="search-empty-title">Pesquisa Livre no YouTube & Biblioteca</div>
-                        <div class="search-empty-desc">Digite qualquer título, artista, ritmo ou BPM para encontrar instantaneamente na biblioteca ou descobrir novas faixas no YouTube com transição Crossfade e adição com um clique!</div>
+                        <div class="search-empty-title">Pesquisa Livre na Biblioteca, YouTube & SoundCloud</div>
+                        <div class="search-empty-desc">Digite qualquer título, artista, ritmo ou BPM para encontrar instantaneamente na biblioteca ou descobrir novas faixas no YouTube e SoundCloud com transição Crossfade e adição com um clique!</div>
                     </div>
                 </div>
             </div>
@@ -662,7 +660,7 @@
                     <div class="search-bar-row" style="margin-top: 6px; margin-bottom: 6px;">
                         <div class="search-input-box">
                             <span class="search-icon">✨</span>
-                            <input type="text" id="suggSearchInput" class="search-input-field" placeholder="Buscar novas músicas no YouTube por ritmo, artista ou BPM (ex: 135 bpm, mandelao)..." onkeydown="if(event.key==='Enter') executeCustomSuggestionSearch(this.value)">
+                            <input type="text" id="suggSearchInput" class="search-input-field" placeholder="Buscar novas músicas por ritmo, artista ou BPM (ex: 135 bpm, mandelao)..." onkeydown="if(event.key==='Enter') executeCustomSuggestionSearch(this.value)">
                         </div>
                         <button class="btn-search-ia-action" onclick="executeCustomSuggestionSearch(document.getElementById('suggSearchInput').value)">
                             ⚡ Buscar IA
@@ -675,7 +673,7 @@
                             <span id="suggestionCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px; font-size: 11px;">0 inéditas</span>
                         </div>
                         <div class="queue-desc" id="suggestionSubtext">
-                            Músicas buscadas em tempo real no YouTube para este estilo e ritmo. <strong>Nunca se repetem</strong>.
+                            Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. <strong>Nunca se repetem</strong>.
                         </div>
                         <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
                             <button class="btn-sync-yt" id="btnRefreshSuggestions" onclick="fetchFreshSuggestionsForCurrentGenre()" style="flex: 1; margin-top: 0; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; padding: 7px 12px; font-size: 12px;">

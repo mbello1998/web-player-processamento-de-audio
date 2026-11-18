@@ -6,6 +6,9 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         const SPOTIFY_PLAYLISTS = window.SPOTIFY_PLAYLISTS || {};
         let activeSpotifyPlaylist = "top_brasil";
         let spotifySearchQuery = "";
+        // "grid" = grade de capas estilo Spotify (visão padrão); "detail" = playlist aberta
+        let spotifyBrowseMode = "grid";
+        let spotifyActiveGenreFilter = "all";
 
         // CONFIGURAÇÕES DE EQUALIZADOR PROFISSIONAL (10 BANDAS ISO & 14 PRESETS)
         const EQ_PRESETS = {
@@ -2088,37 +2091,126 @@ function updateUpcomingTrackUI() {
             }
         }
 
+        // Mesma classificação por gênero usada nos chips de filtro - compartilhada entre a
+        // grade (filtra cards) e, antes, a fileira de abas. Fica num só lugar agora.
+        const SPOTIFY_GENRE_FILTER_MAP = {
+            all: () => true,
+            top: (id, p) => /top|hits|brasil|viral|tiktok|radar|semana|360|globais/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            sertanejo: (id, p) => /sertanejo|modao|sofrencia|churrasco|potencia|fazenda|bruto|vaquejada|piseiro|pisadinha|arrocha/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            funk: (id, p) => /funk|mandelao|ritmada|favela|fluxo|cria|150/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            rap: (id, p) => /rap|trap|drill|hip|poesia|rimas|flow/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            pagode: (id, p) => /pagode|samba|resenha|churrasquinho|tardezinha|parcas/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            eletronica: (id, p) => /eletronica|bass|desande|house|edm|club|vintage|alok/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            latino: (id, p) => /reggaeton|latino|cachengue|rkt|perreo|dembow|fuego/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            cumbia: (id, p) => /cumbia|villera|santafesina|chicha|sonidera|cuarteto|palmeras|damas|pibes|mattioli|gilda|fuego|marama|rombai|konga|luck/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
+            fronteira: (id, p) => /quarai|artigas|fronteira|miriam britos|sonido profesional|chacho ramos|mano lima|baitaca|joca martins|marenco|lucas sugo|valdez|charanga|gaucho/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
+            rock: (id, p) => /rock|pop|mpb|flashback|violao|axe|tchan|micareta/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            treino: (id, p) => /treino|academia|sunset|pool|estrada|sitio|almoco|relax|lofi|chill|sextou|pre_balada|automotivo|carro|paredao/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || ""))
+        };
+
+        // Cor de capa determinística por playlist (não existe artwork real) - mesma
+        // playlist sempre cai na mesma cor, pra não "piscar" cores diferentes a cada render.
+        function getPlaylistCoverGradient(plId) {
+            let hash = 0;
+            for (let i = 0; i < plId.length; i++) hash = (hash * 31 + plId.charCodeAt(i)) >>> 0;
+            const hue1 = hash % 360;
+            const hue2 = (hue1 + 42) % 360;
+            return `linear-gradient(135deg, hsl(${hue1}, 68%, 40%), hsl(${hue2}, 72%, 24%))`;
+        }
+
         function initSpotifyTabs() {
             updateSpotifyNavBadge();
-            const tabsContainer = document.getElementById("spotifyTabsContainer");
-            if (!tabsContainer || !SPOTIFY_PLAYLISTS) return;
-            tabsContainer.innerHTML = "";
-
-            Object.keys(SPOTIFY_PLAYLISTS).forEach(plId => {
-                const pl = SPOTIFY_PLAYLISTS[plId];
-                const meta = pl.meta || {};
-                const tracks = pl.tracks || [];
-                const btn = document.createElement("button");
-                btn.className = `tab-btn ${plId === activeSpotifyPlaylist ? "active" : ""}`;
-                btn.id = `spTab_${plId}`;
-                btn.innerHTML = `<span>${meta.icon || "🟢"} ${escapeHtml(meta.name || plId)}</span><span class="count-badge">${tracks.length}</span>`;
-                btn.onclick = () => selectSpotifyPlaylist(plId);
-                tabsContainer.appendChild(btn);
-            });
-
-            setupTabsAutoScroll("spotifyTabsWrapper", "spotifyTabsScrollLeft", "spotifyTabsScrollRight");
-            renderSpotifyPlaylist();
+            updateSpotifyViewModeUI();
+            renderSpotifyPlaylistGrid();
         }
 
         function initSpotifyView() {
             initSpotifyTabs();
         }
 
+        // Grade de capas estilo Spotify - visão padrão de navegação. Filtra pelos chips de
+        // gênero e pelo texto da busca (nome/gênero da playlist, não faixa por faixa).
+        function renderSpotifyPlaylistGrid() {
+            const grid = document.getElementById("spotifyPlaylistGrid");
+            if (!grid || !SPOTIFY_PLAYLISTS) return;
+            grid.innerHTML = "";
+
+            const testGenre = SPOTIFY_GENRE_FILTER_MAP[spotifyActiveGenreFilter] || SPOTIFY_GENRE_FILTER_MAP.all;
+            const q = spotifySearchQuery;
+            let shown = 0;
+
+            Object.keys(SPOTIFY_PLAYLISTS).forEach(plId => {
+                const pl = SPOTIFY_PLAYLISTS[plId];
+                const meta = pl.meta || {};
+                const tracks = pl.tracks || [];
+                if (!testGenre(plId, pl)) return;
+                if (q) {
+                    const haystack = `${plId} ${meta.name || ""} ${meta.genre || ""} ${meta.desc || ""}`.toLowerCase();
+                    if (!haystack.includes(q)) return;
+                }
+                shown++;
+
+                const card = document.createElement("div");
+                card.className = `sp-playlist-card${plId === activeSpotifyPlaylist ? " active" : ""}`;
+                card.id = `spCard_${plId}`;
+                card.onclick = () => selectSpotifyPlaylist(plId);
+                card.innerHTML = `
+                    <div class="sp-playlist-card-cover" style="background: ${getPlaylistCoverGradient(plId)};">
+                        <span>${meta.icon || "🟢"}</span>
+                        <div class="sp-playlist-card-play">▶</div>
+                    </div>
+                    <div class="sp-playlist-card-name">${escapeHtml(meta.name || plId)}</div>
+                    <div class="sp-playlist-card-meta">${tracks.length} faixas</div>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (shown === 0) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 35px 15px; color: var(--text-dim);">Nenhuma playlist encontrada${q ? ` para "<strong>${escapeHtml(q)}</strong>"` : ""}.</div>`;
+            }
+        }
+
+        function filterSpotifyPlaylistsByGenre(genreKey) {
+            spotifyActiveGenreFilter = genreKey;
+            document.querySelectorAll("#spotifyGenreFilterRow .sp-genre-chip").forEach(chip => {
+                chip.classList.toggle("active", chip.id === `spChip_${genreKey}`);
+            });
+            renderSpotifyPlaylistGrid();
+        }
+
+        // Mostra/esconde a grade de navegação vs. a playlist aberta (card + lista de faixas)
+        function updateSpotifyViewModeUI() {
+            const grid = document.getElementById("spotifyPlaylistGrid");
+            const genreRow = document.getElementById("spotifyGenreFilterRow");
+            const backBtn = document.getElementById("spotifyBackToGrid");
+            const featured = document.getElementById("spotifyFeaturedCard");
+            const trackList = document.getElementById("spotifyTrackList");
+            const isGrid = spotifyBrowseMode === "grid";
+            if (grid) grid.style.display = isGrid ? "grid" : "none";
+            if (genreRow) genreRow.style.display = isGrid ? "flex" : "none";
+            if (backBtn) backBtn.style.display = isGrid ? "none" : "inline-flex";
+            if (featured) featured.style.display = isGrid ? "none" : "block";
+            if (trackList) trackList.style.display = isGrid ? "none" : "block";
+        }
+
+        function showSpotifyGrid() {
+            spotifyBrowseMode = "grid";
+            spotifySearchQuery = "";
+            const input = document.getElementById("spotifySearchInput");
+            if (input) input.value = "";
+            const clearBtn = document.getElementById("btnSpotifySearchClear");
+            if (clearBtn) clearBtn.style.display = "none";
+            updateSpotifyViewModeUI();
+            renderSpotifyPlaylistGrid();
+        }
+
         function selectSpotifyPlaylist(plId) {
             activeSpotifyPlaylist = plId;
-            document.querySelectorAll("#spotifyTabsContainer .tab-btn").forEach(btn => {
-                btn.classList.toggle("active", btn.id === `spTab_${plId}`);
+            spotifyBrowseMode = "detail";
+            document.querySelectorAll("#spotifyPlaylistGrid .sp-playlist-card").forEach(card => {
+                card.classList.toggle("active", card.id === `spCard_${plId}`);
             });
+            updateSpotifyViewModeUI();
             renderSpotifyPlaylist();
         }
 
@@ -2126,7 +2218,11 @@ function updateUpcomingTrackUI() {
             spotifySearchQuery = (query || "").trim().toLowerCase();
             const clearBtn = document.getElementById("btnSpotifySearchClear");
             if (clearBtn) clearBtn.style.display = spotifySearchQuery ? "block" : "none";
-            renderSpotifyPlaylist();
+            if (spotifyBrowseMode === "grid") {
+                renderSpotifyPlaylistGrid();
+            } else {
+                renderSpotifyPlaylist();
+            }
         }
 
         function clearSpotifySearch() {
@@ -8159,53 +8255,6 @@ function triggerCrossfade(nextTrack) {
         }
 
         // ==========================================================
-        // FILTROS DE GÊNEROS PARA AS PLAYLISTS SPOTIFY (111 PLAYLISTS)
-        // ==========================================================
-        let currentSpotifyGenreFilter = "all";
-
-        function filterSpotifyPlaylistsByGenre(genreKey) {
-            currentSpotifyGenreFilter = genreKey;
-            document.querySelectorAll("#spotifyGenreFilterRow .sp-genre-chip").forEach(chip => {
-                chip.classList.toggle("active", chip.id === `spChip_${genreKey}`);
-            });
-
-            if (!window.SPOTIFY_PLAYLISTS) return;
-
-            const filterMap = {
-                all: () => true,
-                top: (id, p) => /top|hits|brasil|viral|tiktok|radar|semana|360|globais/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                sertanejo: (id, p) => /sertanejo|modao|sofrencia|churrasco|potencia|fazenda|bruto|vaquejada|piseiro|pisadinha|arrocha/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                funk: (id, p) => /funk|mandelao|ritmada|favela|fluxo|cria|150/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                rap: (id, p) => /rap|trap|drill|hip|poesia|rimas|flow/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                pagode: (id, p) => /pagode|samba|resenha|churrasquinho|tardezinha|parcas/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                eletronica: (id, p) => /eletronica|bass|desande|house|edm|club|vintage|alok/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                latino: (id, p) => /reggaeton|latino|cachengue|rkt|perreo|dembow|fuego/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                cumbia: (id, p) => /cumbia|villera|santafesina|chicha|sonidera|cuarteto|palmeras|damas|pibes|mattioli|gilda|fuego|marama|rombai|konga|luck/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
-                fronteira: (id, p) => /quarai|artigas|fronteira|miriam britos|sonido profesional|chacho ramos|mano lima|baitaca|joca martins|marenco|lucas sugo|valdez|charanga|gaucho/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
-                rock: (id, p) => /rock|pop|mpb|flashback|violao|axe|tchan|micareta/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-                treino: (id, p) => /treino|academia|sunset|pool|estrada|sitio|almoco|relax|lofi|chill|sextou|pre_balada|automotivo|carro|paredao/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || ""))
-            };
-
-            const testFn = filterMap[genreKey] || filterMap.all;
-            let firstVisibleId = null;
-
-            Object.keys(SPOTIFY_PLAYLISTS).forEach(plId => {
-                const btn = document.getElementById(`spTab_${plId}`);
-                const matches = testFn(plId, SPOTIFY_PLAYLISTS[plId]);
-                if (btn) {
-                    btn.style.display = matches ? "inline-flex" : "none";
-                    if (matches && !firstVisibleId) firstVisibleId = plId;
-                }
-            });
-
-            // Se a playlist atualmente ativa ficou escondida pelo filtro, seleciona a primeira visível
-            const currentTab = document.getElementById(`spTab_${activeSpotifyPlaylist}`);
-            if (currentTab && currentTab.style.display === "none" && firstVisibleId) {
-                selectSpotifyPlaylist(firstVisibleId);
-            }
-        }
-
-        // ==========================================================
         // MOTOR DE SINCRONIZAÇÃO DE BPM & BEATMATCH (MODAL & DJ ENGINE)
         // ==========================================================
         let isAutoBeatmatchEnabled = true;
@@ -8946,7 +8995,6 @@ function triggerCrossfade(nextTrack) {
         initTabs();
         initSpotifyTabs();
         setupTabsAutoScroll("tabsWrapper", "tabsScrollLeft", "tabsScrollRight");
-        setupTabsAutoScroll("spotifyTabsWrapper", "spotifyTabsScrollLeft", "spotifyTabsScrollRight");
         setupTabsAutoScroll("suggestionsTabsWrapper", "suggScrollLeft", "suggScrollRight");
         setupListVerticalAutoScroll("trackList");
         setupListVerticalAutoScroll("spotifyTrackList");
