@@ -8609,25 +8609,67 @@ function triggerCrossfade(nextTrack) {
         });
 
         function selectDjActMode(mode) {
-            setDjMode(mode);
+            setDjMode(mode, true);
             const menu = document.getElementById("djActDropdownMenu");
             if (menu) menu.style.display = "none";
         }
 
         // Cor de destaque de cada Modo de Atuação - o Drop Hunter já tinha a sua própria
-        // (vermelho/laranja, no HUD dele); isso estende a mesma ideia pra todos os modos,
-        // aplicada via a variável CSS --mode-accent em vez de cor fixa espalhada pelo CSS.
+        // (vermelho/laranja, no HUD dele); isso estende a mesma ideia pro site inteiro,
+        // trocando --accent (usada em ~96 regras do CSS: botões, bordas, destaques) e não
+        // só a variável --mode-accent-rgb que só alguns painéis específicos usavam.
         const DJ_MODE_COLORS = {
-            match: "0, 242, 254",      // ciano (padrão/precisão)
-            energy: "255, 170, 0",     // laranja (energia/peak time)
-            shuffle: "168, 85, 247",   // roxo (variedade)
-            smooth: "79, 172, 254",    // azul (fluidez)
-            club: "255, 0, 85",        // rosa/magenta (balada)
-            studio: "255, 215, 0",     // dourado (mastering)
-            drop: "255, 59, 59"        // vermelho (drop hunter)
+            match: { rgb: "0, 242, 254", hex: "#00f2fe" },     // ciano (padrão/precisão)
+            energy: { rgb: "255, 170, 0", hex: "#ffaa00" },    // laranja (energia/peak time)
+            shuffle: { rgb: "168, 85, 247", hex: "#a855f7" },  // roxo (variedade)
+            smooth: { rgb: "79, 172, 254", hex: "#4facfe" },   // azul (fluidez)
+            club: { rgb: "255, 0, 85", hex: "#ff0055" },       // rosa/magenta (balada)
+            studio: { rgb: "255, 215, 0", hex: "#ffd700" },    // dourado (mastering)
+            drop: { rgb: "255, 59, 59", hex: "#ff3b3b" }       // vermelho (drop hunter/agressivo)
         };
 
-        function setDjMode(mode) {
+        // Preset de gênero por modo: ao escolher um modo, a biblioteca pula direto pra essa
+        // categoria (sem interromper a música que já estiver tocando) e trava a seleção de
+        // próxima faixa nesse gênero - como se o modo também fosse um preset de playlist.
+        const DJ_MODE_GENRE_PRESET = {
+            drop: "Mega Funk & Ritmadas",
+            club: "Eletrônica, House & Desande",
+            energy: "Funk Paulista, BH & Mandelão",
+            smooth: "Samba & Pagode"
+            // match / shuffle / studio: não força gênero, ficam neutros.
+        };
+
+        // Mostra a tela de transição animada (texto + barra de progresso), sem jamais
+        // pausar/alterar a reprodução em andamento - é só uma camada visual por cima.
+        function showModeTransitionOverlay(mode, label) {
+            const overlay = document.getElementById("modeTransitionOverlay");
+            if (!overlay) return;
+            const icon = document.getElementById("modeTransitionIcon");
+            const labelEl = document.getElementById("modeTransitionLabel");
+            const barFill = document.getElementById("modeTransitionBarFill");
+
+            const iconMatch = (label || "").match(/^(\S+)\s*(.*)$/);
+            if (icon) icon.textContent = iconMatch ? iconMatch[1] : "⚡";
+            if (labelEl) labelEl.textContent = iconMatch ? iconMatch[2] : (label || mode);
+
+            overlay.classList.toggle("is-aggressive", mode === "drop");
+            if (barFill) barFill.style.width = "0%";
+            overlay.classList.add("is-active");
+
+            // Força o reflow antes de animar a barra, senão o navegador às vezes funde os
+            // dois estados (0% -> 100%) num só frame e a transição não é visível.
+            void overlay.offsetWidth;
+            requestAnimationFrame(() => {
+                if (barFill) barFill.style.width = "100%";
+            });
+
+            if (window.__modeTransitionTimer) clearTimeout(window.__modeTransitionTimer);
+            window.__modeTransitionTimer = setTimeout(() => {
+                overlay.classList.remove("is-active");
+            }, 950);
+        }
+
+        function setDjMode(mode, isUserSelection = false) {
             djPlayMode = mode;
             const shortLabels = {
                 match: "🎯 Match Perfeito",
@@ -8641,9 +8683,26 @@ function triggerCrossfade(nextTrack) {
             const activeLabel = document.getElementById("djActModeActiveLabel");
             if (activeLabel) activeLabel.textContent = shortLabels[mode] || mode;
 
-            // Troca a cor de destaque do modo em toda a UI que depende dela (painel de
-            // ritmo, gatilho do dropdown, opção ativa) de uma vez só via CSS var.
-            document.documentElement.style.setProperty("--mode-accent-rgb", DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match);
+            // Troca a cor de destaque do modo no site inteiro de uma vez via CSS var -
+            // --accent já é usada em botões, bordas e destaques por quase toda a interface.
+            const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
+            document.documentElement.style.setProperty("--mode-accent-rgb", modeColor.rgb);
+            document.documentElement.style.setProperty("--accent", modeColor.hex);
+            document.documentElement.style.setProperty("--accent-glow", `rgba(${modeColor.rgb}, 0.4)`);
+
+            // A animação de transição e a troca automática de gênero (preset) só rodam
+            // quando o PRÓPRIO usuário escolhe o modo - não ao restaurar o modo salvo no
+            // carregamento da página, pra não "pular" a biblioteca sem o usuário pedir.
+            if (isUserSelection) {
+                showModeTransitionOverlay(mode, shortLabels[mode] || mode);
+                const presetGenre = DJ_MODE_GENRE_PRESET[mode];
+                if (presetGenre) {
+                    setLockedGenre(presetGenre);
+                    if (typeof selectCategoryToBrowse === "function") {
+                        selectCategoryToBrowse(presetGenre);
+                    }
+                }
+            }
 
             // Atualiza o Badge de Confirmação do Modo Balada
             const clubBadge = document.getElementById("djClubActiveBadge");
