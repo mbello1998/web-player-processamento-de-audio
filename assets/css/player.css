@@ -6,6 +6,9 @@
             --primary-gradient: linear-gradient(135deg, #ff0055, #ff5500);
             --accent: #00f2fe;
             --accent-glow: rgba(0, 242, 254, 0.4);
+            /* Cor de destaque do Modo de Atuação do DJ ativo (match/energy/shuffle/smooth/
+               club/studio/drop) - trocada via JS em setDjMode(). Ciano é o padrão/fallback. */
+            --mode-accent-rgb: 0, 242, 254;
             --vlc-boost: #ffaa00;
             --vlc-max: #ff0055;
             --success: #00e676;
@@ -574,11 +577,11 @@
            ========================================================== */
         .bpm-live-sync-panel {
             background: linear-gradient(135deg, rgba(14, 18, 28, 0.96), rgba(8, 12, 22, 0.96));
-            border: 1px solid rgba(0, 242, 254, 0.3);
+            border: 1px solid rgba(var(--mode-accent-rgb), 0.3);
             border-radius: 7px;
             padding: 4px 8px;
             margin-bottom: 2px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(0, 242, 254, 0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(var(--mode-accent-rgb), 0.04);
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -608,14 +611,14 @@
         }
         .bpm-live-icon {
             font-size: 11px;
-            color: var(--accent);
+            color: rgb(var(--mode-accent-rgb));
         }
         .bpm-live-icon.pulse {
             animation: bpmIconPulse 1.8s infinite ease-in-out;
         }
         @keyframes bpmIconPulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px var(--accent)); }
-            50% { transform: scale(1.18); filter: drop-shadow(0 0 8px var(--accent)); }
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 2px rgb(var(--mode-accent-rgb))); }
+            50% { transform: scale(1.18); filter: drop-shadow(0 0 8px rgb(var(--mode-accent-rgb))); }
         }
         .bpm-live-title {
             font-size: 9px;
@@ -4960,8 +4963,8 @@ input:checked + .slider-toggle:before {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(79, 172, 254, 0.1));
-    border: 1px solid rgba(0, 242, 254, 0.45);
+    background: linear-gradient(135deg, rgba(var(--mode-accent-rgb), 0.15), rgba(var(--mode-accent-rgb), 0.08));
+    border: 1px solid rgba(var(--mode-accent-rgb), 0.45);
     color: #fff;
     padding: 4px 8px;
     border-radius: 5px;
@@ -4972,13 +4975,13 @@ input:checked + .slider-toggle:before {
     box-sizing: border-box;
 }
 .btn-dj-act-trigger:hover {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.25), rgba(79, 172, 254, 0.2));
-    border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(0, 242, 254, 0.35);
+    background: linear-gradient(135deg, rgba(var(--mode-accent-rgb), 0.25), rgba(var(--mode-accent-rgb), 0.18));
+    border-color: rgb(var(--mode-accent-rgb));
+    box-shadow: 0 0 10px rgba(var(--mode-accent-rgb), 0.35);
 }
 .dj-dropdown-caret {
     font-size: 10px;
-    color: var(--accent);
+    color: rgb(var(--mode-accent-rgb));
     margin-left: 6px;
 }
 .dj-act-dropdown-menu {
@@ -5024,14 +5027,14 @@ input:checked + .slider-toggle:before {
     flex-shrink: 0;
 }
 .dj-act-menu-opt:hover {
-    background: rgba(0, 242, 254, 0.16);
-    border-color: rgba(0, 242, 254, 0.35);
-    color: var(--accent);
+    background: rgba(var(--mode-accent-rgb), 0.16);
+    border-color: rgba(var(--mode-accent-rgb), 0.35);
+    color: rgb(var(--mode-accent-rgb));
 }
 .dj-act-menu-opt.active {
-    background: rgba(0, 242, 254, 0.22) !important;
-    border: 1px solid var(--accent) !important;
-    color: var(--accent) !important;
+    background: rgba(var(--mode-accent-rgb), 0.22) !important;
+    border: 1px solid rgb(var(--mode-accent-rgb)) !important;
+    color: rgb(var(--mode-accent-rgb)) !important;
 }
 .dj-act-menu-opt .opt-icon {
     font-size: 15px;

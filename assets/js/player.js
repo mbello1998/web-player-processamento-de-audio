@@ -8614,6 +8614,19 @@ function triggerCrossfade(nextTrack) {
             if (menu) menu.style.display = "none";
         }
 
+        // Cor de destaque de cada Modo de Atuação - o Drop Hunter já tinha a sua própria
+        // (vermelho/laranja, no HUD dele); isso estende a mesma ideia pra todos os modos,
+        // aplicada via a variável CSS --mode-accent em vez de cor fixa espalhada pelo CSS.
+        const DJ_MODE_COLORS = {
+            match: "0, 242, 254",      // ciano (padrão/precisão)
+            energy: "255, 170, 0",     // laranja (energia/peak time)
+            shuffle: "168, 85, 247",   // roxo (variedade)
+            smooth: "79, 172, 254",    // azul (fluidez)
+            club: "255, 0, 85",        // rosa/magenta (balada)
+            studio: "255, 215, 0",     // dourado (mastering)
+            drop: "255, 59, 59"        // vermelho (drop hunter)
+        };
+
         function setDjMode(mode) {
             djPlayMode = mode;
             const shortLabels = {
@@ -8627,6 +8640,10 @@ function triggerCrossfade(nextTrack) {
             };
             const activeLabel = document.getElementById("djActModeActiveLabel");
             if (activeLabel) activeLabel.textContent = shortLabels[mode] || mode;
+
+            // Troca a cor de destaque do modo em toda a UI que depende dela (painel de
+            // ritmo, gatilho do dropdown, opção ativa) de uma vez só via CSS var.
+            document.documentElement.style.setProperty("--mode-accent-rgb", DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match);
 
             // Atualiza o Badge de Confirmação do Modo Balada
             const clubBadge = document.getElementById("djClubActiveBadge");
