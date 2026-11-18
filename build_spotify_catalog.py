@@ -6,6 +6,9 @@ import time
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from server import resolve_single_track
+
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
 
 PLAYLIST_DEFS = [
@@ -160,6 +163,18 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         yt_title = entries[0].get("title")
                 except Exception:
                     pass
+
+            # Nenhuma das duas buscas no YouTube achou a música - antes disso virava o
+            # placeholder "dQw4w9WgXcQ" (uma faixa completamente errada tocando no lugar).
+            # Tenta achar a mesma música no SoundCloud antes de desistir de vez.
+            if not v_id:
+                resolved = resolve_single_track(search_title, first_artist, duration_hint=dur)
+                if resolved:
+                    v_id = resolved["video_id"]
+                    yt_title = resolved["title"]
+                    if resolved.get("duration"):
+                        dur = resolved["duration"]
+                    print(f"    Resgatado via {resolved['source']}: {yt_title}", flush=True)
 
             item = {
                 "rank": rank,

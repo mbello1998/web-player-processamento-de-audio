@@ -21,6 +21,14 @@ HISTORY_FILE = Path("playback_history.json")
 AUDIO_CACHE = {}
 AUDIO_CACHE_TTL = 3600  # 1 hora para evitar expiração de token do YouTube
 
+# Prefixo usado no próprio campo video_id para identificar faixas vindas do SoundCloud
+# (ex.: "sc:2348326208"), em vez de criar um campo "source" novo que precisaria ser
+# plugado nos ~160 lugares do player.js que já tratam video_id como identificador único.
+SOUNDCLOUD_ID_PREFIX = "sc:"
+
+def is_soundcloud_id(video_id) -> bool:
+    return isinstance(video_id, str) and video_id.startswith(SOUNDCLOUD_ID_PREFIX)
+
 def get_audio_info(video_id, force_refresh=False):
     if not video_id:
         return None
@@ -39,8 +47,14 @@ def get_audio_info(video_id, force_refresh=False):
         if Path("cookies.txt").exists() and Path("cookies.txt").stat().st_size > 0:
             ydl_opts["cookiefile"] = "cookies.txt"
 
+        if is_soundcloud_id(video_id):
+            sc_track_id = video_id[len(SOUNDCLOUD_ID_PREFIX):]
+            source_url = f"https://api.soundcloud.com/tracks/{sc_track_id}"
+        else:
+            source_url = f"https://www.youtube.com/watch?v={video_id}"
+
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=False)
+            info = ydl.extract_info(source_url, download=False)
             url = info.get("url")
             http_headers = info.get("http_headers") or {}
             if not url:
@@ -117,6 +131,100 @@ JUNK_CONTENT_MARKERS = (
 def is_junk_suggestion_title(title: str) -> bool:
     lower = (title or "").lower()
     return any(marker in lower for marker in JUNK_CONTENT_MARKERS)
+
+
+def run_music_search(query: str, engine: str, excluded_ids: set, results: list, category: str,
+                      limit: int, title_keywords: list = None, extra_fields: dict = None,
+                      add_bpm_source_label: bool = False) -> None:
+    """Executa uma busca de música (YouTube ou SoundCloud) e acrescenta candidatos
+    normalizados em `results`, aplicando os mesmos filtros de duração/duplicata/conteúdo-lixo
+    nos dois motores. Usada tanto pelas Novidades por categoria quanto pelas Faixas Parecidas,
+    para que o SoundCloud alimente as duas sem duplicar a lógica de filtragem."""
+    if len(results) >= limit:
+        return
+    search_prefix = "ytsearch25" if engine == "youtube" else "scsearch15"
+    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True}
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            res = ydl.extract_info(f"{search_prefix}:{query}", download=False)
+            for e in res.get("entries") or []:
+                if len(results) >= limit:
+                    break
+                raw_id = e.get("id")
+                t_title = e.get("title")
+                uploader = e.get("uploader") or e.get("channel") or ""
+                dur = e.get("duration") or 0
+
+                if not raw_id or not t_title:
+                    continue
+                # Filtra shorts muito curtos ou sets gigantescos de 3 horas
+                if dur > 0 and (dur < 40 or dur > 2400):
+                    continue
+
+                v_id = f"{SOUNDCLOUD_ID_PREFIX}{raw_id}" if engine == "soundcloud" else raw_id
+                if v_id in excluded_ids:
+                    continue
+                if any(r["video_id"] == v_id for r in results):
+                    continue
+                if is_junk_suggestion_title(t_title):
+                    continue
+                if title_keywords and any(kw in t_title.lower() for kw in title_keywords[:2]):
+                    continue
+
+                track_bpm = detect_or_estimate_bpm(t_title, category)
+                item = {
+                    "video_id": v_id,
+                    "title": t_title,
+                    "artist": uploader,
+                    "category": category,
+                    "duration": dur,
+                    "bpm": track_bpm,
+                }
+                if add_bpm_source_label:
+                    item["source"] = f"Spotify AI • {track_bpm} BPM"
+                if extra_fields:
+                    item.update(extra_fields)
+                results.append(item)
+    except Exception as ex:
+        print(f"Erro ao buscar no {'SoundCloud' if engine == 'soundcloud' else 'YouTube'} ({query}): {ex}")
+
+
+def resolve_single_track(title: str, artist: str = "", duration_hint: int = None):
+    """Acha o melhor candidato tocável pra uma faixa específica (título + artista),
+    usado pelos scripts que montam as Playlists Spotify a partir da lista oficial:
+    eles sabem o nome/artista de cada música mas precisam de um video_id pra tocar.
+    Tenta o YouTube primeiro (ytsearch1, resultado único mais relevante) e só cai pro
+    SoundCloud (scsearch1) quando o YouTube não acha nada - evita que faixas sem match
+    no YouTube fiquem sem áudio tocável (ou, pior, caiam num ID de placeholder errado).
+    Retorna {"video_id", "title", "artist", "duration", "source"} ou None."""
+    query = f"{title} {artist}".strip()
+    if not query:
+        return None
+
+    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True, "socket_timeout": 8}
+
+    for engine, prefix in (("youtube", "ytsearch1"), ("soundcloud", "scsearch1")):
+        try:
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                res = ydl.extract_info(f"{prefix}:{query}", download=False)
+                entries = res.get("entries") or []
+                if not entries:
+                    continue
+                e = entries[0]
+                raw_id = e.get("id")
+                if not raw_id:
+                    continue
+                return {
+                    "video_id": f"{SOUNDCLOUD_ID_PREFIX}{raw_id}" if engine == "soundcloud" else raw_id,
+                    "title": e.get("title") or title,
+                    "artist": e.get("uploader") or e.get("channel") or artist,
+                    "duration": int(e.get("duration") or duration_hint or 0),
+                    "source": engine,
+                }
+        except Exception as ex:
+            print(f"Erro ao resolver '{query}' no {engine}: {ex}")
+
+    return None
 
 
 def detect_or_estimate_bpm(title: str, category: str = "Outros") -> int:
@@ -332,50 +440,14 @@ def discover_tracks(category: str, custom_query: str = None, seed_bpm: int = Non
     query = custom_query if custom_query else get_next_query(category)
 
     results = []
-    ydl_opts = {
-        "extract_flat": True,
-        "quiet": True,
-        "no_warnings": True,
-        "ignoreerrors": True,
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            res = ydl.extract_info(f"ytsearch25:{query}", download=False)
-            for e in res.get("entries") or []:
-                v_id = e.get("id")
-                t_title = e.get("title")
-                uploader = e.get("uploader") or e.get("channel") or ""
-                dur = e.get("duration") or 0
-
-                if not v_id or not t_title:
-                    continue
-                # Filtra shorts muito curtos ou sets gigantescos de 3 horas
-                if dur > 0 and (dur < 40 or dur > 2400):
-                    continue
-                # Ignora faixas já existentes na biblioteca, fila ou sugestões anteriores
-                if v_id in excluded_ids:
-                    continue
-                if any(r["video_id"] == v_id for r in results):
-                    continue
-                if is_junk_suggestion_title(t_title):
-                    continue
-
-                track_bpm = detect_or_estimate_bpm(t_title, category)
-                results.append({
-                    "video_id": v_id,
-                    "title": t_title,
-                    "artist": uploader,
-                    "category": category,
-                    "duration": dur,
-                    "bpm": track_bpm,
-                    "query_used": query
-                })
-
-                if len(results) >= limit:
-                    break
-    except Exception as ex:
-        print(f"Erro ao buscar no YouTube ({category}): {ex}")
+    # Cota fixa pro YouTube (~60%) em vez de "YouTube até encher, SoundCloud só se sobrar":
+    # o ytsearch25 sozinho quase sempre enche o limite todo, então sem reservar espaço o
+    # SoundCloud nunca aparecia de verdade - ficava um fallback que praticamente nunca rodava.
+    yt_quota = max(1, round(limit * 0.6))
+    run_music_search(query, "youtube", excluded_ids, results, category, yt_quota,
+                      extra_fields={"query_used": query})
+    run_music_search(query, "soundcloud", excluded_ids, results, category, limit,
+                      extra_fields={"query_used": query})
 
     # Registra novos IDs como vistos apenas para descobertas automáticas de gênero
     if not custom_query:
@@ -445,56 +517,23 @@ def discover_related_tracks(title: str, artist: str, category: str, current_vide
         queries.append(f"{clean_artist} remix {seed_bpm} bpm")
 
     results = []
-    ydl_opts = {
-        "extract_flat": True,
-        "quiet": True,
-        "no_warnings": True,
-        "ignoreerrors": True,
-    }
+    resolved_category = category or "Relacionadas"
 
-    for q in queries:
+    # Consultas pares vão pro YouTube, ímpares pro SoundCloud, com uma cota fixa pro YouTube
+    # (~60% do limite) em vez de deixar ele esgotar o limite sozinho antes do SoundCloud ter
+    # chance de rodar - a primeira consulta de 15 resultados já enchia a cota inteira sozinha.
+    yt_quota = max(1, round(limit * 0.6))
+    for i, q in enumerate(queries):
         if len(results) >= limit:
             break
-        try:
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                res = ydl.extract_info(f"ytsearch15:{q}", download=False)
-                for e in res.get("entries") or []:
-                    v_id = e.get("id")
-                    t_title = e.get("title")
-                    uploader = e.get("uploader") or e.get("channel") or ""
-                    dur = e.get("duration") or 0
-
-                    if not v_id or not t_title:
-                        continue
-                    if dur > 0 and (dur < 40 or dur > 2400):
-                        continue
-                    if v_id in excluded_ids:
-                        continue
-                    if any(r["video_id"] == v_id for r in results):
-                        continue
-
-                    if is_junk_suggestion_title(t_title):
-                        continue
-
-                    # FILTRO DE CONTEÚDO: Descarta se tiver o mesmo nome da música atual
-                    lower_result_title = t_title.lower()
-                    if title_keywords and any(kw in lower_result_title for kw in title_keywords[:2]):
-                        continue
-
-                    track_bpm = detect_or_estimate_bpm(t_title, category)
-                    results.append({
-                        "video_id": v_id,
-                        "title": t_title,
-                        "artist": uploader,
-                        "category": category or "Relacionadas",
-                        "duration": dur,
-                        "bpm": track_bpm,
-                        "source": f"Spotify AI • {track_bpm} BPM"
-                    })
-                    if len(results) >= limit:
-                        break
-        except Exception as ex:
-            print(f"Erro em discover_related_tracks ({q}): {ex}")
+        if i % 2 == 0:
+            if len(results) >= yt_quota:
+                continue
+            run_music_search(q, "youtube", excluded_ids, results, resolved_category, yt_quota,
+                              title_keywords=title_keywords, add_bpm_source_label=True)
+        else:
+            run_music_search(q, "soundcloud", excluded_ids, results, resolved_category, limit,
+                              title_keywords=title_keywords, add_bpm_source_label=True)
 
     new_ids = {r["video_id"] for r in results}
     seen_ids.update(new_ids)
@@ -1134,7 +1173,8 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
 
                 threading.Thread(target=run_sync_bg, daemon=True).start()
                 queue = load_queue()
-                ids = [t.get("video_id") for t in queue if t.get("video_id")][:50]
+                # Faixas do SoundCloud não têm como entrar numa playlist do YouTube
+                ids = [t.get("video_id") for t in queue if t.get("video_id") and not is_soundcloud_id(t.get("video_id"))][:50]
                 playlist_url = f"https://www.youtube.com/watch_videos?video_ids={','.join(ids)}" if ids else "https://www.youtube.com"
 
                 self.send_json({
