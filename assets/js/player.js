@@ -536,6 +536,18 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         }
 
         function setEngineMode(mode, autoPlay = false) {
+            // Cancela qualquer crossfade em andamento ANTES de trocar de motor. Sem isso,
+            // se o usuário trocar de modo durante uma transição no instante exato em que o
+            // deck ativo está pausado (ex.: entre o play() de um deck e a resolução da
+            // Promise), "isPlaying" é calculado como false, playTrackInstant() nunca é
+            // chamado (só ele limpava a transição via cancelTransition()), e isTransitioning
+            // fica travado em true para sempre: nada mais toca e o monitor de progresso para
+            // de atualizar (ele ignora tudo enquanto isTransitioning === true). Era isso que
+            // o usuário via como "a música para e trava" ao clicar em Áudio HD / Clipe.
+            if (typeof cancelTransition === "function") {
+                cancelTransition();
+            }
+
             engineMode = mode;
             localStorage.setItem("pref_engine_mode", mode);
             
