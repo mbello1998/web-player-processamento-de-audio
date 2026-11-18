@@ -2,6 +2,7 @@ processed.json
 data/
 token.json
 client_secret.json
+spotify_credentials.json
 __pycache__/
 *.pyc
 .pytest_cache/
