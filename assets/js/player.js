@@ -529,13 +529,77 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         function toggleEngineMode() {
             const curAudio = getActiveAudioDeck();
             const activeP = getActivePlayer();
-            const isPlaying = (engineMode === "audio" && curAudio && !curAudio.paused && curAudio.currentTime > 0) || 
-                              (engineMode === "video" && activeP && typeof activeP.getPlayerState === "function" && 
+            const isPlaying = (engineMode === "audio" && curAudio && !curAudio.paused && curAudio.currentTime > 0) ||
+                              (engineMode === "video" && activeP && typeof activeP.getPlayerState === "function" &&
                                (activeP.getPlayerState() === YT.PlayerState.PLAYING || activeP.getPlayerState() === YT.PlayerState.BUFFERING));
-            setEngineMode(engineMode === "audio" ? "video" : "audio", isPlaying);
+
+            // Captura a posição atual ANTES de trocar de motor, para continuar exatamente
+            // de onde parou no outro motor (em vez de voltar pro intro-skip/início da faixa).
+            let resumeAtSec = null;
+            if (engineMode === "audio" && curAudio && curAudio.duration) {
+                resumeAtSec = curAudio.currentTime;
+            } else if (engineMode === "video" && activeP && typeof activeP.getCurrentTime === "function") {
+                try { resumeAtSec = activeP.getCurrentTime(); } catch (e) {}
+            }
+
+            setEngineMode(engineMode === "audio" ? "video" : "audio", isPlaying, resumeAtSec);
         }
 
-        function setEngineMode(mode, autoPlay = false) {
+        // Mantém o motor ANTIGO tocando audível até o motor NOVO realmente começar a
+        // produzir som no ponto retomado, e só então corta o antigo. Sem isso, a troca de
+        // motor é um corte seco: silêncio total enquanto o novo motor carrega/rebufferiza
+        // (até ~1-2s no YouTube, ou o tempo de um novo Range request no Áudio HD) - essa
+        // janela de silêncio era o "travamento" que o usuário sentia ao trocar de modo.
+        function crossoverEngineHandoff(prevMode, newMode) {
+            let handed = false;
+            const cutOldEngine = () => {
+                if (handed) return;
+                handed = true;
+                if (prevMode === "video") {
+                    if (playerA && typeof playerA.pauseVideo === "function") { try { playerA.pauseVideo(); playerA.setVolume(0); } catch (e) {} }
+                    if (playerB && typeof playerB.pauseVideo === "function") { try { playerB.pauseVideo(); playerB.setVolume(0); } catch (e) {} }
+                } else {
+                    if (audioDeckA) audioDeckA.pause();
+                    if (audioDeckB) audioDeckB.pause();
+                }
+            };
+
+            if (newMode === "audio") {
+                const curAudio = getActiveAudioDeck();
+                if (curAudio) {
+                    curAudio.addEventListener("playing", cutOldEngine, { once: true });
+                } else {
+                    cutOldEngine();
+                }
+            } else {
+                const pollId = setInterval(() => {
+                    if (handed) { clearInterval(pollId); return; }
+                    const p = getActivePlayer();
+                    if (p && typeof p.getPlayerState === "function" && p.getPlayerState() === YT.PlayerState.PLAYING) {
+                        clearInterval(pollId);
+                        // Fade suave de volume no YouTube (0 -> alvo), já que o IFrame não
+                        // tem um gain node pra rampa como o Áudio HD - evita o corte seco.
+                        try {
+                            const targetVol = isMuted ? 0 : Math.min(100, masterVolume);
+                            let step = 0;
+                            const steps = 6;
+                            const fadeIv = setInterval(() => {
+                                step++;
+                                try { p.setVolume(Math.round((targetVol * step) / steps)); } catch (e) {}
+                                if (step >= steps) clearInterval(fadeIv);
+                            }, 40);
+                        } catch (e) {}
+                        cutOldEngine();
+                    }
+                }, 150);
+            }
+
+            // Rede de segurança: nunca deixa os dois motores tocando juntos por muito tempo
+            // caso o evento/estado esperado nunca chegue a disparar.
+            setTimeout(cutOldEngine, 2500);
+        }
+
+        function setEngineMode(mode, autoPlay = false, resumeAtSec = null) {
             // Cancela qualquer crossfade em andamento ANTES de trocar de motor. Sem isso,
             // se o usuário trocar de modo durante uma transição no instante exato em que o
             // deck ativo está pausado (ex.: entre o play() de um deck e a resolução da
@@ -548,9 +612,11 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 cancelTransition();
             }
 
+            const prevMode = engineMode;
+            const isHandoff = !!(autoPlay && prevMode !== mode && nowPlayingTrack);
             engineMode = mode;
             localStorage.setItem("pref_engine_mode", mode);
-            
+
             const btnBar = document.getElementById("barEngineModeBtn");
             const visScreen = document.getElementById("visualizerScreen");
             const ytOverlay = document.getElementById("ytWaveOverlay");
@@ -564,25 +630,32 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             if (mode === "audio") {
                 if (visScreen) visScreen.style.display = "flex";
                 if (ytOverlay) ytOverlay.style.display = "none";
-                if (playerA && typeof playerA.pauseVideo === "function") {
-                    try { playerA.pauseVideo(); playerA.setVolume(0); } catch (e) {}
-                }
-                if (playerB && typeof playerB.pauseVideo === "function") {
-                    try { playerB.pauseVideo(); playerB.setVolume(0); } catch (e) {}
+                if (!isHandoff) {
+                    if (playerA && typeof playerA.pauseVideo === "function") {
+                        try { playerA.pauseVideo(); playerA.setVolume(0); } catch (e) {}
+                    }
+                    if (playerB && typeof playerB.pauseVideo === "function") {
+                        try { playerB.pauseVideo(); playerB.setVolume(0); } catch (e) {}
+                    }
                 }
                 showToast("🎵 Áudio HD ativo: Equalizador Spotify, 200% VLC e ZERO bloqueios!");
             } else {
                 if (visScreen) visScreen.style.display = "none";
                 if (ytOverlay) ytOverlay.style.display = "block";
-                if (audioDeckA) audioDeckA.pause();
-                if (audioDeckB) audioDeckB.pause();
+                if (!isHandoff) {
+                    if (audioDeckA) audioDeckA.pause();
+                    if (audioDeckB) audioDeckB.pause();
+                }
                 showToast("🎬 Modo Clipe ativo: Exibindo vídeo oficial com Waveform.");
             }
 
             if (nowPlayingTrack) {
                 updateTrackInfoUI(nowPlayingTrack);
                 if (autoPlay) {
-                    playTrackInstant(nowPlayingTrack);
+                    playTrackInstant(nowPlayingTrack, resumeAtSec, isHandoff);
+                    if (isHandoff) {
+                        crossoverEngineHandoff(prevMode, mode);
+                    }
                 }
             }
         }
@@ -3459,7 +3532,7 @@ function updateUpcomingTrackUI() {
         }
 
         // Executar faixa instantânea
-        function playTrackInstant(track) {
+        function playTrackInstant(track, resumeAtSec = null, keepOtherEngineAlive = false) {
             if (!track) return;
             recordTrackInRecentHistory(track.video_id);
             hideToast();
@@ -3483,7 +3556,11 @@ function updateUpcomingTrackUI() {
                     }).catch(() => {});
             }
 
-            const startSec = (djPlayMode === "drop") ? getTrackDropStartTime(track) : getTrackIntroSkip(track);
+            // Se veio de uma troca de motor (Áudio HD <-> Clipe), continua exatamente de
+            // onde a música estava, em vez de recalcular intro-skip/drop do zero.
+            const startSec = (resumeAtSec != null && resumeAtSec >= 0)
+                ? resumeAtSec
+                : ((djPlayMode === "drop") ? getTrackDropStartTime(track) : getTrackIntroSkip(track));
 
             // Modo Áudio HD (Equalizador + 200% VLC + Zero Restrições)
             if (engineMode === "audio") {
@@ -3540,18 +3617,23 @@ function updateUpcomingTrackUI() {
                     });
                 }
 
-                // Pausa YouTube IFrame
-                const activeP = getActivePlayer();
-                if (activeP && typeof activeP.pauseVideo === "function") {
-                    try { activeP.pauseVideo(); activeP.setVolume(0); } catch (e) {}
+                // Pausa YouTube IFrame (a menos que esteja num handoff de troca de motor,
+                // que mantém o vídeo audível até o Áudio HD realmente começar a tocar)
+                if (!keepOtherEngineAlive) {
+                    const activeP = getActivePlayer();
+                    if (activeP && typeof activeP.pauseVideo === "function") {
+                        try { activeP.pauseVideo(); activeP.setVolume(0); } catch (e) {}
+                    }
                 }
 
                 const visScreen = document.getElementById("visualizerScreen");
                 if (visScreen) visScreen.style.display = "flex";
             } else {
-                // Modo Vídeo Clipe YouTube
-                if (audioDeckA) audioDeckA.pause();
-                if (audioDeckB) audioDeckB.pause();
+                // Modo Vídeo Clipe YouTube (idem: mantém o Áudio HD tocando se for handoff)
+                if (!keepOtherEngineAlive) {
+                    if (audioDeckA) audioDeckA.pause();
+                    if (audioDeckB) audioDeckB.pause();
+                }
 
                 const visScreen = document.getElementById("visualizerScreen");
                 if (visScreen) visScreen.style.display = "none";
@@ -3582,12 +3664,17 @@ function updateUpcomingTrackUI() {
                         if (isMuted) activeP.mute();
                         else {
                             activeP.unMute();
-                            activeP.setVolume(Math.min(100, masterVolume));
+                            // Num handoff começa em 0: crossoverEngineHandoff() sobe o volume
+                            // em rampa só quando o vídeo realmente estiver tocando, em vez de
+                            // já tocar no volume alvo por cima do Áudio HD que ainda está ativo.
+                            activeP.setVolume(keepOtherEngineAlive ? 0 : Math.min(100, masterVolume));
                         }
+                        // loadVideoById(id, startSeconds) já posiciona a faixa sozinho. Um
+                        // seekTo() logo em seguida (antes do vídeo novo terminar de carregar)
+                        // atropelava esse posicionamento e fazia tudo voltar pro 0:00 - era
+                        // por isso que trocar de motor não continuava "na metade" de onde
+                        // estava, mesmo depois de passar o tempo certo pra cá.
                         activeP.loadVideoById(track.video_id, startSec);
-                        if (startSec > 0 && typeof activeP.seekTo === "function") {
-                            try { activeP.seekTo(startSec, true); } catch (e) {}
-                        }
                         if (typeof activeP.setPlaybackRate === "function") {
                             try { activeP.setPlaybackRate(Math.min(2.0, currentPlaybackSpeed)); } catch (e) {}
                         }
@@ -4152,10 +4239,10 @@ function triggerCrossfade(nextTrack) {
                     toPlayer.unMute();
                     toPlayer.setVolume(0);
                     if (typeof toPlayer.loadVideoById === "function") {
+                        // loadVideoById(id, startSeconds) já posiciona sozinho; um seekTo()
+                        // logo depois corria o risco de disparar antes do vídeo carregar e
+                        // zerar a posição de novo (mesma causa corrigida no playTrackInstant).
                         toPlayer.loadVideoById(nextTrack.video_id, startSec);
-                        if (startSec > 0 && typeof toPlayer.seekTo === "function") {
-                            try { toPlayer.seekTo(startSec, true); } catch (e) {}
-                        }
                         if (typeof toPlayer.setPlaybackRate === "function") {
                             try { toPlayer.setPlaybackRate(Math.min(2.0, currentPlaybackSpeed)); } catch (e) {}
                         }
