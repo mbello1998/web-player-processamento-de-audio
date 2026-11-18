@@ -102,11 +102,14 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         sp_id = pl_meta["spotify_id"]
         print(f"\n[{pl_meta['name']}] Spotify ID: {sp_id}", flush=True)
 
-        if pl_id in catalog and len(catalog[pl_id].get("tracks", [])) >= 10:
-            print(f"  Playlist {pl_meta['name']} já possui {len(catalog[pl_id]['tracks'])} faixas prontas.", flush=True)
+        tracks_already_done = pl_id in catalog and len(catalog[pl_id].get("tracks", [])) >= 10
+        cover_already_done = pl_id in catalog and catalog[pl_id].get("meta", {}).get("cover_url")
+        if tracks_already_done and cover_already_done:
+            print(f"  Playlist {pl_meta['name']} já possui {len(catalog[pl_id]['tracks'])} faixas e capa prontas.", flush=True)
             continue
 
         raw_tracks = []
+        cover_url = catalog.get(pl_id, {}).get("meta", {}).get("cover_url")
         try:
             url = f"https://open.spotify.com/embed/playlist/{sp_id}"
             req = urllib.request.Request(url, headers=headers)
@@ -116,13 +119,30 @@ with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 if m:
                     data = json.loads(m.group(1))
                     entity = data.get('props', {}).get('pageProps', {}).get('state', {}).get('data', {}).get('entity', {})
-                    raw_tracks = entity.get('trackList', [])
+                    if not tracks_already_done:
+                        raw_tracks = entity.get('trackList', [])
+                    # Capa oficial da playlist, servida pelo CDN público do próprio Spotify
+                    # (i.scdn.co) - a mesma página de embed já usada pra pegar as faixas.
+                    cover_sources = (entity.get('coverArt') or {}).get('sources') or []
+                    if cover_sources:
+                        cover_url = cover_sources[0].get('url') or cover_url
         except Exception as e:
             print(f"  Erro ao obter embed do Spotify: {e}", flush=True)
+
+        pl_meta = dict(pl_meta)
+        if cover_url:
+            pl_meta["cover_url"] = cover_url
+            print(f"  Capa oficial: {cover_url}", flush=True)
 
         print(f"  Obtidas {len(raw_tracks)} faixas da lista oficial.", flush=True)
         resolved_tracks = catalog.get(pl_id, {}).get("tracks", [])
         existing_ranks = {t.get("rank") for t in resolved_tracks}
+
+        if tracks_already_done:
+            # Já tem faixas - só precisava atualizar a capa, que já foi aplicada em pl_meta acima.
+            catalog[pl_id] = {"meta": pl_meta, "tracks": resolved_tracks}
+            save_catalog()
+            continue
 
         target_tracks = raw_tracks[:10]
         for rank, st in enumerate(target_tracks, 1):

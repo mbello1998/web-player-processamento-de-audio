@@ -5,9 +5,11 @@
       "name": "Top Brasil",
       "badge": "🇧🇷 Top Brasil",
       "icon": "🇧🇷",
-      "genre": "Hits do Brasil",
-      "desc": "A principal playlist com os maiores hits do país: Sertanejo, Funk e Pop.",
-      "bpm": 132
+      "genre": "Sertanejo & Pop BR",
+      "desc": "A principal playlist com os maiores hits do país, reunindo artistas como Hugo & Guilherme, Zé Vaqueiro, Mari Fernandez e Luan Pereira.",
+      "spotify_id": "37i9dQZF1DX0FOF1IUWK1W",
+      "bpm": 130,
+      "cover_url": "https://i.scdn.co/image/ab67706f00000002767ab5ec4aa7d3103ccf8bc8"
     },
     "tracks": [
       {
@@ -163,8 +165,10 @@
       "badge": "📈 Top 50 Brasil",
       "icon": "📈",
       "genre": "Ranking Diário BR",
-      "desc": "O ranking oficial com as músicas mais tocadas no território brasileiro hoje.",
-      "bpm": 130
+      "desc": "O ranking oficial diário atualizado com as 50 músicas mais tocadas no território brasileiro.",
+      "spotify_id": "37i9dQZEVXbMXbN3EUUhlg",
+      "bpm": 132,
+      "cover_url": "https://charts-images.scdn.co/assets/locale_en/regional/daily/region_br_default.jpg"
     },
     "tracks": [
       {
@@ -320,8 +324,10 @@
       "badge": "🌍 Top 50 Mundo",
       "icon": "🌍",
       "genre": "Hits Globais",
-      "desc": "As faixas latinas e internacionais que dominam as paradas globais no momento.",
-      "bpm": 124
+      "desc": "As faixas internacionais e latinas que estão dominando as paradas globais no momento.",
+      "spotify_id": "37i9dQZEVXbMDoHDwVN2tF",
+      "bpm": 124,
+      "cover_url": "https://charts-images.scdn.co/assets/locale_en/regional/daily/region_global_default.jpg"
     },
     "tracks": [
       {
@@ -1899,9 +1905,11 @@
       "name": "Esquenta Sertanejo",
       "badge": "🤠 Esquenta Sertanejo",
       "icon": "🤠",
-      "genre": "Sertanejo Universitário",
-      "desc": "Seleção forte para churrasco, festa e boteco com grandes sucessos sertanejos.",
-      "bpm": 128
+      "genre": "Sertanejo Universitário & Modão",
+      "desc": "Seleção forte de sertanejo universitário e modão para churrasco, festa e boteco.",
+      "spotify_id": "37i9dQZF1DXdSjVZQzv2tl",
+      "bpm": 128,
+      "cover_url": "https://i.scdn.co/image/ab67706f00000002ffba48582918322c6da8da1b"
     },
     "tracks": [
       {
@@ -5156,9 +5164,11 @@
       "name": "Funk Hits",
       "badge": "🔥 Funk Hits",
       "icon": "🔥",
-      "genre": "Funk Paulista & Mandelão",
-      "desc": "Hits de funk mais escutados nas ruas e no streaming.",
-      "bpm": 135
+      "genre": "Funk Paulista & Ritmadas",
+      "desc": "Hits de funk mais escutados nas ruas e no streaming: mandelão, ritmo louco e batidões.",
+      "spotify_id": "37i9dQZF1DXajcHa62WwUp",
+      "bpm": 135,
+      "cover_url": "https://i.scdn.co/image/ab67706f0000000260cd9d98f0f1fcd8510f7628"
     },
     "tracks": [
       {
@@ -8074,9 +8084,11 @@
       "name": "Gigantes do Rap Nacional",
       "badge": "🎤 Rap Nacional",
       "icon": "🎤",
-      "genre": "Rap & Trap Nacional",
+      "genre": "Trap & Rap Nacional",
       "desc": "Destaques consagrados e novos monstros do rap e trap no Brasil.",
-      "bpm": 140
+      "spotify_id": "37i9dQZF1DXaljDe6fISR1",
+      "bpm": 140,
+      "cover_url": "https://i.scdn.co/image/ab67706f00000002e1117788d06bb3c44e234fed"
     },
     "tracks": [
       {

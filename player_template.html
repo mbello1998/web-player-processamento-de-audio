@@ -550,10 +550,6 @@
                         <button class="sp-genre-chip" id="spChip_treino" onclick="filterSpotifyPlaylistsByGenre('treino')">🏋️ Treino & Vibe</button>
                     </div>
 
-                    <!-- Grade de Playlists estilo Spotify (capa + nome), muito mais fácil de
-                         escanear visualmente do que uma fileira de 150 abas rolando na horizontal -->
-                    <div class="sp-playlist-grid" id="spotifyPlaylistGrid"></div>
-
                     <!-- Botão de voltar, visível só quando uma playlist está aberta -->
                     <button class="sp-back-to-grid" id="spotifyBackToGrid" onclick="showSpotifyGrid()" style="display: none;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -579,6 +575,10 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Grade de Playlists estilo Spotify (capa + nome) - fora do cabeçalho fixo,
+                     pra rolar de verdade como a lista de faixas já rolava -->
+                <div class="sp-playlist-grid" id="spotifyPlaylistGrid"></div>
 
                 <!-- Lista de Faixas da Playlist Selecionada -->
                 <div class="track-list" id="spotifyTrackList"></div>

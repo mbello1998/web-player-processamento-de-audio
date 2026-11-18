@@ -2150,13 +2150,20 @@ function updateUpcomingTrackUI() {
                 }
                 shown++;
 
+                // Capa oficial do Spotify quando a playlist é uma espelhada de verdade
+                // (tem spotify_id conhecido); senão cai na capa gerada por gradiente.
+                const coverStyle = meta.cover_url
+                    ? `background-image: url('${meta.cover_url}'); background-size: cover; background-position: center;`
+                    : `background: ${getPlaylistCoverGradient(plId)};`;
+                const coverIcon = meta.cover_url ? "" : `<span>${meta.icon || "🟢"}</span>`;
+
                 const card = document.createElement("div");
                 card.className = `sp-playlist-card${plId === activeSpotifyPlaylist ? " active" : ""}`;
                 card.id = `spCard_${plId}`;
                 card.onclick = () => selectSpotifyPlaylist(plId);
                 card.innerHTML = `
-                    <div class="sp-playlist-card-cover" style="background: ${getPlaylistCoverGradient(plId)};">
-                        <span>${meta.icon || "🟢"}</span>
+                    <div class="sp-playlist-card-cover" style="${coverStyle}">
+                        ${coverIcon}
                         <div class="sp-playlist-card-play">▶</div>
                     </div>
                     <div class="sp-playlist-card-name">${escapeHtml(meta.name || plId)}</div>
@@ -2664,10 +2671,13 @@ function updateUpcomingTrackUI() {
 
             // 1. Renderiza o Card de Destaque da Playlist
             if (featuredCard) {
+                const iconHtml = meta.cover_url
+                    ? `<div class="featured-card-icon has-cover" style="background-image: url('${meta.cover_url}');"></div>`
+                    : `<div class="featured-card-icon">${meta.icon || "🟢"}</div>`;
                 featuredCard.innerHTML = `
                     <div class="featured-card-content">
                         <div class="featured-card-left">
-                            <div class="featured-card-icon">${meta.icon || "🟢"}</div>
+                            ${iconHtml}
                             <div class="featured-card-info">
                                 <div class="featured-card-title">
                                     <span>${escapeHtml(meta.name)}</span>
