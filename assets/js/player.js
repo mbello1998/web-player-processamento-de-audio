@@ -4593,6 +4593,10 @@ function triggerCrossfade(nextTrack) {
             seekToPercentage(percentage);
         }
 
+        // Sessão do micro-fade de seek pendente (permite cancelar um fade anterior se o
+        // usuário clicar várias vezes seguidas na barra de progresso, sem esperar o fallback).
+        let pendingSeekFade = null;
+
         function seekToPercentage(pct) {
             let dur = 0;
             let targetTime = 0;
@@ -4601,7 +4605,46 @@ function triggerCrossfade(nextTrack) {
                 if (curAudio && curAudio.duration) {
                     dur = curAudio.duration;
                     targetTime = pct * dur;
-                    curAudio.currentTime = targetTime;
+
+                    // Micro-fade ao redor do salto (evita o clique/corte seco de trocar
+                    // currentTime com o ganho no talo - mesmo padrão do smartMixSegmentJump).
+                    const activeGain = (activeDeck === "A") ? deckGainA : deckGainB;
+                    if (audioCtx && activeGain && !isTransitioning && !isJumpingMix) {
+                        if (pendingSeekFade) {
+                            clearTimeout(pendingSeekFade.setTimer);
+                            clearTimeout(pendingSeekFade.fallbackTimer);
+                            if (pendingSeekFade.audioEl && pendingSeekFade.listener) {
+                                pendingSeekFade.audioEl.removeEventListener("seeked", pendingSeekFade.listener);
+                            }
+                            pendingSeekFade = null;
+                        }
+
+                        const now = audioCtx.currentTime;
+                        activeGain.gain.cancelScheduledValues(now);
+                        activeGain.gain.setValueAtTime(activeGain.gain.value, now);
+                        activeGain.gain.linearRampToValueAtTime(0.0001, now + 0.025);
+
+                        const session = { setTimer: null, fallbackTimer: null, audioEl: curAudio, listener: null };
+                        const resumeVolume = () => {
+                            if (pendingSeekFade !== session) return;
+                            pendingSeekFade = null;
+                            curAudio.removeEventListener("seeked", resumeVolume);
+                            const resumeNow = audioCtx.currentTime;
+                            activeGain.gain.cancelScheduledValues(resumeNow);
+                            activeGain.gain.setValueAtTime(activeGain.gain.value, resumeNow);
+                            activeGain.gain.linearRampToValueAtTime(1.0, resumeNow + 0.03);
+                        };
+                        session.listener = resumeVolume;
+                        curAudio.addEventListener("seeked", resumeVolume, { once: true });
+                        // Fallback de segurança caso 'seeked' não dispare (ex.: fonte travou)
+                        session.fallbackTimer = setTimeout(resumeVolume, 600);
+                        session.setTimer = setTimeout(() => {
+                            curAudio.currentTime = targetTime;
+                        }, 30);
+                        pendingSeekFade = session;
+                    } else {
+                        curAudio.currentTime = targetTime;
+                    }
                 }
             } else {
                 const activeP = getActivePlayer();
