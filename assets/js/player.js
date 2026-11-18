@@ -6976,6 +6976,17 @@ function triggerCrossfade(nextTrack) {
             if (engineMode === "audio") {
                 const curAudio = getActiveAudioDeck();
                 if (!curAudio) return;
+                // Deck ainda sem nenhuma fonte carregada (ex.: primeiro play numa página
+                // recém-aberta, antes de qualquer faixa ter sido tocada) - chamar .play()
+                // num <audio> vazio não faz nada (a Promise rejeita em silêncio, sem erro
+                // visível), então o botão parecia simplesmente não responder. Carrega e
+                // toca a faixa pré-selecionada de verdade em vez de só dar play no vazio.
+                if (!curAudio.src) {
+                    if (nowPlayingTrack) {
+                        triggerTrackPlayback(nowPlayingTrack);
+                    }
+                    return;
+                }
                 if (curAudio.paused) {
                     curAudio.play();
                     updatePlayPauseButtons(true);
