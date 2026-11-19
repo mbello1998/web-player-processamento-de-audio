@@ -1642,8 +1642,6 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 
 function updateUpcomingTrackUI() {
             const upcoming = getUpcomingTrack();
-            const nextTitleEl = document.getElementById("nextPreviewTitle");
-            const nextArtistEl = document.getElementById("nextPreviewArtist");
             const barStatusText = document.getElementById("barStatusText");
 
             const modeLabels = {
@@ -1659,10 +1657,6 @@ function updateUpcomingTrackUI() {
 
             if (upcoming) {
                 const isRepeatSame = (repeatMode === "one" && nowPlayingTrack && upcoming.video_id === nowPlayingTrack.video_id);
-                const artistText = upcoming.artist ? upcoming.artist : (upcoming.category || "Fila");
-                if (nextTitleEl) nextTitleEl.textContent = isRepeatSame ? `🔂 ${upcoming.title}` : upcoming.title;
-                if (nextArtistEl) nextArtistEl.textContent = isRepeatSame ? `Repetindo esta faixa em loop` : artistText;
-
                 if (barStatusText) {
                     const curTitle = nowPlayingTrack ? nowPlayingTrack.title : "Nenhuma";
                     const curArtist = nowPlayingTrack ? (nowPlayingTrack.artist || "") : "";
@@ -1689,8 +1683,6 @@ function updateUpcomingTrackUI() {
                         </div>`;
                 }
             } else {
-                if (nextTitleEl) nextTitleEl.textContent = "Fim da fila";
-                if (nextArtistEl) nextArtistEl.textContent = "Adicione mais músicas";
                 if (barStatusText) {
                     const curTitle = nowPlayingTrack ? nowPlayingTrack.title : "Nenhuma";
                     const curArtist = nowPlayingTrack ? (nowPlayingTrack.artist || "") : "";
@@ -6044,7 +6036,9 @@ function triggerCrossfade(nextTrack) {
                 }
 
                 if (muteBtn) {
-                    muteBtn.classList.toggle("active-muted", stemsState.muted[stem]);
+                    // A classe no CSS é "active-mute", não "active-muted" - o "d" a mais
+                    // fazia o botão nunca ficar vermelho ao mutar um stem.
+                    muteBtn.classList.toggle("active-mute", stemsState.muted[stem]);
                 }
 
                 if (soloBtn) {

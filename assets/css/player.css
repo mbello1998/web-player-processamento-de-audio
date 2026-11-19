@@ -3082,6 +3082,13 @@
         .stem-card-drums .stem-val { color: #ffca28; }
         .stem-card-bass .stem-val { color: #ff7043; }
         .stem-card-inst .stem-val { color: #4dd0e1; }
+        .stem-val.muted-db {
+            color: var(--text-dim) !important;
+            opacity: 0.55;
+        }
+        .stem-val.zero-db {
+            text-shadow: 0 0 8px currentColor;
+        }
 
         /* REAL-TIME LED VU METER BAR */
         .stem-meter-container {
