@@ -8652,7 +8652,11 @@ function triggerCrossfade(nextTrack) {
             if (icon) icon.textContent = iconMatch ? iconMatch[1] : "⚡";
             if (labelEl) labelEl.textContent = iconMatch ? iconMatch[2] : (label || mode);
 
-            overlay.classList.toggle("is-aggressive", mode === "drop");
+            const isAggressive = mode === "drop";
+            overlay.classList.toggle("is-aggressive", isAggressive);
+            // Duração do fade colorido de fundo (CSS) - o Drop Hunter é mais curto e
+            // mais intenso (dois pulsos), os outros modos têm um fade único mais longo.
+            const washDuration = isAggressive ? 1300 : 1600;
             if (barFill) barFill.style.width = "0%";
             overlay.classList.add("is-active");
 
@@ -8666,7 +8670,7 @@ function triggerCrossfade(nextTrack) {
             if (window.__modeTransitionTimer) clearTimeout(window.__modeTransitionTimer);
             window.__modeTransitionTimer = setTimeout(() => {
                 overlay.classList.remove("is-active");
-            }, 950);
+            }, washDuration);
         }
 
         function setDjMode(mode, isUserSelection = false) {

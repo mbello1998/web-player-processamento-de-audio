@@ -31,17 +31,37 @@
             align-items: center;
             justify-content: center;
             gap: 18px;
-            background: radial-gradient(circle at center, rgba(7, 8, 12, 0.88), rgba(7, 8, 12, 0.97));
+            background: rgba(7, 8, 12, 0.92);
             backdrop-filter: blur(3px);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.25s ease;
+            transition: opacity 0.3s ease;
+            overflow: hidden;
         }
         .mode-transition-overlay.is-active {
             opacity: 1;
             pointer-events: all;
         }
+        /* Fade colorido de fundo na cor do modo - a sensação de "reconstruindo o site"
+           naquela cor enquanto a transição acontece, não só um flash instantâneo. */
+        .mode-transition-overlay::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(var(--mode-accent-rgb), 0.6), rgba(var(--mode-accent-rgb), 0.08) 60%, transparent 100%);
+            opacity: 0;
+        }
+        .mode-transition-overlay.is-active::before {
+            animation: modeTransitionWash 1.6s ease-in-out;
+        }
+        @keyframes modeTransitionWash {
+            0% { opacity: 0; }
+            35% { opacity: 1; }
+            70% { opacity: 0.55; }
+            100% { opacity: 0; }
+        }
         .mode-transition-icon {
+            position: relative;
             font-size: 54px;
             line-height: 1;
             filter: drop-shadow(0 0 18px rgb(var(--mode-accent-rgb)));
@@ -52,6 +72,7 @@
             50% { transform: scale(1.18); }
         }
         .mode-transition-text {
+            position: relative;
             font-size: 15px;
             font-weight: 700;
             color: #fff;
@@ -62,6 +83,7 @@
             text-shadow: 0 0 12px rgba(var(--mode-accent-rgb), 0.7);
         }
         .mode-transition-bar-track {
+            position: relative;
             width: 220px;
             height: 5px;
             border-radius: 3px;
@@ -74,23 +96,21 @@
             border-radius: 3px;
             background: linear-gradient(90deg, rgba(var(--mode-accent-rgb), 0.5), rgb(var(--mode-accent-rgb)));
             box-shadow: 0 0 10px rgb(var(--mode-accent-rgb));
-            transition: width 0.85s cubic-bezier(0.25, 0.8, 0.4, 1);
+            transition: width 1.3s cubic-bezier(0.25, 0.8, 0.4, 1);
         }
-        /* Modo Drop Hunter (agressivo/"sport mode"): transição mais intensa, com um
-           flash de abertura imitando o alerta de um painel esportivo de carro. */
+        /* Modo Drop Hunter (agressivo/"sport mode"): o mesmo fade, só que mais rápido e
+           com um segundo pulso extra - como o alerta de um painel esportivo de carro. */
         .mode-transition-overlay.is-aggressive .mode-transition-icon {
-            animation: modeTransitionPulse 0.35s ease-in-out infinite;
+            animation: modeTransitionPulse 0.3s ease-in-out infinite;
         }
-        .mode-transition-overlay.is-aggressive::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgb(var(--mode-accent-rgb));
-            opacity: 0;
-            animation: modeTransitionFlash 0.5s ease-out;
+        .mode-transition-overlay.is-aggressive.is-active::before {
+            animation: modeTransitionWashAggressive 1.3s ease-in-out;
         }
-        @keyframes modeTransitionFlash {
-            0% { opacity: 0.55; }
+        @keyframes modeTransitionWashAggressive {
+            0% { opacity: 0; }
+            15% { opacity: 1; }
+            32% { opacity: 0.35; }
+            48% { opacity: 1; }
             100% { opacity: 0; }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
