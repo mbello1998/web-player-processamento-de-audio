@@ -74,5 +74,108 @@ Fonte: `~/.gemini/antigravity/brain/4e736382-dc90-49a2-8585-11cbf9578576/*.md`
 
 ---
 
-A partir daqui (sessão Claude, 2026-11-17), o trabalho segue versionado
-normalmente no Git a partir da tag `baseline-pre-mixer`.
+A partir daqui (sessão Claude, 2026-11-17) o trabalho segue versionado
+normalmente no Git a partir da tag `baseline-pre-mixer` — cada entrada abaixo
+corresponde a um commit de verdade (`git log baseline-pre-mixer..HEAD`), não
+mais a um auto-relato reconstruído. Ao adicionar trabalho novo, continue essa
+lista com uma entrada por mudança significativa.
+
+## 2026-11-17
+
+- **13:44** — Reconstrução deste changelog a partir dos relatórios de sessão
+  do Antigravity (ponto de partida: tag `baseline-pre-mixer`).
+- **14:15** — Eliminadas as 4 causas-raiz de clipping, desvio de DSP e
+  vazamento entre stems.
+- **14:48** — Correção do eco e da imagem estéreo desbalanceada do Studio Pro.
+
+## 2026-11-18
+
+- **14:56** — Eliminado o clique audível ao pular na barra de progresso
+  (seek).
+- **15:38** — Sugestões de "músicas parecidas" da IA ignoravam o gênero da
+  faixa-semente; corrigido. Player travava ao trocar Áudio HD ↔ Clipe no meio
+  de uma transição; corrigido.
+- **15:49** — Trocar entre Áudio HD e Clipe no meio da faixa mantém a posição
+  de reprodução.
+- **16:22/16:23** — SoundCloud como segunda fonte de descoberta e playlists;
+  tocar faixas do SoundCloud, mostrar a etiqueta da fonte, corrigir bugs de
+  handoff/gênero.
+- **16:28** — Playlists do Spotify viram uma grade de capas em vez de 150
+  abas.
+- **16:35** — Correção da rolagem da grade de playlists, quebra de linha dos
+  filtros de gênero, capas reais do Spotify.
+- **17:19** — Botão de play não fazia nada numa página recém-carregada;
+  corrigido.
+- **17:22** — Arquivo de credenciais da API do Spotify adicionado ao
+  `.gitignore`.
+- **18:16** — Cada modo de atuação DJ ganha sua própria cor de destaque.
+- **20:58** — Tema de cor no site inteiro + transição animada + preset de
+  gênero por modo DJ.
+- **21:05** — Transição de modo lia como um "flash", não como um fade de fundo
+  colorido; corrigido.
+- **21:10** — Os painéis reais do player se desmontam e remontam de verdade
+  ao trocar de modo.
+- **21:17** — Cada card de música visível se desmonta individualmente, depois
+  remonta.
+- **21:35** — Cascata dos cards era instantânea em vez de escalonada;
+  desacelerada para ~8,5s+.
+- **21:44** — Capas reais do Spotify para as 2 playlists de Cumbia achadas por
+  busca.
+- **21:52/22:04** — Player ficava mudo pra sempre quando a faixa seguinte do
+  crossfade falhava ao carregar (SoundCloud e depois YouTube quebrado);
+  corrigido nos dois casos.
+
+## 2026-11-19
+
+- **04:29** — Transição de modo redesenhada: profundidade 3D de verdade +
+  sequência (desmontar → carregar → remontar).
+- **04:32** — Versão do asset em cache incrementada pra o navegador pegar o
+  CSS/JS novo da transição.
+- **04:38** — Tela de carregamento estava presa dentro do painel que ela
+  precisa flutuar por cima; corrigido.
+- **04:42/04:43/04:45** — Tela de hold do carregamento ganha vida: equalizador
+  + brilho pulsante contínuo, partículas subindo + anel girando, faixas de
+  aurora boreal fluindo no fundo.
+- **04:50 a 05:18** — Várias rodadas de busca de capas reais do Spotify (89,
+  depois +14, +18, +1 playlists cobertas); nova playlist de cachengue
+  adicionada; filtros de gênero quebrados corrigidos; 120 playlists novas
+  adicionadas aos 12 chips de filtro de gênero (10 por chip).
+- **11:06** — 5ª rodada de busca acha capas reais do Spotify para mais 81
+  playlists.
+- **12:51** — Busca livre não ordena mais por BPM; reordenar a fila arrastando;
+  confirmação de ações sem travar a tela; remover item único do histórico.
+- **12:56** — Botão "Mover" do Histórico não abria o modal (o `video_id`
+  sozinho não era capturado); corrigido.
+- **13:01** — Filtros da Pesquisa Livre simplificados (sem mexer no Spotify).
+- **13:06** — Abas de gênero da Biblioteca e Sugestões agora quebram linha em
+  vez de exigir rolagem horizontal.
+- **13:09** — Remover 1 música do histórico não removia de primeira nem
+  notificava corretamente; corrigido.
+- **13:14** — Notificação (`showToast`) ficava escondida atrás de qualquer
+  modal aberto; corrigido.
+- **13:29** — Auditoria geral: botões quebrados, HUD travado, UI sem estilo,
+  timeouts de rede.
+- **13:35** — Botão de mudo dos stems não ficava vermelho quando ativo; último
+  código morto removido.
+- **13:42** — Sistema de curadoria de músicas assistida por IA (favoritas por
+  plays/skip rate, promoção automática).
+- **13:52** — Curadoria contava cada play em dobro e diluía a taxa de skip
+  pela metade; corrigido.
+- **14:00** — Descoberta de músicas novas baseada nas favoritas da curadoria.
+- **14:09** — Detecção de silêncio do Drop Hunter dava falso positivo quando o
+  motor estava em modo "vídeo"; corrigido. Curadoria por favorita individual
+  adicionada.
+- **17:12** — Logo animado de fone de ouvido, animação de modal saindo do
+  botão clicado, e curadoria por faixa individual (trabalho do Antigravity,
+  commitado como estava, sem revisão).
+- **17:28** — Logo própria (SVG por código, não mais a imagem/GIF) na
+  transição de modo, voando do cabeçalho até o carregamento e de volta.
+- **17:37** — Logo da transição movida pra uma camada própria (independente
+  da opacidade do fundo escuro) e sequência de fases refeita na ordem certa:
+  logo sai do cabeçalho → site desmonta → hold → logo volta → site remonta.
+- **18:38** — Correção do voo de ida/volta da logo (posição exata do
+  cabeçalho, não mais deslocada); cabeçalho entra no sistema de desmontagem
+  junto com o resto do site; handoff da logo real só depois do cabeçalho
+  remontar; logo troca de cor "pintando" o próprio traço ao chegar no
+  carregamento; cor de destaque do site inteiro só muda depois que a
+  transição termina, não mais no clique.
