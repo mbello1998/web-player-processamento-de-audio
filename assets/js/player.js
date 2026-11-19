@@ -8641,6 +8641,24 @@ function triggerCrossfade(nextTrack) {
 
         // Mostra a tela de transição animada (texto + barra de progresso), sem jamais
         // pausar/alterar a reprodução em andamento - é só uma camada visual por cima.
+        // Desmonta (voa pros lados, some) e depois remonta (volta ao lugar) os 3 blocos
+        // estruturais DE VERDADE do player (.player-pane, .list-pane, .bottom-player-bar) -
+        // nada de vídeo gravado, é a própria interface se "desmontando" na cor do modo e
+        // voltando com tudo intacto por baixo (música, fila, conteúdo nunca somem do DOM).
+        function playPanelDisassembleEffect(holdMs) {
+            const panels = [
+                document.querySelector(".player-pane"),
+                document.querySelector(".list-pane"),
+                document.querySelector(".bottom-player-bar")
+            ].filter(Boolean);
+            if (panels.length === 0) return;
+
+            panels.forEach(p => p.classList.add("is-disassembling"));
+            setTimeout(() => {
+                panels.forEach(p => p.classList.remove("is-disassembling"));
+            }, holdMs);
+        }
+
         function showModeTransitionOverlay(mode, label) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
@@ -8659,6 +8677,11 @@ function triggerCrossfade(nextTrack) {
             const washDuration = isAggressive ? 1300 : 1600;
             if (barFill) barFill.style.width = "0%";
             overlay.classList.add("is-active");
+
+            // Desmonta no pico de cor e já dispara a remontagem (a troca de classe some
+            // sozinha após "holdMs" - ver playPanelDisassembleEffect), ficando desfeito
+            // bem no meio da duração total, igual o fade de fundo.
+            playPanelDisassembleEffect(Math.round(washDuration * 0.55));
 
             // Força o reflow antes de animar a barra, senão o navegador às vezes funde os
             // dois estados (0% -> 100%) num só frame e a transição não é visível.

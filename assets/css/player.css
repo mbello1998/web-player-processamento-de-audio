@@ -113,6 +113,34 @@
             48% { opacity: 1; }
             100% { opacity: 0; }
         }
+
+        /* ==========================================================
+           DESMONTAGEM/REMONTAGEM DOS PAINÉIS REAIS AO TROCAR DE MODO
+           São os 3 blocos estruturais de verdade (não um vídeo gravado) - cada um voa
+           pra um lado diferente, soltando um brilho na cor do modo, e volta ao lugar.
+           Nunca desmonta do DOM de verdade, só transforma visualmente - o áudio e o
+           conteúdo (música tocando, fila etc.) continuam intactos por baixo.
+           ========================================================== */
+        .player-pane,
+        .list-pane,
+        .bottom-player-bar {
+            transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.55s ease, filter 0.55s ease;
+        }
+        .player-pane.is-disassembling {
+            transform: translateX(-70px) rotate(-7deg);
+            opacity: 0;
+            filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
+        }
+        .list-pane.is-disassembling {
+            transform: translateX(70px) rotate(5deg);
+            opacity: 0;
+            filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
+        }
+        .bottom-player-bar.is-disassembling {
+            transform: translateY(90px) rotate(2deg);
+            opacity: 0;
+            filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
         /* BLOQUEIA SCROLLBAR EXTERNA DA PÁGINA (Layout fixo estilo Spotify Desktop) */
