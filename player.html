@@ -5,15 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_15">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_20">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
     <div class="top-header-area">
         <div class="header-main-row">
             <div class="header-brand">
-                <h1>Central de Músicas</h1>
-                <p>Web Audio HD • Equalizador Spotify • Super Volume VLC (200%)</p>
+                <div class="brand-headphone-box" id="headerMainLogo" title="Central de Músicas - Epicentro dos Efeitos" onclick="pulseHeaderLogo()">
+                    <img src="/assets/img/headphone_logo.gif" alt="Headphone Animado" class="brand-headphone-gif">
+                    <span class="brand-headphone-glow"></span>
+                    <span class="brand-headphone-ring"></span>
+                </div>
+                <div class="header-brand-info">
+                    <h1>Central de Músicas</h1>
+                    <p>Web Audio HD • Equalizador Spotify • Super Volume VLC (200%)</p>
+                </div>
             </div>
             <!-- Navegação Principal com 5 Abas -->
             <div class="top-nav">
@@ -34,7 +41,7 @@
                     <span>📋 Minha Fila</span>
                     <span class="queue-badge" id="queueBadgeCount">0</span>
                 </button>
-                <button class="nav-btn" id="navHistory" onclick="openHistoryModal()" title="Histórico de reprodução e músicas descobertas (salve na sua biblioteca)">
+                <button class="nav-btn" id="navHistory" onclick="openHistoryModal(event)" title="Histórico de reprodução e músicas descobertas (salve na sua biblioteca)">
                     <span>📜 Histórico</span>
                     <span class="queue-badge" id="historyBadgeCount" style="background: rgba(0, 242, 254, 0.25); color: var(--accent);">0</span>
                 </button>
@@ -221,7 +228,7 @@
                         </div>
                         <div class="bpm-live-header-actions">
                             <span class="bpm-live-status-pill" id="bpmLiveStatusPill">Original (1.0x)</span>
-                            <button class="bpm-live-quick-btn" onclick="openBpmModal()" title="Abrir Ajustes Avançados de Beatmatch & Pitch">🎚️ Ajustar</button>
+                            <button class="bpm-live-quick-btn" onclick="openBpmModal(event)" title="Abrir Ajustes Avançados de Beatmatch & Pitch">🎚️ Ajustar</button>
                         </div>
                     </div>
                     
@@ -265,7 +272,7 @@
                     </div>
                     <!-- Linha 2: Ações Rápidas do Player (Fila Spotify & Rádio de Parecidas) -->
                     <div class="track-actions-row">
-                        <button class="btn-player-action-pill" id="btnPlayerQueueMain" onclick="openSpotifyQueueModal()" title="Abrir Gerenciador de Fila (Estilo Spotify)">
+                        <button class="btn-player-action-pill" id="btnPlayerQueueMain" onclick="openSpotifyQueueModal(event)" title="Abrir Gerenciador de Fila (Estilo Spotify)">
                             📋 Fila <span class="player-queue-badge" id="playerQueueCount">0</span>
                         </button>
                         <button class="btn-player-action-pill" id="btnPlayerSimilar" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas com esta música (mesmo BPM e ritmo)">
@@ -283,7 +290,7 @@
                         </div>
                         <div style="display: flex; gap: 4px; align-items: center;">
                             <button class="dj-speed-badge" id="djSpeedBadge" onclick="cyclePlaybackSpeed()" title="Velocidade da Música (Clique para alternar: 1x, 1.25x, 1.5x, 2x, 4x, 0.5x, 0.75x)">⚡ 1.0x</button>
-                            <button class="dj-bpm-sync" id="djBpmSyncBadge" onclick="openBpmModal()" title="Abrir Sincronizador de BPM e Beatmatch" style="background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: var(--accent); cursor: pointer; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700;">⚡ BPM Sync</button>
+                            <button class="dj-bpm-sync" id="djBpmSyncBadge" onclick="openBpmModal(event)" title="Abrir Sincronizador de BPM e Beatmatch" style="background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: var(--accent); cursor: pointer; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700;">⚡ BPM Sync</button>
                         </div>
                     </div>
 
@@ -500,7 +507,7 @@
                         <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube e SoundCloud com IA">
                             ⚡ Pesquisa Livre
                         </button>
-                        <button class="btn-search-ext-quick" onclick="openCurationModal()" title="Sugestões de curadoria com base no que você mais toca e mais pula">
+                        <button class="btn-search-ext-quick" onclick="openCurationModal(event)" title="Sugestões de curadoria com base no que você mais toca e mais pula">
                             🎯 Curadoria
                         </button>
                     </div>
@@ -759,12 +766,12 @@
             <!-- Linha 3: Ferramentas DJ e Efeitos (Alinhadas e Compactas) -->
             <div class="bar-tools-cluster">
                 <button class="bar-pill-btn fade-active" id="barCrossfadeBtn" onclick="toggleCrossfadeSetting()" title="Ajustar tempo de crossfade">🎚️ Fade: 4s</button>
-                <button class="bar-pill-btn bpm-sync-active" id="barBpmSyncBtn" onclick="openBpmModal()" title="Sincronizador de BPM & Beatmatch Automático">⚡ BPM Sync</button>
+                <button class="bar-pill-btn bpm-sync-active" id="barBpmSyncBtn" onclick="openBpmModal(event)" title="Sincronizador de BPM & Beatmatch Automático">⚡ BPM Sync</button>
                 <button class="bar-pill-btn active" id="barIntroSkipBtn" onclick="toggleIntroSkip()" title="Pular silêncio/intro inicial">⚡ Silêncio: 2s</button>
-                <button class="bar-pill-btn eq-active" id="barEqBtn" onclick="openEqualizerModal()" title="Equalizador Spotify e Super Volume VLC">🎛️ EQ: <span id="barEqLabel">Grave</span></button>
-                <button class="bar-pill-btn stems-active" id="barStemsBtn" onclick="openStemsModal()" title="Stems DJ">🎧 Stems DJ</button>
-                <button class="bar-pill-btn studio-active" id="barStudioBtn" onclick="openStudioModal()" title="Console de Estúdio, Mastering DSP e Efeitos">🎚️ Estúdio Pro</button>
-                <button class="bar-pill-btn" id="barQueueBtn" onclick="openSpotifyQueueModal()" title="Gerenciar Fila de Músicas (Estilo Spotify)">📋 Fila <span id="barQueueCountBadge" class="bar-queue-chip">0</span></button>
+                <button class="bar-pill-btn eq-active" id="barEqBtn" onclick="openEqualizerModal(event)" title="Equalizador Spotify e Super Volume VLC">🎛️ EQ: <span id="barEqLabel">Grave</span></button>
+                <button class="bar-pill-btn stems-active" id="barStemsBtn" onclick="openStemsModal(event)" title="Stems DJ">🎧 Stems DJ</button>
+                <button class="bar-pill-btn studio-active" id="barStudioBtn" onclick="openStudioModal(event)" title="Console de Estúdio, Mastering DSP e Efeitos">🎚️ Estúdio Pro</button>
+                <button class="bar-pill-btn" id="barQueueBtn" onclick="openSpotifyQueueModal(event)" title="Gerenciar Fila de Músicas (Estilo Spotify)">📋 Fila <span id="barQueueCountBadge" class="bar-queue-chip">0</span></button>
                 <button class="bar-pill-btn" id="barControlSimilarBtn" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas">📻 Parecidas</button>
                 
                 <!-- Controle de Velocidade -->
@@ -1233,7 +1240,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_15"></script>
+    <script src="/assets/js/player.js?v=20261119_20"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -1836,7 +1843,7 @@
                         Baseado no que você mais toca e mais pula de verdade. Quanto mais você usa o player, mais precisa fica.
                     </div>
                 </div>
-                <button class="eq-close-btn" onclick="closeCurationModal()" title="Fechar Curadoria" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+                <button class="eq-close-btn" onclick="closeCurationModal(event)" title="Fechar Curadoria" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
             <div class="history-modal-body">
                 <!-- Descoberta por favorita: roda uma busca "Faixas Parecidas" dedicada pra CADA
@@ -1854,7 +1861,43 @@
                 <div id="curationModalItems" class="history-modal-list"></div>
             </div>
             <div class="queue-modal-footer">
-                <button class="btn-modal-done" onclick="closeCurationModal()">✓ Fechar</button>
+                <button class="btn-modal-done" onclick="closeCurationModal(event)">✓ Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE NOVIDADES EXCLUSIVAS DA FAIXA (CURADORIA ESPECÍFICA) -->
+    <div class="eq-modal-overlay" id="trackCurationModal" onclick="closeTrackCurationModal(event)" style="display: none; z-index: 10050;">
+        <div class="eq-modal-card history-modal-card" onclick="event.stopPropagation()">
+            <div class="eq-modal-header">
+                <div>
+                    <div class="eq-modal-title">
+                        <span>🎯 Novidades Exclusivas da Faixa</span>
+                    </div>
+                    <div class="eq-modal-sub" id="trackCurationModalSub">
+                        3 faixas ideais selecionadas pela IA baseadas no estilo, BPM e ritmo desta música.
+                    </div>
+                </div>
+                <button class="eq-close-btn" onclick="closeTrackCurationModal(event)" title="Fechar" aria-label="Fechar">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            <div class="history-modal-body">
+                <!-- Card da Faixa Base (Origem) -->
+                <div id="trackCurationBaseCard" class="history-track-card" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.35); margin-bottom: 14px;"></div>
+
+                <div class="queue-modal-section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span>✨ 3 Faixas Ideais de Novidades</span>
+                    <button class="btn-refresh-curation" onclick="refreshCurrentTrackCuration()" title="Buscar outras 3 sugestões">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                        <span>Outras 3</span>
+                    </button>
+                </div>
+
+                <div id="trackCurationModalItems" class="history-modal-list"></div>
+            </div>
+            <div class="queue-modal-footer">
+                <button class="btn-modal-done" onclick="closeTrackCurationModal(event)">✓ Fechar</button>
             </div>
         </div>
     </div>
@@ -1964,7 +2007,20 @@
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
         </div>
-        <div class="mode-transition-icon" id="modeTransitionIcon">⚡</div>
+        <div class="transicao-logo-box" id="modeTransitionLogoBox">
+            <div class="transicao-headphone-core">
+                <img src="/assets/img/headphone_logo.gif" alt="Headphone Animado" class="mode-transition-headphone-img">
+            </div>
+            <svg class="transicao-logo" id="modeTransitionLogoSvg" width="96" height="96" viewBox="36 50 728 712" fill="none" stroke="currentColor" stroke-width="48" aria-hidden="true">
+                <circle cx="135" cy="150" r="65" pathLength="1" />
+                <circle cx="665" cy="150" r="65" pathLength="1" />
+                <circle cx="133" cy="662" r="65" pathLength="1" />
+                <circle cx="665" cy="662" r="65" pathLength="1" />
+                <path d="m135 215-2 382M665 215v382M184.8 191.7 400 372l215.2-180.3" pathLength="1" />
+                <path class="transicao-miolo" fill="currentColor" stroke="none" d="m232 335 168 165 168-165v83L400 583 232 418z" />
+            </svg>
+            <div class="mode-transition-icon-badge" id="modeTransitionIcon">⚡</div>
+        </div>
         <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
         <div class="mode-transition-eq" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span>

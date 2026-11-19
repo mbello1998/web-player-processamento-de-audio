@@ -391,13 +391,37 @@ def save_queue(queue: list[dict]) -> None:
 # usado pra sugerir o que promover (toca muito, quase nunca pulada) e o que tirar da rotação
 # (pulada na maioria das vezes que toca).
 def load_track_stats() -> dict:
-    if not TRACK_STATS_FILE.exists():
-        return {}
-    try:
-        with open(TRACK_STATS_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    stats = {}
+    if TRACK_STATS_FILE.exists():
+        try:
+            with open(TRACK_STATS_FILE, "r", encoding="utf-8") as f:
+                stats = json.load(f)
+        except Exception:
+            stats = {}
+
+    # Sincroniza e reaproveita todo o histórico de reprodução real (playback_history.json)
+    if HISTORY_FILE.exists():
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                history = json.load(f)
+            counts = {}
+            for item in history:
+                vid = item.get("video_id")
+                if vid:
+                    counts[vid] = counts.get(vid, 0) + 1
+
+            modified = False
+            for vid, count in counts.items():
+                entry = stats.setdefault(vid, {"plays": 0, "skips": 0, "last_played": None})
+                if entry.get("plays", 0) < count:
+                    entry["plays"] = count
+                    modified = True
+            if modified:
+                save_track_stats(stats)
+        except Exception as e:
+            print("Erro ao sincronizar histórico com track_stats:", e)
+
+    return stats
 
 
 def save_track_stats(stats: dict) -> None:
@@ -408,9 +432,9 @@ def save_track_stats(stats: dict) -> None:
         print("Erro ao salvar track_stats.json:", e)
 
 
-CURATION_MIN_SAMPLES = 3  # amostra mínima pra uma faixa entrar nas sugestões (evita opinar sobre 1 play/skip isolado)
-CURATION_PROMOTE_MAX_SKIP_RATE = 0.15
-CURATION_REMOVE_MIN_SKIP_RATE = 0.5
+CURATION_MIN_SAMPLES = 3  # amostra mínima pra uma faixa virar favorita confirmada (>= 3 plays)
+CURATION_PROMOTE_MAX_SKIP_RATE = 0.20
+CURATION_REMOVE_MIN_SKIP_RATE = 0.50
 
 
 def build_curation_suggestions() -> dict:
@@ -424,14 +448,25 @@ def build_curation_suggestions() -> dict:
             lib = []
     lib_by_id = {t.get("video_id"): t for t in lib if t.get("video_id")}
 
-    promote, remove_candidates = [], []
+    history_tracks = {}
+    if HISTORY_FILE.exists():
+        try:
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                for h in json.load(f):
+                    vid = h.get("video_id")
+                    if vid and vid not in history_tracks:
+                        history_tracks[vid] = h
+        except Exception:
+            pass
+
+    promote, remove_candidates, in_observation = [], [], []
     for vid, s in stats.items():
-        track = lib_by_id.get(vid)
+        track = lib_by_id.get(vid) or history_tracks.get(vid)
         if not track:
-            continue  # já não está mais na biblioteca - nada a sugerir sobre ela
+            continue  # já não está mais na biblioteca nem no histórico
         plays = s.get("plays", 0)
         skips = s.get("skips", 0)
-        if plays < CURATION_MIN_SAMPLES:
+        if plays <= 0:
             continue
         # "plays" já conta TODA vez que a faixa começou a tocar, inclusive as que depois
         # viraram skip - skips é um SUBCONJUNTO de plays, não uma contagem separada. Taxa
@@ -443,18 +478,35 @@ def build_curation_suggestions() -> dict:
         item["skips"] = skips
         item["skip_rate"] = round(skip_rate, 2)
 
-        if skip_rate <= CURATION_PROMOTE_MAX_SKIP_RATE:
-            promote.append(item)
-        elif skip_rate >= CURATION_REMOVE_MIN_SKIP_RATE:
-            remove_candidates.append(item)
+        if plays >= CURATION_MIN_SAMPLES:
+            if skip_rate <= CURATION_PROMOTE_MAX_SKIP_RATE:
+                promote.append(item)
+            elif skip_rate >= CURATION_REMOVE_MIN_SKIP_RATE:
+                remove_candidates.append(item)
+            else:
+                in_observation.append(item)
+        else:
+            in_observation.append(item)
+
+    # Se ainda não houver faixas com 3 plays, mas o usuário já tocou várias músicas,
+    # usa as mais ouvidas (plays >= 2) como favoritas provisórias para nunca deixar a curadoria vazia
+    if not promote and in_observation:
+        valid_candidates = [t for t in in_observation if t["skip_rate"] <= 0.25]
+        valid_candidates.sort(key=lambda x: (-x["plays"], x["skip_rate"]))
+        if valid_candidates and valid_candidates[0]["plays"] >= 2:
+            promote = valid_candidates[:10]
 
     promote.sort(key=lambda x: (-x["plays"], x["skip_rate"]))
     remove_candidates.sort(key=lambda x: (-x["skip_rate"], -x["skips"]))
+    in_observation.sort(key=lambda x: (-x["plays"], x["skip_rate"]))
 
     return {
         "promote": promote[:15],
         "remove_candidates": remove_candidates[:15],
+        "in_observation": in_observation[:15],
         "tracked_count": len(stats),
+        "total_plays": sum(s.get("plays", 0) for s in stats.values()),
+        "total_skips": sum(s.get("skips", 0) for s in stats.values()),
     }
 
 
@@ -938,6 +990,54 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
 
             if path == "/api/curation/discover-per-favorite":
                 self.send_json(build_curation_discovery_per_favorite())
+                return
+
+            if path == "/api/curation/track-novidades":
+                params = urllib.parse.parse_qs(parsed.query)
+                vid = params.get("video_id", [""])[0]
+                title = params.get("title", [""])[0]
+                artist = params.get("artist", [""])[0]
+                category = params.get("category", ["Outros"])[0]
+                bpm_val = params.get("bpm", [""])[0]
+                limit_val = params.get("limit", ["3"])[0]
+                limit = int(limit_val) if limit_val and limit_val.isdigit() else 3
+
+                # Se veio apenas video_id, busca os metadados na biblioteca ou histórico
+                if vid and not title:
+                    lib = []
+                    if LIBRARY_FILE.exists():
+                        try:
+                            with open(LIBRARY_FILE, "r", encoding="utf-8") as f:
+                                lib = json.load(f)
+                        except Exception:
+                            pass
+                    t_match = next((t for t in lib if t.get("video_id") == vid), None)
+                    if not t_match and HISTORY_FILE.exists():
+                        try:
+                            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                                h_list = json.load(f)
+                                t_match = next((t for t in h_list if t.get("video_id") == vid), None)
+                        except Exception:
+                            pass
+                    if t_match:
+                        title = t_match.get("title", "")
+                        artist = t_match.get("artist", "")
+                        category = t_match.get("category", "Outros")
+                        if not bpm_val:
+                            bpm_val = str(t_match.get("bpm", 128))
+
+                target_bpm = int(bpm_val) if bpm_val and bpm_val.isdigit() else None
+                tracks = discover_related_tracks(title, artist, category, current_video_id=vid, target_bpm=target_bpm, limit=limit)
+                self.send_json({
+                    "success": True,
+                    "video_id": vid,
+                    "title": title,
+                    "artist": artist,
+                    "category": category,
+                    "target_bpm": target_bpm,
+                    "tracks": tracks[:limit],
+                    "count": len(tracks[:limit])
+                })
                 return
 
             if path == "/api/suggestions/discover":

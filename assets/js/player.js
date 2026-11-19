@@ -3437,8 +3437,9 @@ function updateUpcomingTrackUI() {
             }
 
             if (modal) {
-                modal.style.display = "flex";
-                modal.classList.add("open");
+                const trigger = window.__lastClickedTrigger || document.getElementById(`libCard_${videoId}`) || document.getElementById("headerMainLogo");
+                animateModalOpenFromTrigger(modal, trigger);
+                puxarBlocosDoModal(modal, 60);
             }
         }
         window.openMovePlaylistModal = openMovePlaylistModal;
@@ -3449,11 +3450,10 @@ function updateUpcomingTrackUI() {
         window.openMovePlaylistModalByVideoId = openMovePlaylistModalByVideoId;
 
         function closeMovePlaylistModal(e) {
-            if (e && e.target && e.target !== document.getElementById("movePlaylistModal")) return;
+            if (e && e.target && e.target !== document.getElementById("movePlaylistModal") && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const modal = document.getElementById("movePlaylistModal");
             if (modal) {
-                modal.style.display = "none";
-                modal.classList.remove("open");
+                animateModalCloseToTrigger(modal);
             }
             currentTrackToMove = null;
             currentSourceCategory = null;
@@ -3574,19 +3574,18 @@ function updateUpcomingTrackUI() {
             }
 
             if (modal) {
-                modal.style.display = "flex";
-                modal.classList.add("open");
+                const trigger = window.__lastClickedTrigger || document.getElementById(`libCard_${vid}`) || document.getElementById("headerMainLogo");
+                animateModalOpenFromTrigger(modal, trigger);
             }
         }
         window.openConfirmRemoveModal = openConfirmRemoveModal;
         window.removeLibraryTrackPrompt = openConfirmRemoveModal; // Retrocompatibilidade
 
         function closeConfirmRemoveModal(e) {
-            if (e && e.target && e.target !== document.getElementById("confirmRemoveModal")) return;
+            if (e && e.target && e.target !== document.getElementById("confirmRemoveModal") && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const modal = document.getElementById("confirmRemoveModal");
             if (modal) {
-                modal.style.display = "none";
-                modal.classList.remove("open");
+                animateModalCloseToTrigger(modal);
             }
             currentTrackToRemove = null;
         }
@@ -4338,6 +4337,12 @@ function triggerCrossfade(nextTrack) {
 
             showCrossfadeIndicator();
 
+            // Registra a entrada da nova faixa imediatamente no histórico e nas estatísticas de curadoria
+            nowPlayingTrack = incomingTrack;
+            if (typeof recordTrackInHistory === "function") {
+                recordTrackInHistory(incomingTrack);
+            }
+
             // Prepara a UI dos dois Decks para o crossfade
             const deckATitle = document.getElementById("deckATitle");
             const deckAArtist = document.getElementById("deckAArtist");
@@ -4520,7 +4525,7 @@ function triggerCrossfade(nextTrack) {
                         resetDecksContourUI();
                         setDeckCrossoverEngaged(false);
                         startTimeMonitor();
-                        if (typeof recordTrackInHistory === "function") recordTrackInHistory(incomingTrack);
+                        // recordTrackInHistory já foi chamado no início do crossfade (triggerCrossfade)
                         if (typeof calculateDjModeNextTrack === "function") calculateDjModeNextTrack(incomingTrack);
                         renderAllActiveLists();
                         updateUpcomingTrackUI();
@@ -4619,7 +4624,7 @@ function triggerCrossfade(nextTrack) {
                         resetDecksContourUI();
                         setDeckCrossoverEngaged(false);
                         startTimeMonitor();
-                        if (typeof recordTrackInHistory === "function") recordTrackInHistory(incomingTrack);
+                        // recordTrackInHistory já foi chamado no início do crossfade (triggerCrossfade)
                         if (typeof calculateDjModeNextTrack === "function") calculateDjModeNextTrack(incomingTrack);
                         renderAllActiveLists();
                         updateUpcomingTrackUI();
@@ -4877,6 +4882,14 @@ function triggerCrossfade(nextTrack) {
             const isPlaying = (engineMode === "audio" && curAudio && !curAudio.paused && curAudio.currentTime > 0) || 
                               (engineMode === "video" && activeP && typeof activeP.getPlayerState === "function" && 
                                (activeP.getPlayerState() === YT.PlayerState.PLAYING || activeP.getPlayerState() === YT.PlayerState.BUFFERING));
+
+            // Se o usuário trocou de faixa manualmente enquanto uma tocava e estava com menos de 40% tocada, registra skip!
+            if (isPlaying && nowPlayingTrack && nowPlayingTrack.video_id && nowPlayingTrack.video_id !== track.video_id) {
+                const { curr, dur } = getCurrentPlaybackPosition();
+                if (dur > 0 ? (curr < dur * 0.4) : (curr < 30)) {
+                    recordSkipStat(nowPlayingTrack.video_id);
+                }
+            }
 
             if (isPlaying && crossfadeSeconds > 0 && nowPlayingTrack && nowPlayingTrack.video_id !== track.video_id) {
                 triggerCrossfade(track);
@@ -5436,22 +5449,27 @@ function triggerCrossfade(nextTrack) {
             ctx.stroke();
         }
 
-        function openEqualizerModal() {
+        function openEqualizerModal(e) {
             const m = document.getElementById("equalizerModal");
-            if (m) m.classList.add("open");
+            if (!m) return;
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .bar-pill-btn, [onclick*='openEqualizerModal']")))) ||
+                window.__lastClickedTrigger ||
+                document.getElementById("barEqBtn") ||
+                document.getElementById("btnOpenEqualizer");
+            animateModalOpenFromTrigger(m, trigger);
             selectEqPreset(currentEqPreset);
             const preSlider = document.getElementById("eqPreAmpSlider");
             if (preSlider) preSlider.value = eqPreAmpValue;
             const preVal = document.getElementById("eqPreAmpVal");
             if (preVal) preVal.textContent = (eqPreAmpValue > 0 ? `+${eqPreAmpValue}` : `${eqPreAmpValue}`) + " dB";
             updateVolumeUI();
-            setTimeout(drawEqCurve, 40);
+            setTimeout(drawEqCurve, 50);
         }
 
         function closeEqualizerModal(e) {
-            if (e && e.target && e.target.id !== "equalizerModal") return;
+            if (e && e.target && e.target.id !== "equalizerModal" && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const m = document.getElementById("equalizerModal");
-            if (m) m.classList.remove("open");
+            if (m) animateModalCloseToTrigger(m);
         }
 
         // ==========================================================
@@ -6173,7 +6191,7 @@ function triggerCrossfade(nextTrack) {
             applyStemsToDsp();
         }
 
-        function openStemsModal() {
+        function openStemsModal(e) {
             initWebAudio();
             if (audioCtx && audioCtx.state === "suspended") {
                 audioCtx.resume();
@@ -6181,18 +6199,27 @@ function triggerCrossfade(nextTrack) {
             if (!stemsDspInitialized) {
                 initStemsDsp();
             }
-            const modal = document.getElementById("stemsModal") || document.getElementById("djStemsModal");
-            if (modal) modal.style.display = "flex";
+            const modal = document.getElementById("djStemsModal") || document.getElementById("stemsModal");
+            if (!modal) return;
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .bar-pill-btn, [onclick*='openStemsModal']")))) ||
+                window.__lastClickedTrigger ||
+                document.getElementById("barStemsBtn") ||
+                document.getElementById("btnPlayerBarStems");
+            animateModalOpenFromTrigger(modal, trigger);
             updateStemsUI();
             startStemsMeters();
         }
 
-        function closeStemsModal() {
-            const modal = document.getElementById("stemsModal") || document.getElementById("djStemsModal");
-            if (modal) modal.style.display = "none";
-            if (stemsMeterAnimId) {
-                cancelAnimationFrame(stemsMeterAnimId);
-                stemsMeterAnimId = null;
+        function closeStemsModal(e) {
+            if (e && e.target && e.target.id !== "djStemsModal" && e.target.id !== "stemsModal" && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
+            const modal = document.getElementById("djStemsModal") || document.getElementById("stemsModal");
+            if (modal) {
+                animateModalCloseToTrigger(modal, () => {
+                    if (stemsMeterAnimId) {
+                        cancelAnimationFrame(stemsMeterAnimId);
+                        stemsMeterAnimId = null;
+                    }
+                });
             }
         }
 
@@ -7156,7 +7183,7 @@ function triggerCrossfade(nextTrack) {
             // automático não conta (só decisão explícita e precoce de pular).
             if (dir === "next" && nowPlayingTrack && nowPlayingTrack.video_id) {
                 const { curr, dur } = getCurrentPlaybackPosition();
-                if (dur > 0 && curr < dur * 0.4) {
+                if (dur > 0 ? (curr < dur * 0.4) : (curr < 30)) {
                     recordSkipStat(nowPlayingTrack.video_id);
                 }
             }
@@ -7691,18 +7718,24 @@ function triggerCrossfade(nextTrack) {
             renderSpotifyQueueModalContent();
         }
 
-        function openSpotifyQueueModal() {
+        function openSpotifyQueueModal(e) {
             const m = document.getElementById("spotifyQueueModal");
             if (m) {
-                m.style.display = "flex";
+                const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .btn-action, [onclick*='openSpotifyQueueModal']")))) ||
+                    document.getElementById("btnOpenQueueModal") ||
+                    document.querySelector("[onclick*='openSpotifyQueueModal']");
+                animateModalOpenFromTrigger(m, trigger);
                 renderSpotifyQueueModalContent();
+                puxarBlocosDoModal(m, 100);
             }
         }
 
         function closeSpotifyQueueModal(e) {
-            if (e && e.target && e.target.id !== "spotifyQueueModal") return;
+            if (e && e.target && e.target.id !== "spotifyQueueModal" && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const m = document.getElementById("spotifyQueueModal");
-            if (m) m.style.display = "none";
+            if (m) {
+                animateModalCloseToTrigger(m);
+            }
         }
 
         function renderSpotifyQueueModalContent() {
@@ -8531,7 +8564,7 @@ function triggerCrossfade(nextTrack) {
         let isAutoBeatmatchEnabled = true;
         let currentPitchAdjustment = 0; // %
 
-        function openBpmModal() {
+        function openBpmModal(e) {
             const modal = document.getElementById("bpmSyncModal");
             if (!modal) return;
 
@@ -8597,13 +8630,17 @@ function triggerCrossfade(nextTrack) {
             if (checkSync) checkSync.checked = isAutoBeatmatchEnabled;
             updateBpmPitchUI();
 
-            modal.style.display = "flex";
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .bar-pill-btn, .bpm-live-quick-btn, .dj-bpm-sync, [onclick*='openBpmModal']")))) ||
+                window.__lastClickedTrigger ||
+                document.getElementById("barBpmSyncBtn") ||
+                document.getElementById("djBpmSyncBadge");
+            animateModalOpenFromTrigger(modal, trigger);
         }
 
         function closeBpmModal(event) {
-            if (event && event.target && event.target !== event.currentTarget) return;
+            if (event && event.target && event.target !== event.currentTarget && !event.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const modal = document.getElementById("bpmSyncModal");
-            if (modal) modal.style.display = "none";
+            if (modal) animateModalCloseToTrigger(modal);
         }
 
         function toggleAutoBpmSync(checked) {
@@ -9040,7 +9077,48 @@ function triggerCrossfade(nextTrack) {
                 }
 
                 schedule(() => {
-                    // Tempo 3: esconde o carregamento e remonta painéis + cards em cascata.
+                    // Tempo 3: A logo voa até o botão do Modo de Atuação (FLIP Animation estilo AutoPost)
+                    const logoBox = document.getElementById("modeTransitionLogoBox");
+                    const targetBtn = document.getElementById("btnDjActTrigger");
+                    const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
+
+                    if (logoBox && targetBtn && logoBox.animate && !reduceMotion) {
+                        const de = logoBox.getBoundingClientRect();
+                        const para = targetBtn.getBoundingClientRect();
+                        if (de.width > 0 && para.width > 0) {
+                            const escala = Math.max(0.2, para.height / de.height);
+                            const dx = (para.left + para.width / 2) - (de.left + de.width / 2);
+                            const dy = (para.top + para.height / 2) - (de.top + de.height / 2);
+
+                            const voo = logoBox.animate([
+                                { transform: "none", opacity: 1 },
+                                { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, opacity: 0 }
+                            ], {
+                                duration: 680,
+                                easing: "cubic-bezier(.65, 0, .2, 1)",
+                                fill: "forwards"
+                            });
+
+                            // Desliga o overlay e remonta a interface com cascade stagger estilo AutoPost
+                            overlay.classList.remove("is-active");
+                            reassemblePanels(panels, reduceMotion);
+                            reassembleTrackCards(cards, reduceMotion);
+
+                            voo.onfinish = () => {
+                                voo.cancel();
+                                // Pulso de pouso no botão do Modo de Atuação
+                                if (targetBtn.animate) {
+                                    targetBtn.animate([
+                                        { transform: "scale(1.18)", boxShadow: `0 0 25px rgba(${modeColor.rgb}, 0.8)` },
+                                        { transform: "none", boxShadow: "none" }
+                                    ], { duration: 340, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+                                }
+                            };
+                            return;
+                        }
+                    }
+
+                    // Fallback
                     overlay.classList.remove("is-active");
                     reassemblePanels(panels, reduceMotion);
                     reassembleTrackCards(cards, reduceMotion);
@@ -9298,61 +9376,319 @@ function triggerCrossfade(nextTrack) {
             }
         }
 
-        async function openHistoryModal() {
+        async function openHistoryModal(e) {
             const modal = document.getElementById("historyModal");
             if (!modal) return;
             const curCount = (playbackHistory && playbackHistory.length) || 0;
             updateHistoryBadge(curCount);
-            modal.style.display = "flex";
-            modal.classList.add("open");
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .btn-action, [onclick*='openHistoryModal']")))) ||
+                document.getElementById("btnOpenHistoryModal") ||
+                document.querySelector("[onclick*='openHistoryModal']");
+            animateModalOpenFromTrigger(modal, trigger);
             await renderHistoryModal();
+            puxarBlocosDoModal(modal, 100);
         }
 
         function closeHistoryModal(e) {
-            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay")) return;
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay") && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const modal = document.getElementById("historyModal");
             if (modal) {
-                modal.style.display = "none";
-                modal.classList.remove("open");
+                animateModalCloseToTrigger(modal);
             }
+        }
+
+        // ==========================================================
+        // EFEITO MORPH FLIP & CASSETE DE CARDS ESTILO AUTOPOST
+        // Abre o modal voando e expandindo do botão clicado, e ao fechar
+        // desmonta os cards internos e contrai de volta pro botão de origem!
+        // ==========================================================
+        const CURVA_AUTOPOST = "cubic-bezier(.16, 1, .3, 1)";
+        const CURVA_POUSO_AUTOPOST = "cubic-bezier(.65, 0, .2, 1)";
+
+        // Captura global do último elemento interativo clicado (fase de captura)
+        window.__lastClickedTrigger = null;
+        document.addEventListener("click", function (evt) {
+            try {
+                const interactive = evt.target && evt.target.closest(
+                    "button, .btn-action, .btn-header-action, .btn-mode-nav, .btn-add-playlist, .history-track-card, .btn-search-ext-quick, .btn-curation-hub, .bar-pill-btn, .nav-btn, .bpm-live-quick-btn, .dj-bpm-sync, .brand-headphone-box, .btn-refresh-curation, a, [role='button'], [onclick]"
+                );
+                if (interactive && !interactive.classList.contains("eq-modal-overlay") && !interactive.classList.contains("eq-close-btn") && !interactive.classList.contains("btn-modal-done") && !interactive.classList.contains("btn-modal-close")) {
+                    window.__lastClickedTrigger = interactive;
+                }
+            } catch (err) {}
+        }, true);
+
+        function pulseHeaderLogo() {
+            const box = document.querySelector(".brand-headphone-box");
+            const logo = document.getElementById("headerMainLogo");
+            if (logo && logo.animate) {
+                logo.animate([
+                    { transform: "scale(0.88) rotate(-5deg)", filter: "drop-shadow(0 0 25px #00f2fe) brightness(1.3)" },
+                    { transform: "scale(1.22) rotate(4deg)", filter: "drop-shadow(0 0 45px #00f2fe) brightness(1.8)" },
+                    { transform: "scale(1) rotate(0deg)", filter: "drop-shadow(0 0 16px rgba(0, 242, 254, 0.4)) brightness(1)" }
+                ], { duration: 420, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+            }
+            if (box && box.animate) {
+                box.animate([
+                    { boxShadow: "0 0 35px rgba(0, 242, 254, 0.9)" },
+                    { boxShadow: "0 0 15px rgba(0, 242, 254, 0.25)" }
+                ], { duration: 420, easing: "ease-out" });
+            }
+        }
+        window.pulseHeaderLogo = pulseHeaderLogo;
+
+        function animateModalOpenFromTrigger(modalEl, triggerEl) {
+            if (!modalEl) return;
+            const card = modalEl.querySelector(".eq-modal-card");
+            if (!card) {
+                modalEl.style.display = "flex";
+                modalEl.classList.add("open");
+                return;
+            }
+
+            const headphone = document.getElementById("headerMainLogo") || document.querySelector(".brand-headphone-box");
+            let effTrigger = triggerEl;
+            if (!effTrigger || !effTrigger.getBoundingClientRect || effTrigger.getBoundingClientRect().width === 0) {
+                effTrigger = window.__lastClickedTrigger;
+            }
+            if (!effTrigger || !effTrigger.getBoundingClientRect || effTrigger.getBoundingClientRect().width === 0) {
+                effTrigger = headphone;
+            }
+
+            modalEl._originTrigger = effTrigger || null;
+
+            // Pulso no elemento de origem (botão clicado ou headphone logo)
+            if (effTrigger && effTrigger.animate) {
+                effTrigger.animate([
+                    { transform: "scale(0.92)", boxShadow: "0 0 20px rgba(0, 242, 254, 0.8)" },
+                    { transform: "scale(1.08)", boxShadow: "0 0 35px rgba(0, 242, 254, 0.4)" },
+                    { transform: "none", boxShadow: "none" }
+                ], { duration: 320, easing: CURVA_AUTOPOST });
+            }
+
+            // CRÍTICO ANTI-FLASH: Esconde o card no instante exato em que o overlay é exibido
+            // Isso evita 100% qualquer frame onde o modal inteiro aparece no centro antes de voar!
+            card.style.opacity = "0";
+            card.style.visibility = "hidden";
+            modalEl.style.display = "flex";
+            modalEl.classList.add("open");
+
+            if (modalEl.animate) {
+                modalEl.animate([
+                    { opacity: 0 },
+                    { opacity: 1 }
+                ], { duration: 260, easing: "ease-out", fill: "both" });
+            }
+
+            const fromRect = effTrigger ? effTrigger.getBoundingClientRect() : null;
+            const toRect = card.getBoundingClientRect();
+
+            card.style.visibility = "";
+            card.style.opacity = "";
+
+            if (fromRect && fromRect.width > 0 && fromRect.height > 0 && toRect.width > 0 && toRect.height > 0 && card.animate) {
+                const fromCenterX = fromRect.left + fromRect.width / 2;
+                const fromCenterY = fromRect.top + fromRect.height / 2;
+                const toCenterX = toRect.left + toRect.width / 2;
+                const toCenterY = toRect.top + toRect.height / 2;
+
+                const dx = fromCenterX - toCenterX;
+                const dy = fromCenterY - toCenterY;
+                const scaleX = Math.max(0.08, Math.min(0.85, fromRect.width / toRect.width));
+                const scaleY = Math.max(0.06, Math.min(0.85, fromRect.height / toRect.height));
+
+                card.animate([
+                    {
+                        opacity: 0,
+                        transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`,
+                        borderRadius: "28px",
+                        boxShadow: "0 0 50px rgba(0, 242, 254, 0.9), inset 0 0 20px rgba(0, 242, 254, 0.6)"
+                    },
+                    {
+                        opacity: 1,
+                        transform: "none",
+                        borderRadius: "14px",
+                        boxShadow: "0 16px 40px rgba(0, 0, 0, 0.85)"
+                    }
+                ], {
+                    duration: 380,
+                    easing: CURVA_AUTOPOST,
+                    fill: "both"
+                });
+            } else if (card.animate) {
+                card.animate([
+                    { opacity: 0, transform: "scale(0.88) translateY(20px)" },
+                    { opacity: 1, transform: "none" }
+                ], {
+                    duration: 320,
+                    easing: CURVA_AUTOPOST,
+                    fill: "both"
+                });
+            }
+        }
+
+        function puxarBlocosDoModal(modalEl, delayBase = 100) {
+            if (!modalEl) return;
+            // Puxa APENAS cards de listas dinâmicas geradas no corpo do modal
+            // NUNCA o #trackCurationBaseCard ou títulos estáticos!
+            const items = modalEl.querySelectorAll(
+                ".history-track-card:not(#trackCurationBaseCard):not(.track-novidade-card), .queue-track-card, .move-playlist-opt-card"
+            );
+            items.forEach((el, i) => {
+                if (!el.animate) return;
+                el.animate([
+                    { opacity: 0, transform: "translate(24px, 36px) scale(0.95)" },
+                    { opacity: 1, transform: "none" }
+                ], {
+                    duration: 440,
+                    delay: delayBase + Math.min(i, 10) * 45,
+                    easing: CURVA_AUTOPOST,
+                    fill: "both"
+                });
+            });
+        }
+
+        function animateModalCloseToTrigger(modalEl, onClosed) {
+            if (!modalEl) {
+                if (onClosed) onClosed();
+                return;
+            }
+
+            const card = modalEl.querySelector(".eq-modal-card");
+            const headphone = document.getElementById("headerMainLogo") || document.querySelector(".brand-headphone-box");
+            let triggerEl = modalEl._originTrigger || window.__lastClickedTrigger || headphone;
+
+            // Desmonta os cards internos voando em diagonal reversa estilo AutoPost
+            const items = modalEl.querySelectorAll(
+                ".history-track-card:not(#trackCurationBaseCard), .queue-track-card, .stems-card-row, .move-playlist-opt-card, .eq-band-col, .studio-rack-module"
+            );
+            if (items.length > 0) {
+                items.forEach((el, i) => {
+                    if (!el.animate) return;
+                    el.animate([
+                        { opacity: 1, transform: "none" },
+                        { opacity: 0, transform: "translate(18px, 24px) scale(0.94)" }
+                    ], {
+                        duration: 180,
+                        delay: Math.min(items.length - 1 - i, 6) * 16,
+                        easing: "cubic-bezier(.4, 0, .2, 1)",
+                        fill: "forwards"
+                    });
+                });
+            }
+
+            if (triggerEl && card && card.animate) {
+                const toRect = triggerEl.getBoundingClientRect();
+                const fromRect = card.getBoundingClientRect();
+
+                if (toRect.width > 0 && toRect.height > 0 && fromRect.width > 0 && fromRect.height > 0) {
+                    const fromCenterX = fromRect.left + fromRect.width / 2;
+                    const fromCenterY = fromRect.top + fromRect.height / 2;
+                    const toCenterX = toRect.left + toRect.width / 2;
+                    const toCenterY = toRect.top + toRect.height / 2;
+
+                    const dx = toCenterX - fromCenterX;
+                    const dy = toCenterY - fromCenterY;
+                    const scaleX = Math.max(0.08, Math.min(0.85, toRect.width / fromRect.width));
+                    const scaleY = Math.max(0.06, Math.min(0.85, toRect.height / fromRect.height));
+
+                    if (modalEl.animate) {
+                        modalEl.animate([
+                            { opacity: 1 },
+                            { opacity: 0 }
+                        ], { duration: 280, easing: "ease-in", fill: "forwards" });
+                    }
+
+                    const anim = card.animate([
+                        {
+                            opacity: 1,
+                            transform: "none",
+                            borderRadius: "14px"
+                        },
+                        {
+                            opacity: 0,
+                            transform: `translate(${dx}px, ${dy}px) scale(${scaleX}, ${scaleY})`,
+                            borderRadius: "28px",
+                            boxShadow: "0 0 35px rgba(0, 242, 254, 0.85)"
+                        }
+                    ], {
+                        duration: 290,
+                        easing: CURVA_POUSO_AUTOPOST,
+                        fill: "forwards"
+                    });
+
+                    anim.onfinish = () => {
+                        modalEl.style.display = "none";
+                        modalEl.classList.remove("open");
+                        anim.cancel();
+                        // Pulso de chegada no elemento de origem!
+                        if (triggerEl && triggerEl.animate) {
+                            triggerEl.animate([
+                                { transform: "scale(1.18)", boxShadow: "0 0 28px rgba(0, 242, 254, 0.9)" },
+                                { transform: "none", boxShadow: "none" }
+                            ], { duration: 320, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+                        }
+                        if (triggerEl && (triggerEl.id === "headerMainLogo" || triggerEl.classList.contains("brand-headphone-box"))) {
+                            pulseHeaderLogo();
+                        }
+                        modalEl._originTrigger = null;
+                        if (onClosed) onClosed();
+                    };
+                    return;
+                }
+            }
+
+            modalEl.style.display = "none";
+            modalEl.classList.remove("open");
+            modalEl._originTrigger = null;
+            if (onClosed) onClosed();
         }
 
         // --- MODAL DE CURADORIA DE MÚSICAS (ASSISTIDA POR IA) ---
         let currentCurationData = { promote: [], remove_candidates: [] };
 
-        async function openCurationModal() {
+        async function openCurationModal(e) {
             const modal = document.getElementById("curationModal");
             if (!modal) return;
-            modal.style.display = "flex";
-            modal.classList.add("open");
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .btn-search-ext-quick, .btn-curation-hub")))) ||
+                window.__lastClickedTrigger ||
+                document.querySelector('.btn-search-ext-quick') ||
+                document.getElementById("btnOpenCuration");
+            animateModalOpenFromTrigger(modal, trigger);
             await renderCurationModal();
+            puxarBlocosDoModal(modal, 60);
         }
 
         function closeCurationModal(e) {
-            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay")) return;
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay") && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
             const modal = document.getElementById("curationModal");
             if (modal) {
-                modal.style.display = "none";
-                modal.classList.remove("open");
+                animateModalCloseToTrigger(modal);
             }
         }
 
         function curationTrackCardHtml(track, idx, section) {
             const bpmVal = track.bpm || 128;
             const pct = Math.round((track.skip_rate || 0) * 100);
-            const statHtml = section === "promote"
-                ? `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${track.plays}x tocada${track.skips ? ` • pulada ${track.skips}x` : ""}</span>`
-                : `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays})</span>`;
+            let statHtml = "";
+            if (section === "promote") {
+                statHtml = `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${track.plays}x tocada${track.skips ? ` • pulada ${track.skips}x` : ""}</span>`;
+            } else if (section === "remove") {
+                statHtml = `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays})</span>`;
+            } else {
+                statHtml = `<span class="history-mode-chip" style="background: rgba(0,242,254,0.15); border-color: rgba(0,242,254,0.4); color: #00f2fe;">⏳ ${track.plays}/3 plays para virar favorita${track.skips ? ` • ${track.skips} pulo` : ""}</span>`;
+            }
 
-            const actionsHtml = section === "promote"
+            const actionsHtml = section === "remove"
                 ? `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
-                   <button class="btn-add-queue" onclick="queueCurationTrack(${idx}, '${section}')">+ Fila</button>`
-                : `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
-                   <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">🗑️ Remover</button>`;
+                   <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">🗑️ Remover</button>`
+                : `<button class="btn-add-playlist" onclick="openTrackCurationModal('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', ${bpmVal}, ${track.plays || 0}, event)" title="Ver 3 novidades ideais selecionadas pela IA para esta música" style="background: rgba(0,242,254,0.12); border-color: rgba(0,242,254,0.4); color: #00f2fe; font-weight: 600; padding: 4px 8px; font-size: 11px;">✨ 3 Novidades</button>
+                   <button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
+                   <button class="btn-add-queue" onclick="queueCurationTrack(${idx}, '${section}')">+ Fila</button>`;
 
             return `
                 <div class="history-track-card" id="curCard_${section}_${track.video_id}">
-                    <div class="history-card-left">
+                    <div class="history-card-left" onclick="openTrackCurationModal('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', ${bpmVal}, ${track.plays || 0}, event)" style="cursor: pointer;" title="Clique para ver 3 novidades ideais para ${escapeQuotes(track.title)}">
                         <div class="history-thumb-box">
                             <img src="${getTrackThumbnailUrl(track)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
                         </div>
@@ -9380,15 +9716,27 @@ function triggerCrossfade(nextTrack) {
                 const data = await res.json();
                 currentCurationData = data;
 
-                if ((!data.promote || data.promote.length === 0) && (!data.remove_candidates || data.remove_candidates.length === 0)) {
-                    container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--text-dim);">
+                let html = "";
+                // Estatísticas da curadoria em tempo real
+                html += `
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: 11px; color: var(--text-dim); background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+                        <span>📊 <strong>${data.total_plays || 0}</strong> reproduções monitoradas</span>
+                        <span>•</span>
+                        <span>🎵 <strong>${data.tracked_count || 0}</strong> faixas no radar</span>
+                        <span>•</span>
+                        <span>⏭ <strong>${data.total_skips || 0}</strong> pulos</span>
+                    </div>
+                `;
+
+                if ((!data.promote || data.promote.length === 0) && (!data.remove_candidates || data.remove_candidates.length === 0) && (!data.in_observation || data.in_observation.length === 0)) {
+                    html += `<div style="text-align: center; padding: 30px; color: var(--text-dim);">
                         Ainda não há dados suficientes pra sugerir nada.<br>
-                        <span style="font-size: 11px;">Continue ouvindo e pulando faixas normalmente - a curadoria aprende sozinha com o uso (precisa de pelo menos 3 plays/pulos numa mesma faixa pra opinar sobre ela).</span>
+                        <span style="font-size: 11px;">Continue ouvindo e pulando faixas normalmente - a curadoria aprende automaticamente enquanto você ouve!</span>
                     </div>`;
+                    container.innerHTML = html;
                     return;
                 }
 
-                let html = "";
                 if (data.promote && data.promote.length > 0) {
                     html += `<div class="queue-modal-section-title">🔥 Suas favoritas de verdade (toca muito, quase nunca pula)</div>`;
                     html += data.promote.map((t, i) => curationTrackCardHtml(t, i, "promote")).join("");
@@ -9397,6 +9745,10 @@ function triggerCrossfade(nextTrack) {
                     html += `<div class="queue-modal-section-title" style="margin-top: 14px;">⚠️ Candidatas a sair da rotação (você pula na maioria das vezes)</div>`;
                     html += data.remove_candidates.map((t, i) => curationTrackCardHtml(t, i, "remove")).join("");
                 }
+                if (data.in_observation && data.in_observation.length > 0) {
+                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">📈 Em Observação (a caminho de virar favoritas)</div>`;
+                    html += data.in_observation.slice(0, 8).map((t, i) => curationTrackCardHtml(t, i, "in_observation")).join("");
+                }
                 container.innerHTML = html;
             } catch (e) {
                 container.innerHTML = `<div style="text-align: center; padding: 25px; color: #ff5555;">Erro ao carregar a curadoria. Tente novamente.</div>`;
@@ -9404,18 +9756,183 @@ function triggerCrossfade(nextTrack) {
         }
 
         function playCurationTrack(idx, section) {
-            const list = section === "promote" ? currentCurationData.promote : currentCurationData.remove_candidates;
+            const list = section === "promote" ? currentCurationData.promote : 
+                         section === "remove" ? currentCurationData.remove_candidates : 
+                         currentCurationData.in_observation;
             const track = list && list[idx];
             if (!track) return;
             playCustomTrack(track.video_id, track.title, track.artist || "", track.category || "", "Curadoria IA", track.bpm || 128);
         }
 
         function queueCurationTrack(idx, section) {
-            const list = section === "promote" ? currentCurationData.promote : currentCurationData.remove_candidates;
+            const list = section === "promote" ? currentCurationData.promote : 
+                         section === "remove" ? currentCurationData.remove_candidates : 
+                         currentCurationData.in_observation;
             const track = list && list[idx];
             if (!track) return;
             addToQueue(track);
         }
+
+        // --- MODAL DE NOVIDADES EXCLUSIVAS DA FAIXA (CURADORIA ESPECÍFICA) ---
+        let currentTargetTrackCuration = null;
+
+        async function openTrackCurationModal(videoId, title, artist, category, bpm, plays = 0, e = null) {
+            currentTargetTrackCuration = { video_id: videoId, title, artist, category, bpm, plays };
+            const modal = document.getElementById("trackCurationModal");
+            if (!modal) return;
+            
+            const subEl = document.getElementById("trackCurationModalSub");
+            if (subEl) subEl.textContent = `3 novidades ideais selecionadas pela IA baseadas em ritmo, BPM (${bpm}) e estilo de "${title.slice(0, 35)}...".`;
+
+            const baseCardEl = document.getElementById("trackCurationBaseCard");
+            if (baseCardEl) {
+                const bpmBadge = bpm ? `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>` : "";
+                const playsBadge = plays > 0 ? `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${plays}x tocada</span>` : "";
+                baseCardEl.innerHTML = `
+                    <div class="history-card-left">
+                        <div class="history-thumb-box">
+                            <img src="${getTrackThumbnailUrl({video_id: videoId})}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title" style="color: #00f2fe; font-weight: 700;">🎯 Faixa Base: ${escapeQuotes(title)}</div>
+                            <div class="history-sub">
+                                <span class="history-artist-text">${escapeQuotes(artist || category || "")}</span>
+                                ${bpmBadge}
+                                ${playsBadge}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn-history-play" onclick="playCustomTrack('${videoId}', '${escapeQuotes(title)}', '${escapeQuotes(artist || '')}', '${escapeQuotes(category || '')}', 'Curadoria IA', ${bpm || 128})" title="Tocar esta faixa agora">▶</button>
+                    </div>
+                `;
+                // Faixa base firme e visível, sem nunca piscar
+                baseCardEl.style.opacity = "1";
+                baseCardEl.style.transform = "none";
+            }
+
+            const trigger = (e && (e.currentTarget || (e.target && e.target.closest(".history-track-card, button, .btn-add-playlist")))) ||
+                document.getElementById(`curCard_promote_${videoId}`) ||
+                document.getElementById(`curCard_remove_${videoId}`) ||
+                document.getElementById(`curCard_in_observation_${videoId}`) ||
+                window.__lastClickedTrigger;
+
+            animateModalOpenFromTrigger(modal, trigger);
+            // Busca as 3 novidades (os novos cards se auto-animam suavemente, sem piscar o card base)
+            await loadTrackCurationNovidades();
+        }
+
+        async function refreshCurrentTrackCuration() {
+            if (!currentTargetTrackCuration) return;
+            await loadTrackCurationNovidades();
+        }
+
+        async function loadTrackCurationNovidades() {
+            if (!currentTargetTrackCuration) return;
+            const container = document.getElementById("trackCurationModalItems");
+            if (!container) return;
+
+            container.innerHTML = `
+                <div style="text-align: center; padding: 25px; color: var(--text-dim);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⏳</div>
+                    Analisando padrão sonoro e minerando as 3 melhores novidades no YouTube e SoundCloud...
+                </div>
+            `;
+
+            try {
+                const t = currentTargetTrackCuration;
+                const url = `/api/curation/track-novidades?video_id=${encodeURIComponent(t.video_id)}&title=${encodeURIComponent(t.title)}&artist=${encodeURIComponent(t.artist || '')}&category=${encodeURIComponent(t.category || '')}&bpm=${t.bpm || 128}&limit=3`;
+                const res = await fetchWithTimeout(url, {}, 45000);
+                const data = await res.json();
+                const tracks = data.tracks || [];
+
+                if (!tracks || tracks.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 25px; color: var(--text-dim);">
+                            Nenhuma faixa parecida nova encontrada no momento fora da sua biblioteca.<br>
+                            <span style="font-size: 11px;">Tente clicar em '🔄 Outras 3' ou continue ouvindo para atualizar os filtros.</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = "";
+                tracks.forEach((track, idx) => {
+                    const bpmVal = track.bpm || t.bpm || 128;
+                    html += `
+                        <div class="history-track-card track-novidade-card" id="trackNovidadeCard_${idx}">
+                            <div class="history-card-left">
+                                <div class="history-thumb-box">
+                                    <img src="${getTrackThumbnailUrl(track)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                                </div>
+                                <div class="history-info">
+                                    <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
+                                    <div class="history-sub">
+                                        <span class="history-artist-text">${escapeQuotes(track.artist || track.category || "")}</span>
+                                        <span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>
+                                        ${getTrackSourceBadgeHtml(track)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn-history-play" onclick="playCustomTrack('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', 'Novidade Curadoria', ${bpmVal})" title="Tocar esta faixa agora">▶</button>
+                                <button class="btn-add-playlist" onclick="saveTrackNovidadeToLibrary(${idx})" title="Salvar na sua biblioteca">⭐ + Playlist</button>
+                                <button class="btn-add-queue" onclick="addCustomTrackToQueue('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', 'Novidade Curadoria', ${bpmVal})">+ Fila</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                window.__currentTrackNovidades = tracks;
+
+                // Animação de entrada fluida e cascateada APENAS dos 3 novos cards de novidades
+                const newCards = container.querySelectorAll(".track-novidade-card");
+                newCards.forEach((c, i) => {
+                    if (c.animate) {
+                        c.animate([
+                            { opacity: 0, transform: "translateY(22px) scale(0.96)" },
+                            { opacity: 1, transform: "none" }
+                        ], {
+                            duration: 380,
+                            delay: i * 75,
+                            easing: CURVA_AUTOPOST,
+                            fill: "both"
+                        });
+                    }
+                });
+            } catch (e) {
+                container.innerHTML = `<div style="text-align: center; padding: 25px; color: #ff5555;">Erro ao buscar novidades para esta faixa. Tente novamente.</div>`;
+            }
+        }
+
+        async function saveTrackNovidadeToLibrary(idx) {
+            const tracks = window.__currentTrackNovidades;
+            const track = tracks && tracks[idx];
+            if (!track) return;
+            const res = await saveHistoryTrackToLibrary(track.video_id, track.title, track.artist || "", track.category || "Outros", track.bpm || 128);
+            if (res) {
+                const btn = document.querySelector(`#trackNovidadeCard_${idx} .btn-add-playlist`);
+                if (btn) {
+                    btn.textContent = "✓ Salvo";
+                    btn.disabled = true;
+                    btn.style.background = "rgba(0, 230, 118, 0.2)";
+                    btn.style.color = "#00e676";
+                }
+            }
+        }
+
+        function closeTrackCurationModal(e) {
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay") && !e.target.closest(".eq-close-btn, .btn-modal-done")) return;
+            const modal = document.getElementById("trackCurationModal");
+            if (modal) {
+                animateModalCloseToTrigger(modal);
+            }
+        }
+
+        window.openTrackCurationModal = openTrackCurationModal;
+        window.closeTrackCurationModal = closeTrackCurationModal;
+        window.refreshCurrentTrackCuration = refreshCurrentTrackCuration;
+        window.saveTrackNovidadeToLibrary = saveTrackNovidadeToLibrary;
 
         // --- DESCOBERTA DE NOVIDADES, UMA LISTA POR FAVORITA (curadoria) ---
         // currentCurationDiscovery: [{video_id, title, artist, tracks: [...]}, ...] - uma
@@ -10434,28 +10951,35 @@ function applyStudioDspParams() {
 }
 
 // Funções da Interface do Usuário (UI)
-function openStudioModal() {
+function openStudioModal(e) {
     initWebAudio();
     if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
     initStudioDsp();
 
     const modal = document.getElementById("studioModal");
     if (modal) {
-        modal.style.display = "flex";
+        const trigger = (e && (e.currentTarget || (e.target && e.target.closest("button, .bar-pill-btn, [onclick*='openStudioModal']")))) ||
+            window.__lastClickedTrigger ||
+            document.getElementById("barStudioBtn") ||
+            document.getElementById("btnOpenStudio");
+        animateModalOpenFromTrigger(modal, trigger);
         updateStudioUiElements();
         startStudioVuLoop();
     }
 }
 
 function closeStudioModal(event) {
-    if (event && event.target && event.target.id !== "studioModal" && !event.target.classList.contains("btn-modal-close") && !event.target.classList.contains("btn-modal-done")) {
+    if (event && event.target && event.target.id !== "studioModal" && !event.target.classList.contains("btn-modal-close") && !event.target.classList.contains("btn-modal-done") && !event.target.closest(".eq-close-btn, .btn-modal-done")) {
         return;
     }
     const modal = document.getElementById("studioModal");
-    if (modal) modal.style.display = "none";
-    if (studioVuTimer) {
-        cancelAnimationFrame(studioVuTimer);
-        studioVuTimer = null;
+    if (modal) {
+        animateModalCloseToTrigger(modal, () => {
+            if (studioVuTimer) {
+                cancelAnimationFrame(studioVuTimer);
+                studioVuTimer = null;
+            }
+        });
     }
 }
 
