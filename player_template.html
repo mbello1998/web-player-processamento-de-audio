@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_20">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_24">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -13,7 +13,10 @@
         <div class="header-main-row">
             <div class="header-brand">
                 <div class="brand-headphone-box" id="headerMainLogo" title="Central de Músicas - Epicentro dos Efeitos" onclick="pulseHeaderLogo()">
-                    <img src="/assets/img/headphone_logo.gif" alt="Headphone Animado" class="brand-headphone-gif">
+                    <svg class="app-logo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
+                        <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
+                    </svg>
                     <span class="brand-headphone-glow"></span>
                     <span class="brand-headphone-ring"></span>
                 </div>
@@ -1240,7 +1243,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_20"></script>
+    <script src="/assets/js/player.js?v=20261119_24"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -2007,19 +2010,14 @@
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
         </div>
+        <!-- Mesma logo (SVG por código) do cabeçalho, aqui maior e com a animação de
+             "se desenhar" - é o mesmo objeto visual voando do cabeçalho pra cá e de volta,
+             não uma imagem separada (ver animateHeaderLogoToOverlay/animateOverlayLogoToHeader). -->
         <div class="transicao-logo-box" id="modeTransitionLogoBox">
-            <div class="transicao-headphone-core">
-                <img src="/assets/img/headphone_logo.gif" alt="Headphone Animado" class="mode-transition-headphone-img">
-            </div>
-            <svg class="transicao-logo" id="modeTransitionLogoSvg" width="96" height="96" viewBox="36 50 728 712" fill="none" stroke="currentColor" stroke-width="48" aria-hidden="true">
-                <circle cx="135" cy="150" r="65" pathLength="1" />
-                <circle cx="665" cy="150" r="65" pathLength="1" />
-                <circle cx="133" cy="662" r="65" pathLength="1" />
-                <circle cx="665" cy="662" r="65" pathLength="1" />
-                <path d="m135 215-2 382M665 215v382M184.8 191.7 400 372l215.2-180.3" pathLength="1" />
-                <path class="transicao-miolo" fill="currentColor" stroke="none" d="m232 335 168 165 168-165v83L400 583 232 418z" />
+            <svg class="app-logo-glyph" id="modeTransitionLogoSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
+                <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
             </svg>
-            <div class="mode-transition-icon-badge" id="modeTransitionIcon">⚡</div>
         </div>
         <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
         <div class="mode-transition-eq" aria-hidden="true">

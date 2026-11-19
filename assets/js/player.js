@@ -9031,13 +9031,13 @@ function triggerCrossfade(nextTrack) {
         function showModeTransitionOverlay(mode, label) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
-            const icon = document.getElementById("modeTransitionIcon");
             const labelEl = document.getElementById("modeTransitionLabel");
             const barFill = document.getElementById("modeTransitionBarFill");
 
-            const iconMatch = (label || "").match(/^(\S+)\s*(.*)$/);
-            if (icon) icon.textContent = iconMatch ? iconMatch[1] : "⚡";
-            if (labelEl) labelEl.textContent = iconMatch ? iconMatch[2] : (label || mode);
+            // O emoji do modo (ex: ⚡) vai junto do nome agora, não mais como selo em cima da
+            // logo - ficava sobreposto bem no centro do fone de ouvido, brigando com o desenho
+            // dele (reportado como ícone "desproporcional e grosseiro").
+            if (labelEl) labelEl.textContent = label || mode;
 
             const isAggressive = mode === "drop";
             overlay.classList.toggle("is-aggressive", isAggressive);
@@ -9069,6 +9069,32 @@ function triggerCrossfade(nextTrack) {
                     barFill.style.width = "0%";
                     barFill.style.transitionDuration = "0ms";
                 }
+
+                // FLIP de entrada: a logo "chega" vindo de onde ela mora de verdade (o ícone
+                // no cabeçalho) até o centro da tela - é o mesmo elemento visual indo e, mais
+                // abaixo, voltando pro mesmo lugar, não duas imagens diferentes cruzando.
+                // O overlay já tem display:flex sempre (só opacity muda em .is-active), então
+                // getBoundingClientRect() do logoBox já dá a posição real mesmo antes de ativar.
+                // Duração igual ao fade do fundo (.mode-transition-overlay, 0.35s) e não mais -
+                // com a logo demorando mais que o fundo pra chegar, a tela preta ficava cheia
+                // e sozinha por um instante antes da logo pousar (reportado como "tela preta
+                // aparece antes da logo vir").
+                const logoBoxEntrada = document.getElementById("modeTransitionLogoBox");
+                const headerLogoEntrada = document.getElementById("headerMainLogo");
+                if (logoBoxEntrada && headerLogoEntrada && logoBoxEntrada.animate && !reduceMotion) {
+                    const origem = headerLogoEntrada.getBoundingClientRect();
+                    const destino = logoBoxEntrada.getBoundingClientRect();
+                    if (origem.width > 0 && destino.width > 0) {
+                        const escalaEntrada = Math.max(0.15, origem.height / destino.height);
+                        const dxEntrada = (origem.left + origem.width / 2) - (destino.left + destino.width / 2);
+                        const dyEntrada = (origem.top + origem.height / 2) - (destino.top + destino.height / 2);
+                        logoBoxEntrada.animate([
+                            { transform: `translate(${dxEntrada}px, ${dyEntrada}px) scale(${escalaEntrada})`, opacity: 0.5 },
+                            { transform: "none", opacity: 1 }
+                        ], { duration: 340, easing: "cubic-bezier(0.23, 1, 0.32, 1)", fill: "both" });
+                    }
+                }
+
                 overlay.classList.add("is-active");
                 void overlay.offsetWidth;
                 if (barFill) {
@@ -9077,9 +9103,11 @@ function triggerCrossfade(nextTrack) {
                 }
 
                 schedule(() => {
-                    // Tempo 3: A logo voa até o botão do Modo de Atuação (FLIP Animation estilo AutoPost)
+                    // Tempo 3: a logo volta voando pro MESMO lugar de onde ela saiu no Tempo 2
+                    // (o ícone no cabeçalho) - fecha o ciclo "sai do canto, vai pro carregamento,
+                    // volta pro canto" (FLIP Animation).
                     const logoBox = document.getElementById("modeTransitionLogoBox");
-                    const targetBtn = document.getElementById("btnDjActTrigger");
+                    const targetBtn = document.getElementById("headerMainLogo");
                     const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
 
                     if (logoBox && targetBtn && logoBox.animate && !reduceMotion) {
@@ -9090,12 +9118,20 @@ function triggerCrossfade(nextTrack) {
                             const dx = (para.left + para.width / 2) - (de.left + de.width / 2);
                             const dy = (para.top + para.height / 2) - (de.top + de.height / 2);
 
+                            // A opacidade só cai no último trecho (offset 0.7-1), não junto com
+                            // a translação inteira - com as duas interpoladas pela mesma curva
+                            // de ease-out forte (que sobe/desce rápido logo no início), a logo
+                            // ficava quase invisível bem cedo no voo e "sumia" antes de dar pra
+                            // ver ela realmente chegando de volta no cabeçalho (reportado como
+                            // "vai pro loading mas não volta"). Assim ela viaja visível e só
+                            // desaparece de fato ao pousar.
                             const voo = logoBox.animate([
-                                { transform: "none", opacity: 1 },
-                                { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, opacity: 0 }
+                                { transform: "none", opacity: 1, offset: 0 },
+                                { transform: `translate(${(dx * 0.92).toFixed(2)}px, ${(dy * 0.92).toFixed(2)}px) scale(${(escala * 1.05).toFixed(3)})`, opacity: 1, offset: 0.7 },
+                                { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, opacity: 0, offset: 1 }
                             ], {
-                                duration: 680,
-                                easing: "cubic-bezier(.65, 0, .2, 1)",
+                                duration: 420,
+                                easing: "cubic-bezier(0.4, 0, 0.2, 1)",
                                 fill: "forwards"
                             });
 
