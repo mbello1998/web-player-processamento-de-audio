@@ -2095,14 +2095,28 @@ function updateUpcomingTrackUI() {
         // grade (filtra cards) e, antes, a fileira de abas. Fica num só lugar agora.
         const SPOTIFY_GENRE_FILTER_MAP = {
             all: () => true,
-            top: (id, p) => /top|hits|brasil|viral|tiktok|radar|semana|360|globais/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-            sertanejo: (id, p) => /sertanejo|modao|sofrencia|churrasco|potencia|fazenda|bruto|vaquejada|piseiro|pisadinha|arrocha/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            // "brasil"/"hits" sozinhos apareciam em quase toda playlist do catálogo
+            // (até "Rock Brasil 80 & 90" caía aqui só por causa de "brasil") e afogavam os
+            // chips de gênero específico - removidos, ficando só sinais de "ranking/chart
+            // geral" de verdade.
+            top: (id, p) => /\btop\b|viral|tiktok|radar|semana|360|globais|all-stars/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            // "balada" cobre "Balada Sertaneja", que antes não caía em NENHUM chip de gênero.
+            sertanejo: (id, p) => /sertanejo|modao|sofrencia|churrasco|potencia|fazenda|bruto|vaquejada|piseiro|pisadinha|arrocha|balada/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
             funk: (id, p) => /funk|mandelao|ritmada|favela|fluxo|cria|150/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
             rap: (id, p) => /rap|trap|drill|hip|poesia|rimas|flow/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-            pagode: (id, p) => /pagode|samba|resenha|churrasquinho|tardezinha|parcas/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            // "sambinha|cerveja" cobre "Sambinha & Cerveja Gelada", que também não caía em
+            // nenhum chip de gênero antes.
+            pagode: (id, p) => /pagode|samba|resenha|churrasquinho|tardezinha|parcas|sambinha|cerveja/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
             eletronica: (id, p) => /eletronica|bass|desande|house|edm|club|vintage|alok/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
+            // "fuego" sozinho pegava tanto playlist latina quanto de cumbia (ambíguo) -
+            // ficou só aqui, tirado do padrão de cumbia (onde fazia "Fuego Latino", que é
+            // reggaeton/latino puro, aparecer errado no chip de Cumbia).
             latino: (id, p) => /reggaeton|latino|cachengue|rkt|perreo|dembow|fuego/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
-            cumbia: (id, p) => /cumbia|villera|santafesina|chicha|sonidera|cuarteto|palmeras|damas|pibes|mattioli|gilda|fuego|marama|rombai|konga|luck/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
+            cumbia: (id, p) => /cumbia|villera|santafesina|chicha|sonidera|cuarteto|palmeras|damas|pibes|mattioli|gilda|marama|rombai|konga|luck/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
+            // Chip "Mix Fiesteros & Enganchados" não tinha entrada nenhuma aqui - caía no
+            // fallback SPOTIFY_GENRE_FILTER_MAP.all (`() => true`), então clicar nele
+            // mostrava TODAS as playlists sem filtrar nada.
+            fiestero: (id, p) => /fiestero|enganchado|previa|boliche/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
             fronteira: (id, p) => /quarai|artigas|fronteira|miriam britos|sonido profesional|chacho ramos|mano lima|baitaca|joca martins|marenco|lucas sugo|valdez|charanga|gaucho/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "") + " " + (p.meta?.desc || "")),
             rock: (id, p) => /rock|pop|mpb|flashback|violao|axe|tchan|micareta/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || "")),
             treino: (id, p) => /treino|academia|sunset|pool|estrada|sitio|almoco|relax|lofi|chill|sextou|pre_balada|automotivo|carro|paredao/i.test(id + " " + (p.meta?.name || "") + " " + (p.meta?.genre || ""))
