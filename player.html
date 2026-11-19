@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_02">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_03">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -598,8 +598,9 @@
                         </button>
                     </div>
                     
-                    <!-- Chips de BPM & Ritmo Rápido -->
-                    <div class="quick-bpm-chips-row">
+                    <!-- Chips de BPM & Ritmo Rápido - só aparecem ANTES de ter resultado (depois,
+                         dão lugar às abas de filtro abaixo, pra nunca empilhar as duas fileiras) -->
+                    <div class="quick-bpm-chips-row" id="quickBpmChipsRow">
                         <button class="chip-bpm" onclick="quickBpmSearch('Mega Funk 135 BPM')">⚡ 135 BPM Mega Funk</button>
                         <button class="chip-bpm" onclick="quickBpmSearch('Mandelao 130 BPM')">🔊 130 BPM Mandelão</button>
                         <button class="chip-bpm" onclick="quickBpmSearch('Eletronica House 126 BPM')">🎛️ 126 BPM House</button>
@@ -607,7 +608,7 @@
                         <button class="chip-bpm" onclick="quickBpmSearch('Trap Brasil')">💎 Trap Brasil</button>
                     </div>
 
-                    <div class="search-filters-bar" id="searchFiltersBar" style="display: flex;">
+                    <div class="search-filters-bar" id="searchFiltersBar" style="display: none;">
                         <button class="filter-tab-btn active" id="tabFilterAll" onclick="setSearchFilter('all')">Todas (<span id="countSearchAll">0</span>)</button>
                         <button class="filter-tab-btn" id="tabFilterLib" onclick="setSearchFilter('library')">📚 Na Biblioteca (<span id="countSearchLib">0</span>)</button>
                         <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades (<span id="countSearchNew">0</span>)</button>
@@ -1233,7 +1234,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_02"></script>
+    <script src="/assets/js/player.js?v=20261119_03"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->

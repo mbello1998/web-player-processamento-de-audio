@@ -8082,6 +8082,15 @@ function triggerCrossfade(nextTrack) {
             if (cntAll && freeSearchResults.tracks) cntAll.textContent = freeSearchResults.tracks.length;
             if (cntLib && freeSearchResults.library_tracks) cntLib.textContent = freeSearchResults.library_tracks.length;
             if (cntNew && freeSearchResults.youtube_tracks) cntNew.textContent = freeSearchResults.youtube_tracks.length;
+
+            // Só uma fileira de controles por vez na Pesquisa Livre: chips de sugestão rápida
+            // antes de ter resultado, abas de filtro depois - empilhadas as duas deixavam a
+            // tela cheia de botão antes de dar pra ver qualquer coisa pesquisada.
+            const hasResults = !!(freeSearchResults.tracks && freeSearchResults.tracks.length > 0);
+            const chipsRow = document.getElementById("quickBpmChipsRow");
+            const filtersBar = document.getElementById("searchFiltersBar");
+            if (chipsRow) chipsRow.style.display = hasResults ? "none" : "flex";
+            if (filtersBar) filtersBar.style.display = hasResults ? "flex" : "none";
         }
 
         function quickBpmSearch(bpmOrStyle) {
