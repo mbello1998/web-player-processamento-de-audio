@@ -63,6 +63,57 @@
             70% { opacity: 0.55; }
             100% { opacity: 0; }
         }
+        /* "Aurora boreal" - faixas largas, borradas e translúcidas na cor do modo, ondulando
+           devagar atrás do ícone/texto (por isso ficam no início do HTML, pintam primeiro =
+           atrás dos outros elementos absolutos/normais). blur() pesado é o que dá o efeito
+           de cortina de luz em vez de uma forma com borda dura. Cada faixa tem sua própria
+           altura/posição/rotação/duração pra não ficarem todas se mexendo em uníssono. */
+        .mode-transition-aurora {
+            position: absolute;
+            inset: -15% -10%;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+        .mode-transition-overlay.is-active .mode-transition-aurora {
+            opacity: 0.8;
+        }
+        .mode-transition-aurora span {
+            position: absolute;
+            left: -20%;
+            width: 140%;
+            border-radius: 50%;
+            filter: blur(42px);
+            mix-blend-mode: screen;
+        }
+        .mode-transition-aurora span:nth-child(1) {
+            top: 8%;
+            height: 90px;
+            background: linear-gradient(90deg, transparent, rgba(var(--mode-accent-rgb), 0.65) 40%, rgba(255,255,255,0.25) 50%, rgba(var(--mode-accent-rgb), 0.65) 60%, transparent);
+            animation: auroraFlowA 9s ease-in-out infinite;
+        }
+        .mode-transition-aurora span:nth-child(2) {
+            top: 28%;
+            height: 110px;
+            background: linear-gradient(90deg, transparent, rgba(var(--mode-accent-rgb), 0.4) 45%, rgba(var(--mode-accent-rgb), 0.4) 60%, transparent);
+            animation: auroraFlowB 11s ease-in-out infinite;
+        }
+        .mode-transition-aurora span:nth-child(3) {
+            top: 2%;
+            height: 70px;
+            background: linear-gradient(90deg, transparent, rgba(var(--mode-accent-rgb), 0.5) 50%, transparent);
+            animation: auroraFlowA 7.5s ease-in-out infinite reverse;
+        }
+        @keyframes auroraFlowA {
+            0%, 100% { transform: translateX(-12%) translateY(0) scaleY(1) rotate(-3deg); }
+            50% { transform: translateX(14%) translateY(-26px) scaleY(1.5) rotate(2deg); }
+        }
+        @keyframes auroraFlowB {
+            0%, 100% { transform: translateX(10%) translateY(-10px) scaleY(1.2) rotate(2deg); }
+            50% { transform: translateX(-16%) translateY(18px) scaleY(0.8) rotate(-3deg); }
+        }
+
         /* Respiro contínuo de fundo enquanto a tela de carregamento segura - o wash acima
            (::before) só acontece uma vez na entrada; isso aqui é uma segunda camada (::after)
            que fica pulsando em loop pra tela não ficar parada/sem graça durante o hold. */
@@ -304,7 +355,8 @@
                 animation: none;
                 transform: scaleY(0.55);
             }
-            .mode-transition-particles {
+            .mode-transition-particles,
+            .mode-transition-aurora {
                 display: none;
             }
         }
