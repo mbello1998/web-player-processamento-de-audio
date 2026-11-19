@@ -3364,6 +3364,12 @@ function updateUpcomingTrackUI() {
                 }
             }
 
+            // Chamada só por video_id (ex: openMovePlaylistModalByVideoId no Histórico) passa
+            // arg1/arg2 nulos e o id em arg3 - nenhum dos ramos acima captura isso sozinho.
+            if (!videoId && typeof arg3 === "string") {
+                videoId = arg3;
+            }
+
             if (!track && videoId) {
                 for (const cat of Object.keys(DATA)) {
                     const found = (DATA[cat] || []).find(t => t.video_id === videoId);
