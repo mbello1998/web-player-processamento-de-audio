@@ -28,3 +28,5 @@ track_stats.json
 *.bak
 test_init.txt
 
+
+*.log
