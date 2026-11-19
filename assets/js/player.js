@@ -8659,6 +8659,56 @@ function triggerCrossfade(nextTrack) {
             }, holdMs);
         }
 
+        // Desmonta os cards de música visíveis NA TELA um por um, em cascata (atraso
+        // crescente por card, de propósito devagar pra dar pra acompanhar visualmente),
+        // cada um voando numa direção/rotação levemente diferente, e depois remonta na
+        // ordem inversa. Só pega os cards realmente visíveis na janela (não a lista
+        // inteira, que pode ter centenas de faixas fora da tela) pra não travar nada.
+        function playTrackCardsDisassembleEffect() {
+            const activePane = Array.from(document.querySelectorAll(".pane-view")).find(p => p.style.display !== "none" && p.offsetParent !== null);
+            const container = activePane || document;
+            const allCards = Array.from(container.querySelectorAll(".track-card"));
+            const viewportH = window.innerHeight;
+            const cards = allCards.filter(c => {
+                const r = c.getBoundingClientRect();
+                return r.bottom > 0 && r.top < viewportH && r.height > 0;
+            }).slice(0, 24);
+
+            if (cards.length === 0) return { cascadeMs: 0 };
+
+            const STAGGER_MS = 55;
+            cards.forEach((card, i) => {
+                const dir = i % 2 === 0 ? 1 : -1;
+                card.style.setProperty("--card-fly-x", `${dir * (45 + Math.random() * 40)}px`);
+                card.style.setProperty("--card-fly-y", `${(Math.random() - 0.3) * 30}px`);
+                card.style.setProperty("--card-fly-rot", `${dir * (6 + Math.random() * 8)}deg`);
+                card.style.transitionDelay = `${i * STAGGER_MS}ms`;
+            });
+
+            const cardTransitionMs = 450;
+            const disassembleSpan = (cards.length - 1) * STAGGER_MS + cardTransitionMs;
+
+            requestAnimationFrame(() => {
+                cards.forEach(card => card.classList.add("is-disassembling"));
+            });
+
+            // Remonta em cascata também, na ordem inversa - a última faixa a se desmontar
+            // é a primeira a voltar, criando um efeito de "fecha o zíper" ao recompor a lista.
+            setTimeout(() => {
+                cards.slice().reverse().forEach((card, i) => {
+                    card.style.transitionDelay = `${i * STAGGER_MS}ms`;
+                });
+                requestAnimationFrame(() => {
+                    cards.forEach(card => card.classList.remove("is-disassembling"));
+                });
+                setTimeout(() => {
+                    cards.forEach(card => { card.style.transitionDelay = ""; });
+                }, disassembleSpan);
+            }, disassembleSpan + 120);
+
+            return { cascadeMs: disassembleSpan * 2 + 120 };
+        }
+
         function showModeTransitionOverlay(mode, label) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
@@ -8672,9 +8722,14 @@ function triggerCrossfade(nextTrack) {
 
             const isAggressive = mode === "drop";
             overlay.classList.toggle("is-aggressive", isAggressive);
-            // Duração do fade colorido de fundo (CSS) - o Drop Hunter é mais curto e
-            // mais intenso (dois pulsos), os outros modos têm um fade único mais longo.
-            const washDuration = isAggressive ? 1300 : 1600;
+
+            // Dispara a cascata de cards PRIMEIRO pra saber quanto tempo ela precisa -
+            // com muitas faixas visíveis a cascata pode levar mais tempo que o fade padrão,
+            // e a tela de transição/painéis precisam ficar de pé até ela terminar de verdade.
+            const cardsResult = playTrackCardsDisassembleEffect();
+            const baseWashDuration = isAggressive ? 1300 : 1600;
+            const washDuration = Math.max(baseWashDuration, cardsResult.cascadeMs + 300);
+
             if (barFill) barFill.style.width = "0%";
             overlay.classList.add("is-active");
 
@@ -8684,7 +8739,10 @@ function triggerCrossfade(nextTrack) {
             playPanelDisassembleEffect(Math.round(washDuration * 0.55));
 
             // Força o reflow antes de animar a barra, senão o navegador às vezes funde os
-            // dois estados (0% -> 100%) num só frame e a transição não é visível.
+            // dois estados (0% -> 100%) num só frame e a transição não é visível. A duração
+            // da barra acompanha washDuration (que cresce se a cascata de cards precisar
+            // de mais tempo), senão a barra terminaria antes da cascata de verdade.
+            if (barFill) barFill.style.transitionDuration = `${washDuration}ms`;
             void overlay.offsetWidth;
             requestAnimationFrame(() => {
                 if (barFill) barFill.style.width = "100%";
@@ -8721,7 +8779,12 @@ function triggerCrossfade(nextTrack) {
             // quando o PRÓPRIO usuário escolhe o modo - não ao restaurar o modo salvo no
             // carregamento da página, pra não "pular" a biblioteca sem o usuário pedir.
             if (isUserSelection) {
-                showModeTransitionOverlay(mode, shortLabels[mode] || mode);
+                // Troca o gênero ANTES de animar: selectCategoryToBrowse() reconstrói a
+                // lista de faixas (container.innerHTML = ...), e se isso rodasse depois de
+                // iniciar a desmontagem dos cards, os cards em animação eram destruídos e
+                // substituídos no meio do efeito - a cascata nunca chegava a aparecer.
+                // Trocando antes, a cascata já roda em cima da lista nova (faz sentido
+                // narrativamente também: "a playlist nova se monta na tela").
                 const presetGenre = DJ_MODE_GENRE_PRESET[mode];
                 if (presetGenre) {
                     setLockedGenre(presetGenre);
@@ -8825,6 +8888,14 @@ function triggerCrossfade(nextTrack) {
             updateTurntablesState();
             if (nowPlayingTrack) updateDjIdealHelper(nowPlayingTrack);
             renderAllActiveLists();
+
+            // A animação só roda DEPOIS de renderAllActiveLists(): esse é o último ponto
+            // que reconstrói a lista (container.innerHTML = ...) - rodar a cascata antes
+            // dela fazia os cards recém-animados serem substituídos no meio do efeito,
+            // e a desmontagem nunca chegava a aparecer na tela.
+            if (isUserSelection) {
+                showModeTransitionOverlay(mode, shortLabels[mode] || mode);
+            }
 
             if (nextTrack) {
                 showToast(`Modo ${shortLabels[mode]}: Próxima faixa selecionada (${nextTrack.title.slice(0, 28)}...)`);
