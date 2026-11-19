@@ -1941,7 +1941,7 @@ function updateUpcomingTrackUI() {
             isFetchingSimilar = true;
 
             try {
-                const res = await fetch(`/api/suggestions/related?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}&category=${encodeURIComponent(category)}&video_id=${encodeURIComponent(videoId)}&bpm=${bpm}`);
+                const res = await fetchWithTimeout(`/api/suggestions/related?title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}&category=${encodeURIComponent(category)}&video_id=${encodeURIComponent(videoId)}&bpm=${bpm}`);
                 const data = await res.json();
                 const tracks = data.tracks || [];
 
@@ -1985,7 +1985,7 @@ function updateUpcomingTrackUI() {
             if (isRadioActive) return;
 
             if (titleEl) titleEl.textContent = `✨ Novidades: ${currentSuggestionCategory}`;
-            if (subEl) subEl.innerHTML = `Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. <strong>Nunca se repetem</strong>.`;
+            if (subEl) subEl.innerHTML = `Buscadas em tempo real no YouTube/SoundCloud • <strong>nunca se repetem</strong>`;
             const currentList = suggestionsByGenre[currentSuggestionCategory] || [];
             if (badge) {
                 if (isFetchingSuggestions) {
@@ -1996,7 +1996,7 @@ function updateUpcomingTrackUI() {
                     badge.textContent = "0 inéditas";
                 }
             }
-            if (btn) btn.innerHTML = `<span>🔄 Buscar Mais Novas Músicas (Sem Repetir)</span>`;
+            if (btn) btn.innerHTML = `<span>🔄 Buscar Mais Novas (Sem Repetir)</span>`;
         }
 
         function showSuggestionsSkeleton() {
@@ -2037,7 +2037,7 @@ function updateUpcomingTrackUI() {
             showSuggestionsSkeleton();
 
             try {
-                const res = await fetch("/api/suggestions/discover", {
+                const res = await fetchWithTimeout("/api/suggestions/discover", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ category: requestedCategory })
@@ -2062,7 +2062,7 @@ function updateUpcomingTrackUI() {
                 suggestionsFetchingCategories.delete(requestedCategory);
                 if (suggestionsFetchingCategories.size === 0) isFetchingSuggestions = false;
                 if (requestedCategory === currentSuggestionCategory && btn) {
-                    btn.innerHTML = `<span>🔄 Buscar Mais Novas Músicas (Sem Repetir)</span>`;
+                    btn.innerHTML = `<span>🔄 Buscar Mais Novas (Sem Repetir)</span>`;
                 }
             }
         }
@@ -4967,6 +4967,20 @@ function triggerCrossfade(nextTrack) {
             triggerTrackPlayback(customTrack);
         }
 
+        // Usada pelo botão "+ Fila" da busca global do Spotify (renderGlobalSpotifySearchResults) -
+        // faltava essa função (botão não fazia nada, só dava erro no console).
+        function addCustomTrackToQueue(videoId, title, artist, category, source, bpm) {
+            addToQueue({
+                video_id: videoId,
+                title: title,
+                artist: artist,
+                category: category || "Personalizada",
+                source: source || "Geral",
+                bpm: bpm || 135
+            });
+        }
+        window.addCustomTrackToQueue = addCustomTrackToQueue;
+
         function recalculateContextOnSeek(targetTime, dur) {
             const dropStartSec = (typeof getTrackDropStartTime === "function") ? getTrackDropStartTime(nowPlayingTrack) : 22.0;
             hasFadedCurrentTrack = false;
@@ -6265,7 +6279,7 @@ function triggerCrossfade(nextTrack) {
                 if (iconSpan) iconSpan.textContent = fxInfo.icon || "⚡";
             }
 
-            const dropStatus = document.getElementById("djHudDropStatus");
+            const dropStatus = document.getElementById("djHudDropIndicator");
             if (dropStatus) dropStatus.textContent = "💥 PREPARANDO DROP...";
 
             const barBassA = document.getElementById("djBarBassA");
@@ -6314,7 +6328,7 @@ function triggerCrossfade(nextTrack) {
                 if (barHighA) barHighA.style.width = `${Math.round(toHigh * 100)}%`;
             }
 
-            const dropStatus = document.getElementById("djHudDropStatus");
+            const dropStatus = document.getElementById("djHudDropIndicator");
             if (dropStatus) {
                 if (p < 0.45) dropStatus.textContent = "💥 PREPARANDO DROP...";
                 else if (p < 0.85) dropStatus.textContent = "🔥 DROP ATIVADO! (BASS SWAP)";
@@ -7454,6 +7468,20 @@ function triggerCrossfade(nextTrack) {
         }
         window.confirmToast = confirmToast;
 
+        // fetch com prazo máximo: o servidor já falha rápido se o YouTube/SoundCloud caírem
+        // (socket_timeout no yt-dlp), mas isso é só uma rede de segurança extra no cliente -
+        // sem ela, qualquer travamento inesperado (conexão caiu sem avisar, processo preso)
+        // deixava o "Buscando..." girando pra sempre, sem erro, sem jeito de desistir.
+        async function fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                return await fetch(url, { ...options, signal: controller.signal });
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
         function showCrossfadeIndicator() {
             const ind = document.getElementById("crossfadeIndicator");
             if (ind) ind.style.display = "block";
@@ -7572,7 +7600,7 @@ function triggerCrossfade(nextTrack) {
             showSuggestionsSkeleton();
 
             try {
-                const res = await fetch("/api/search", {
+                const res = await fetchWithTimeout("/api/search", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ query: q, category: currentSuggestionCategory })
@@ -8134,7 +8162,7 @@ function triggerCrossfade(nextTrack) {
             }
 
             try {
-                const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const res = await fetchWithTimeout(`/api/search?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
                 if (thisReqId !== freeSearchRequestId) return; // descarta se outra busca mais recente foi disparada
                 freeSearchResults = data;
@@ -9087,17 +9115,6 @@ function triggerCrossfade(nextTrack) {
             });
             const selOpt = document.getElementById(`actOpt_${mode}`);
             if (selOpt) selOpt.classList.add("active");
-
-            const modeBtns = {
-                match: document.getElementById("btnModeMatch"),
-                energy: document.getElementById("btnModeEnergy"),
-                shuffle: document.getElementById("btnModeShuffle"),
-                smooth: document.getElementById("btnModeSmooth"),
-                club: document.getElementById("btnModeClub")
-            };
-            Object.keys(modeBtns).forEach(k => {
-                if (modeBtns[k]) modeBtns[k].classList.toggle("active", k === mode);
-            });
 
             const modeLabels = {
                 match: "🎯 Match Perfeito (Harmonia máxima, BPM ideal e descoberta inteligente)",

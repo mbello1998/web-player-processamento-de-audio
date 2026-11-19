@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_05">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_09">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -640,9 +640,6 @@
             <!-- Painel de Sugestões com Categorias & Busca Sem Repetição -->
             <div id="paneSuggestions" class="pane-view" style="display: none;">
                 <div class="pane-fixed-header">
-                    <div style="margin-bottom: 5px;">
-                        <span style="font-size: 12px; font-weight: 700; color: var(--accent);">🎯 Escolha o Gênero ou ative o Rádio da Faixa:</span>
-                    </div>
                     <div class="tabs-nav-outer" id="suggTabsNavOuter">
                         <button class="tabs-scroll-btn left" id="suggScrollLeft" title="Rolar para a esquerda" aria-label="Rolar para a esquerda">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -666,20 +663,24 @@
                         </button>
                     </div>
 
-                    <div class="queue-header-box" style="margin-top: 8px; margin-bottom: 8px;">
+                    <!-- Caixa compacta: título+badge, descrição de 1 linha só (trunca com "...") e
+                         ações, tudo bem mais enxuto - antes a descrição era um parágrafo que podia
+                         quebrar em 2 linhas, e somada às abas de gênero e à barra de busca acima,
+                         empurrava a lista de faixas pra fora da tela. -->
+                    <div class="queue-header-box queue-header-box--compact" style="margin-top: 6px;">
                         <div class="queue-title">
                             <span id="suggestionActiveGenreTitle">✨ Novidades Recomendadas</span>
                             <span id="suggestionCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px; font-size: 11px;">0 inéditas</span>
                         </div>
-                        <div class="queue-desc" id="suggestionSubtext">
-                            Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. <strong>Nunca se repetem</strong>.
+                        <div class="queue-desc queue-desc--oneline" id="suggestionSubtext" title="Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. Nunca se repetem.">
+                            Buscadas em tempo real no YouTube/SoundCloud • nunca se repetem
                         </div>
-                        <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
-                            <button class="btn-sync-yt" id="btnRefreshSuggestions" onclick="fetchFreshSuggestionsForCurrentGenre()" style="flex: 1; margin-top: 0; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff; padding: 7px 12px; font-size: 12px;">
-                                <span>🔄 Buscar Mais Novas Músicas (Sem Repetir)</span>
+                        <div class="queue-actions-row">
+                            <button class="btn-sync-yt" id="btnRefreshSuggestions" onclick="fetchFreshSuggestionsForCurrentGenre()" title="Buscar mais novas músicas sem repetir" style="flex: 1; margin-top: 0; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff;">
+                                <span>🔄 Buscar Mais Novas (Sem Repetir)</span>
                             </button>
-                            <button class="btn-sync-yt" onclick="resetSeenHistory()" style="flex: 0; margin-top: 0; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim); padding: 7px 12px; font-size: 12px;" title="Resetar histórico de faixas já vistas">
-                                <span>↺ Resetar Histórico</span>
+                            <button class="btn-sync-yt btn-sync-yt--ghost" onclick="resetSeenHistory()" style="flex: 0; margin-top: 0;" title="Resetar histórico de faixas já vistas (as sugestões passadas podem voltar a aparecer)">
+                                <span>↺</span>
                             </button>
                         </div>
                     </div>
@@ -690,20 +691,17 @@
             <!-- Painel de Fila de Reprodução -->
             <div id="paneQueue" class="pane-view" style="display: none;">
                 <div class="pane-fixed-header">
-                    <div class="queue-header-box">
+                    <div class="queue-header-box queue-header-box--compact" title="Músicas adicionadas por você para tocar na sequência. Você pode abri-las todas juntas como uma playlist instantânea no YouTube!">
                         <div class="queue-title">
                             <span>📋 Minha Fila de Reprodução</span>
                             <span id="queueCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px;">0 músicas</span>
                         </div>
-                        <div class="queue-desc">
-                            Músicas adicionadas por você para tocar na sequência. Você pode abri-las todas juntas como uma playlist instantânea no YouTube!
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div class="queue-actions-row">
                             <button class="btn-sync-yt" onclick="openDirectQueueUrl()" style="flex: 1; margin-top: 0;">
                                 ▶ Assistir Fila Completa no YouTube
                             </button>
-                            <button class="btn-sync-yt" onclick="clearAllQueue()" style="flex: 0; margin-top: 0; background: rgba(255, 0, 85, 0.2); border: 1px solid var(--primary); color: #fff; padding: 8px 14px;">
-                                🗑️ Limpar
+                            <button class="btn-sync-yt btn-sync-yt--ghost" onclick="clearAllQueue()" style="flex: 0; margin-top: 0; background: rgba(255, 0, 85, 0.2); border: 1px solid var(--primary); color: #fff;" title="Limpar a fila inteira">
+                                🗑️
                             </button>
                         </div>
                     </div>
@@ -1232,7 +1230,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_05"></script>
+    <script src="/assets/js/player.js?v=20261119_09"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->

@@ -43,6 +43,9 @@ def get_audio_info(video_id, force_refresh=False):
             "extract_flat": False,
             "skip_download": True,
             "socket_timeout": 10,
+            # yt-dlp tenta de novo até 10x por padrão - sem isso, um YouTube lento podia
+            # prender essa chamada por minutos (10 tentativas x 10s) antes de desistir.
+            "retries": 2,
         }
         if Path("cookies.txt").exists() and Path("cookies.txt").stat().st_size > 0:
             ydl_opts["cookiefile"] = "cookies.txt"
@@ -143,7 +146,10 @@ def run_music_search(query: str, engine: str, excluded_ids: set, results: list, 
     if len(results) >= limit:
         return
     search_prefix = "ytsearch25" if engine == "youtube" else "scsearch15"
-    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True}
+    # socket_timeout ausente aqui deixava a busca travar sem limite nenhum se o YouTube ou o
+    # SoundCloud ficassem lentos/fora do ar - as outras chamadas yt-dlp do arquivo já tinham
+    # esse timeout, só essa (a mais usada: Novidades, Pesquisa Livre, Faixas Parecidas) não tinha.
+    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True, "socket_timeout": 10, "retries": 2}
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             res = ydl.extract_info(f"{search_prefix}:{query}", download=False)
@@ -201,7 +207,7 @@ def resolve_single_track(title: str, artist: str = "", duration_hint: int = None
     if not query:
         return None
 
-    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True, "socket_timeout": 8}
+    ydl_opts = {"extract_flat": True, "quiet": True, "no_warnings": True, "ignoreerrors": True, "socket_timeout": 8, "retries": 2}
 
     for engine, prefix in (("youtube", "ytsearch1"), ("soundcloud", "scsearch1")):
         try:
