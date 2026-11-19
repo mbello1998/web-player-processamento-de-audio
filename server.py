@@ -456,9 +456,13 @@ def discover_tracks(category: str, custom_query: str = None, seed_bpm: int = Non
         seen_ids.update(new_ids)
         save_seen_ids(seen_ids)
 
-    # Ordena pelo encaixe harmônico mais próximo ao BPM da música atual (para transição perfeita)
-    target_bpm = seed_bpm if seed_bpm else GENRE_BPM_RANGES.get(category, (115, 130, 124))[2]
-    results.sort(key=lambda x: abs(x.get("bpm", 130) - target_bpm))
+    # Ordena pelo encaixe harmônico mais próximo ao BPM da música atual (para transição perfeita).
+    # Só faz sentido pra descoberta automática por gênero: numa busca livre do usuário (custom_query)
+    # isso descartava a ordem de relevância que o próprio YouTube/SoundCloud já devolveu, jogando
+    # o match exato pro fim da lista só porque o BPM dele ficou longe do BPM médio do gênero.
+    if not custom_query:
+        target_bpm = seed_bpm if seed_bpm else GENRE_BPM_RANGES.get(category, (115, 130, 124))[2]
+        results.sort(key=lambda x: abs(x.get("bpm", 130) - target_bpm))
 
     return results
 
@@ -937,6 +941,18 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json({"success": True, "count": 0, "queue": []})
                 return
 
+            if self.path == "/api/queue/reorder":
+                video_ids = data.get("video_ids", [])
+                queue = load_queue()
+                by_id = {item.get("video_id"): item for item in queue}
+                reordered = [by_id[vid] for vid in video_ids if vid in by_id]
+                # Mantém no fim qualquer item que não veio na lista nova (nunca perde música por divergência)
+                seen = {item.get("video_id") for item in reordered}
+                reordered.extend(item for item in queue if item.get("video_id") not in seen)
+                save_queue(reordered)
+                self.send_json({"success": True, "count": len(reordered), "queue": reordered})
+                return
+
             if self.path == "/api/suggestions/discover":
                 category = data.get("category", "Mega Funk & Ritmadas")
                 title = data.get("title", "")
@@ -1022,6 +1038,26 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
                 except Exception as e:
                     print("Erro ao limpar playback_history.json:", e)
                 self.send_json({"status": "cleared", "count": 0})
+                return
+
+            if self.path == "/api/history/remove":
+                video_id = data.get("video_id")
+                history_file = HISTORY_FILE
+                history = []
+                if history_file.exists():
+                    try:
+                        with open(history_file, "r", encoding="utf-8") as f:
+                            history = json.load(f)
+                    except Exception:
+                        history = []
+                initial_len = len(history)
+                history = [t for t in history if t.get("video_id") != video_id]
+                try:
+                    with open(history_file, "w", encoding="utf-8") as f:
+                        json.dump(history, f, ensure_ascii=False, indent=2)
+                except Exception as e:
+                    print("Erro ao salvar playback_history.json na remoção:", e)
+                self.send_json({"status": "ok", "removed": initial_len - len(history), "count": len(history)})
                 return
 
             if self.path == "/api/library/add":
@@ -1161,6 +1197,46 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
                     "new_category": new_category,
                     "count": len(lib)
                 })
+                return
+
+            if self.path == "/api/library/reorder":
+                category = data.get("category")
+                video_ids = data.get("video_ids", [])
+                if not category or not isinstance(video_ids, list):
+                    self.send_json({"error": "category and video_ids required"}, status=400)
+                    return
+
+                lib = []
+                if LIBRARY_FILE.exists():
+                    try:
+                        with open(LIBRARY_FILE, "r", encoding="utf-8") as f:
+                            lib = json.load(f)
+                    except Exception:
+                        lib = []
+
+                # Índices que a categoria ocupa no array plano, na ordem atual - reordenar só
+                # troca o CONTEÚDO desses mesmos índices, nunca move faixas de outra categoria.
+                cat_indexes = [i for i, t in enumerate(lib) if t.get("category") == category]
+                cat_tracks = [lib[i] for i in cat_indexes]
+                by_id = {t.get("video_id"): t for t in cat_tracks}
+
+                new_order = [by_id[vid] for vid in video_ids if vid in by_id]
+                seen = {t.get("video_id") for t in new_order}
+                # Mantém no fim qualquer faixa da categoria que não veio na lista nova
+                new_order.extend(t for t in cat_tracks if t.get("video_id") not in seen)
+
+                for idx, track in zip(cat_indexes, new_order):
+                    lib[idx] = track
+
+                try:
+                    with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
+                        json.dump(lib, f, ensure_ascii=False, indent=2)
+                    import build_full_player
+                    build_full_player.rebuild_player_html()
+                except Exception as err:
+                    print("Erro ao salvar complete_library.json na reordenação:", err)
+
+                self.send_json({"success": True, "category": category, "count": len(new_order)})
                 return
 
             if self.path == "/api/sync-youtube":

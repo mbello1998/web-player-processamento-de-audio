@@ -2068,7 +2068,7 @@ function updateUpcomingTrackUI() {
         }
 
         async function resetSeenHistory() {
-            if (confirm("Deseja resetar o histórico de músicas vistas? As sugestões passadas poderão voltar a ser exibidas.")) {
+            if (await confirmToast("Deseja resetar o histórico de músicas vistas? As sugestões passadas poderão voltar a ser exibidas.")) {
                 try {
                     await fetch("/api/suggestions/reset-seen", { method: "POST" });
                     showToast("Histórico de sugestões resetado!");
@@ -3132,8 +3132,14 @@ function updateUpcomingTrackUI() {
                 card.className = cardClasses;
 
                 const artistText = t.artist ? t.artist + " • " + (t.source || "") : (t.source || "");
+                // Arrastar só faz sentido na lista "crua" da categoria - numa busca filtrada os
+                // cards podem vir de categorias diferentes e o índice não corresponde à ordem real.
+                const dragHandleHtml = filteredTracks === null
+                    ? `<span class="drag-handle" draggable="true" title="Arrastar para reordenar">⠿</span>`
+                    : "";
 
                 card.innerHTML = `
+                    ${dragHandleHtml}
                     <div class="track-meta" onclick="playLibraryTrack('${browseCategory}', ${index})">
                         <div class="track-card-title">
                             <span>${index + 1}. ${escapeHtml(t.title)}</span>
@@ -7407,6 +7413,41 @@ function triggerCrossfade(nextTrack) {
             if (t) t.style.display = "none";
         }
 
+        // Substitui window.confirm() (modal bloqueante do navegador) por uma notificação
+        // no canto, no mesmo estilo visual do resto do app. Usado em toda ação de
+        // salvar/limpar/remover que precisa de confirmação.
+        function confirmToast(message) {
+            return new Promise((resolve) => {
+                const el = document.getElementById("confirmToast");
+                const msgEl = document.getElementById("confirmToastMsg");
+                const btnConfirm = document.getElementById("confirmToastConfirmBtn");
+                const btnCancel = document.getElementById("confirmToastCancelBtn");
+                if (!el || !msgEl || !btnConfirm || !btnCancel) {
+                    resolve(window.confirm(message));
+                    return;
+                }
+
+                msgEl.textContent = message;
+
+                function cleanup(result) {
+                    el.classList.remove("is-active");
+                    btnConfirm.onclick = null;
+                    btnCancel.onclick = null;
+                    document.removeEventListener("keydown", onKeydown);
+                    resolve(result);
+                }
+                function onKeydown(e) {
+                    if (e.key === "Escape") cleanup(false);
+                }
+
+                btnConfirm.onclick = () => cleanup(true);
+                btnCancel.onclick = () => cleanup(false);
+                document.addEventListener("keydown", onKeydown);
+                el.classList.add("is-active");
+            });
+        }
+        window.confirmToast = confirmToast;
+
         function showCrossfadeIndicator() {
             const ind = document.getElementById("crossfadeIndicator");
             if (ind) ind.style.display = "block";
@@ -7713,7 +7754,7 @@ function triggerCrossfade(nextTrack) {
         }
 
         async function clearAllQueue() {
-            if (confirm("Deseja realmente limpar toda a sua fila?")) {
+            if (await confirmToast("Deseja realmente limpar toda a sua fila?")) {
                 try {
                     await fetch("/api/queue/clear", { method: "POST" });
                     loadQueue();
@@ -7759,6 +7800,7 @@ function triggerCrossfade(nextTrack) {
                 card.setAttribute("data-video-id", item.video_id);
                 if (meta.transitionRole) card.setAttribute("data-transition-role", meta.transitionRole);
                 card.innerHTML = `
+                    <span class="drag-handle" draggable="true" title="Arrastar para reordenar">⠿</span>
                     <div class="track-meta" onclick="playQueueTrack(${idx})">
                         <div class="track-card-title">
                             <span>${idx + 1}. ${escapeHtml(item.title)}</span>
@@ -7784,6 +7826,101 @@ function triggerCrossfade(nextTrack) {
                 container.appendChild(card);
             });
         }
+
+        // --- ARRASTAR PARA REORDENAR (Fila e Biblioteca) ---
+        // Delegação de evento no container (uma vez só) em vez de religar listener a cada
+        // render - os cards são recriados via innerHTML/appendChild toda hora, então um
+        // listener direto no elemento se perderia a cada re-render.
+        function setupDragReorder(containerId, onReorder) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let dragEl = null;
+
+            function clearDragOverMarks() {
+                container.querySelectorAll(".drag-over-before, .drag-over-after").forEach(el => {
+                    el.classList.remove("drag-over-before", "drag-over-after");
+                });
+            }
+
+            container.addEventListener("dragstart", (e) => {
+                const card = e.target.closest(".track-card");
+                if (!card || !e.target.closest(".drag-handle")) return;
+                dragEl = card;
+                card.classList.add("is-dragging");
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", card.dataset.videoId || "");
+            });
+
+            container.addEventListener("dragend", () => {
+                if (dragEl) dragEl.classList.remove("is-dragging");
+                dragEl = null;
+                clearDragOverMarks();
+            });
+
+            container.addEventListener("dragover", (e) => {
+                if (!dragEl) return;
+                e.preventDefault();
+                const target = e.target.closest(".track-card");
+                if (!target || target === dragEl) return;
+                const rect = target.getBoundingClientRect();
+                const before = (e.clientY - rect.top) < rect.height / 2;
+                clearDragOverMarks();
+                target.classList.add(before ? "drag-over-before" : "drag-over-after");
+            });
+
+            container.addEventListener("drop", (e) => {
+                if (!dragEl) return;
+                e.preventDefault();
+                const target = e.target.closest(".track-card");
+                clearDragOverMarks();
+                if (target && target !== dragEl) {
+                    const rect = target.getBoundingClientRect();
+                    const before = (e.clientY - rect.top) < rect.height / 2;
+                    container.insertBefore(dragEl, before ? target : target.nextSibling);
+                }
+                const newOrder = Array.from(container.querySelectorAll(".track-card[data-video-id]"))
+                    .map(el => el.getAttribute("data-video-id"));
+                onReorder(newOrder);
+            });
+        }
+
+        async function persistQueueReorder(videoIds) {
+            const byId = new Map(pendingQueue.map(t => [t.video_id, t]));
+            pendingQueue = videoIds.map(id => byId.get(id)).filter(Boolean);
+            renderQueueList();
+            try {
+                await fetch("/api/queue/reorder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ video_ids: videoIds })
+                });
+            } catch (err) {
+                console.warn("Aviso ao persistir reordenação da fila:", err);
+            }
+        }
+
+        async function persistLibraryReorder(videoIds) {
+            const list = DATA[browseCategory] || [];
+            const byId = new Map(list.map(t => [t.video_id, t]));
+            const reordered = videoIds.map(id => byId.get(id)).filter(Boolean);
+            // Mantém no fim qualquer faixa que não estava no DOM reordenado (ex: busca filtrada)
+            const seen = new Set(reordered.map(t => t.video_id));
+            reordered.push(...list.filter(t => !seen.has(t.video_id)));
+            DATA[browseCategory] = reordered;
+            renderList(currentFilteredLibraryTracks);
+            try {
+                await fetch("/api/library/reorder", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ category: browseCategory, video_ids: videoIds })
+                });
+            } catch (err) {
+                console.warn("Aviso ao persistir reordenação da biblioteca:", err);
+            }
+        }
+
+        setupDragReorder("queueList", persistQueueReorder);
+        setupDragReorder("trackList", persistLibraryReorder);
 
         let currentActiveSuggestions = [];
 
@@ -9164,6 +9301,7 @@ function triggerCrossfade(nextTrack) {
                                     ⭐ Salvar na Biblioteca
                                 </button>
                             `}
+                            <button class="btn-remove-lib-card" onclick="removeHistoryTrack('${track.video_id}')" title="Remover só este item do histórico (não afeta a biblioteca)">✕</button>
                         </div>
                     </div>
                 `;
@@ -9258,7 +9396,7 @@ function triggerCrossfade(nextTrack) {
         }
 
         async function clearPlaybackHistory() {
-            if (!confirm("Deseja realmente limpar todo o histórico recente de reprodução?")) return;
+            if (!(await confirmToast("Deseja realmente limpar todo o histórico recente de reprodução?"))) return;
             try {
                 await fetch("/api/history/clear", { method: "POST" });
                 playbackHistory = [];
@@ -9269,6 +9407,25 @@ function triggerCrossfade(nextTrack) {
                 showToast("Erro ao limpar histórico.");
             }
         }
+
+        async function removeHistoryTrack(videoId) {
+            const removedTrack = (playbackHistory || []).find(t => t.video_id === videoId);
+            playbackHistory = (playbackHistory || []).filter(t => t.video_id !== videoId);
+            updateHistoryBadge(playbackHistory.length);
+            renderHistoryModal();
+            const label = removedTrack ? removedTrack.title : "Música";
+            showToast(`🗑️ "${label.slice(0, 40)}" removida do histórico!`);
+            try {
+                await fetch("/api/history/remove", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ video_id: videoId })
+                });
+            } catch (err) {
+                console.warn("Aviso ao persistir remoção do histórico:", err);
+            }
+        }
+        window.removeHistoryTrack = removeHistoryTrack;
 
         // Atalho de teclado Escape para fechar qualquer modal aberto
         document.addEventListener("keydown", (e) => {

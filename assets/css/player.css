@@ -1876,6 +1876,72 @@
             flex-shrink: 0;
         }
 
+        /* NOTIFICAÇÃO DE CONFIRMAÇÃO NO CANTO (substitui window.confirm()) */
+        .confirm-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 99999;
+            background: rgba(16, 20, 32, 0.97);
+            border: 1px solid var(--primary);
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(14px) scale(0.97);
+            transition: opacity 0.2s var(--ease-out-strong), transform 0.2s var(--ease-out-strong);
+            pointer-events: none;
+        }
+        .confirm-toast.is-active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        .confirm-toast-msg {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.4;
+        }
+        .confirm-toast-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+        .confirm-toast-btn {
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-dim);
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .confirm-toast-btn:hover {
+            background: var(--surface-hover);
+            color: #fff;
+        }
+        .confirm-toast-btn.confirm {
+            background: rgba(255, 0, 85, 0.18);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .confirm-toast-btn.confirm:hover {
+            background: rgba(255, 0, 85, 0.3);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .confirm-toast, .confirm-toast.is-active {
+                transition: opacity 0.2s ease;
+                transform: none;
+            }
+        }
+
         /* PAINEL DE LISTAS À DIREITA: O ÚNICO QUE ROLA */
         .list-pane {
             flex: 1;
@@ -2010,7 +2076,40 @@
             border-color: rgba(255, 255, 255, 0.2);
             transform: translateX(3px);
         }
-        
+
+        /* ARRASTAR PARA REORDENAR (Fila e Biblioteca - só onde a ordem é salva de verdade) */
+        .drag-handle {
+            cursor: grab;
+            color: var(--text-dim);
+            font-size: 15px;
+            line-height: 1;
+            padding: 4px 5px;
+            flex-shrink: 0;
+            touch-action: none;
+            user-select: none;
+            opacity: 0.5;
+            transition: opacity 0.15s ease, color 0.15s ease;
+        }
+        .drag-handle:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+        .track-card.is-dragging {
+            opacity: 0.35;
+        }
+        .track-card.drag-over-before {
+            box-shadow: inset 0 2px 0 0 var(--accent);
+        }
+        .track-card.drag-over-after {
+            box-shadow: inset 0 -2px 0 0 var(--accent);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .drag-handle { transition: none; }
+        }
+
         /* DESTAQUE: MÚSICA TOCANDO AGORA */
         .track-card.playing-now {
             background: linear-gradient(135deg, rgba(255, 0, 85, 0.18), rgba(0, 242, 254, 0.12));
