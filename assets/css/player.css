@@ -63,6 +63,23 @@
             70% { opacity: 0.55; }
             100% { opacity: 0; }
         }
+        /* Respiro contínuo de fundo enquanto a tela de carregamento segura - o wash acima
+           (::before) só acontece uma vez na entrada; isso aqui é uma segunda camada (::after)
+           que fica pulsando em loop pra tela não ficar parada/sem graça durante o hold. */
+        .mode-transition-overlay::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(var(--mode-accent-rgb), 0.22), transparent 55%);
+            opacity: 0;
+        }
+        .mode-transition-overlay.is-active::after {
+            animation: modeTransitionBreathe 1.8s ease-in-out infinite;
+        }
+        @keyframes modeTransitionBreathe {
+            0%, 100% { opacity: 0.3; transform: scale(0.92); }
+            50% { opacity: 0.7; transform: scale(1.06); }
+        }
         .mode-transition-icon {
             position: relative;
             font-size: 54px;
@@ -73,6 +90,38 @@
         @keyframes modeTransitionPulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.18); }
+        }
+        /* Barras de equalizador - visual de "processando/mixando" temático de música, fica
+           entre o texto e a barra de progresso. Cada barra tem sua própria duração/atraso
+           (atraso NEGATIVO pra já entrar no meio do ciclo, sem todas "baterem" juntas no
+           início) pra parecer um nível de áudio de verdade, não um bloco sincronizado. */
+        .mode-transition-eq {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4px;
+            height: 22px;
+        }
+        .mode-transition-eq span {
+            display: block;
+            width: 4px;
+            height: 100%;
+            border-radius: 2px;
+            background: rgb(var(--mode-accent-rgb));
+            box-shadow: 0 0 8px rgba(var(--mode-accent-rgb), 0.7);
+            transform: scaleY(0.22);
+            transform-origin: bottom;
+            animation: modeTransitionEq 0.68s ease-in-out infinite;
+        }
+        .mode-transition-eq span:nth-child(1) { animation-duration: 0.62s; animation-delay: -0.52s; }
+        .mode-transition-eq span:nth-child(2) { animation-duration: 0.77s; animation-delay: -0.18s; }
+        .mode-transition-eq span:nth-child(3) { animation-duration: 0.58s; animation-delay: -0.35s; }
+        .mode-transition-eq span:nth-child(4) { animation-duration: 0.84s; animation-delay: -0.09s; }
+        .mode-transition-eq span:nth-child(5) { animation-duration: 0.7s; animation-delay: -0.41s; }
+        @keyframes modeTransitionEq {
+            0%, 100% { transform: scaleY(0.22); }
+            50% { transform: scaleY(1); }
         }
         .mode-transition-text {
             position: relative;
@@ -191,6 +240,14 @@
             .track-card.is-disassembling {
                 transform: none;
                 opacity: 0;
+            }
+            .mode-transition-overlay.is-active::after,
+            .mode-transition-icon {
+                animation: none;
+            }
+            .mode-transition-eq span {
+                animation: none;
+                transform: scaleY(0.55);
             }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
