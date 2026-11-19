@@ -3694,11 +3694,35 @@ function updateUpcomingTrackUI() {
         // YouTube: proxy direto do servidor, como sempre. SoundCloud: só serve HLS publicamente
         // (confirmado testando várias faixas - nenhuma tinha formato progressivo), então
         // <audio src="..."> sozinho não toca; usa hls.js, com fallback pro HLS nativo do Safari.
-        function loadAudioSourceForDeck(audioEl, deckName, track) {
+        //
+        // verifyLoad: por padrão o lado do YouTube resolve na hora, sem esperar o <audio>
+        // confirmar que o stream carregou - o listener "error" permanente do deck (ver
+        // setupAudioEvents) já cobre isso quando o deck é o ATIVO (play direto de uma faixa).
+        // Mas durante o crossfade automático o deck de ENTRADA ainda não é o ativo quando o
+        // erro acontece (activeDeck só troca no fim da transição), então aquele listener
+        // fica calado e a faixa quebrada passava batido - o crossfade terminava a transição
+        // igual, o deck de entrada ficava mudo e travado pra sempre sem nenhum aviso (mesma
+        // causa do bug já corrigido pro SoundCloud, só que pelo lado do YouTube). Só o
+        // triggerCrossfade passa verifyLoad=true pra realmente esperar e poder recuperar;
+        // playTrackInstant mantém o comportamento de sempre pra não disparar a recuperação
+        // em dobro (o listener permanente já cuida desse caminho).
+        function loadAudioSourceForDeck(audioEl, deckName, track, verifyLoad = false) {
             if (!isSoundCloudTrack(track)) {
                 teardownHlsForDeck(deckName);
                 audioEl.src = `/api/audio/stream?id=${track.video_id}`;
-                return Promise.resolve();
+                if (!verifyLoad) {
+                    return Promise.resolve();
+                }
+                return new Promise((resolve, reject) => {
+                    const cleanup = () => {
+                        audioEl.removeEventListener("loadedmetadata", onReady);
+                        audioEl.removeEventListener("error", onErr);
+                    };
+                    const onReady = () => { cleanup(); resolve(); };
+                    const onErr = () => { cleanup(); reject(new Error("YouTube: falha ao carregar o stream para " + track.video_id)); };
+                    audioEl.addEventListener("loadedmetadata", onReady, { once: true });
+                    audioEl.addEventListener("error", onErr, { once: true });
+                });
             }
 
             return fetch(`/api/audio/info?id=${encodeURIComponent(track.video_id)}`)
@@ -4369,7 +4393,7 @@ function triggerCrossfade(nextTrack) {
 
                 if (toAudio) {
                     const toDeckName = activeDeck === "A" ? "B" : "A";
-                    loadAudioSourceForDeck(toAudio, toDeckName, nextTrack).then(() => {
+                    loadAudioSourceForDeck(toAudio, toDeckName, nextTrack, true).then(() => {
                         toAudio.currentTime = startSec;
                         toAudio.playbackRate = beatmatchRate;
                         toAudio.preservesPitch = true;
