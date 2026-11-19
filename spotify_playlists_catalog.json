@@ -7960,7 +7960,8 @@
       "icon": "🔟",
       "genre": "Os 10 Maiores Hits",
       "desc": "As dez faixas de funk mais reproduzidas da semana.",
-      "bpm": 138
+      "bpm": 138,
+      "cover_url": "https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da84fc6112e073a2ff2ee28df32d"
     },
     "tracks": [
       {
