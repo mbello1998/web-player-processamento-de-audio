@@ -15,6 +15,9 @@
             --text: #ffffff;
             --text-dim: #9aa0a6;
             --border: #1e2233;
+            /* Curva de ease-out forte pra qualquer transição de entrada/saída de UI -
+               o ease-out nativo do CSS é fraco demais pra ler como "intencional". */
+            --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         /* ==========================================================
@@ -35,7 +38,7 @@
             backdrop-filter: blur(3px);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.35s var(--ease-out-strong);
             overflow: hidden;
         }
         .mode-transition-overlay.is-active {
@@ -52,7 +55,7 @@
             opacity: 0;
         }
         .mode-transition-overlay.is-active::before {
-            animation: modeTransitionWash 1.6s ease-in-out;
+            animation: modeTransitionWash 1.4s ease-in-out;
         }
         @keyframes modeTransitionWash {
             0% { opacity: 0; }
@@ -96,7 +99,9 @@
             border-radius: 3px;
             background: linear-gradient(90deg, rgba(var(--mode-accent-rgb), 0.5), rgb(var(--mode-accent-rgb)));
             box-shadow: 0 0 10px rgb(var(--mode-accent-rgb));
-            transition: width 1.3s cubic-bezier(0.25, 0.8, 0.4, 1);
+            /* Progresso de carregamento = movimento constante, por isso linear (não uma
+               curva de ease) - a duração exata é setada via JS (style.transitionDuration). */
+            transition: width 1s linear;
         }
         /* Modo Drop Hunter (agressivo/"sport mode"): o mesmo fade, só que mais rápido e
            com um segundo pulso extra - como o alerta de um painel esportivo de carro. */
@@ -104,7 +109,7 @@
             animation: modeTransitionPulse 0.3s ease-in-out infinite;
         }
         .mode-transition-overlay.is-aggressive.is-active::before {
-            animation: modeTransitionWashAggressive 1.3s ease-in-out;
+            animation: modeTransitionWashAggressive 1.2s ease-in-out;
         }
         @keyframes modeTransitionWashAggressive {
             0% { opacity: 0; }
@@ -117,34 +122,38 @@
         /* ==========================================================
            DESMONTAGEM/REMONTAGEM DOS PAINÉIS REAIS AO TROCAR DE MODO
            São os 3 blocos estruturais de verdade (não um vídeo gravado) - cada um voa
-           pra um lado diferente, soltando um brilho na cor do modo, e volta ao lugar.
-           Nunca desmonta do DOM de verdade, só transforma visualmente - o áudio e o
-           conteúdo (música tocando, fila etc.) continuam intactos por baixo.
+           pra longe da câmera com profundidade real (perspective + translateZ + rotateX/Y),
+           soltando um brilho na cor do modo, e volta ao lugar. Rotação 2D plana (só
+           rotate(deg) num eixo só) lia como "deslizando", não como "vídeo" - a profundidade
+           é o que muda isso de verdade, não a duração. Nunca desmonta do DOM de verdade, só
+           transforma visualmente - o áudio e o conteúdo (música tocando, fila etc.)
+           continuam intactos por baixo.
            ========================================================== */
         .player-pane,
         .list-pane,
         .bottom-player-bar {
-            transition: transform 0.55s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.55s ease, filter 0.55s ease;
+            transition: transform 0.46s var(--ease-out-strong), opacity 0.46s var(--ease-out-strong), filter 0.46s ease;
         }
         .player-pane.is-disassembling {
-            transform: translateX(-70px) rotate(-7deg);
+            transform: perspective(1000px) translateX(-110px) translateZ(-260px) rotateY(-32deg);
             opacity: 0;
             filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
         }
         .list-pane.is-disassembling {
-            transform: translateX(70px) rotate(5deg);
+            transform: perspective(1000px) translateX(110px) translateZ(-260px) rotateY(32deg);
             opacity: 0;
             filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
         }
         .bottom-player-bar.is-disassembling {
-            transform: translateY(90px) rotate(2deg);
+            transform: perspective(1000px) translateY(130px) translateZ(-260px) rotateX(38deg);
             opacity: 0;
             filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
         }
 
         /* Desmontagem faixa por faixa dos cards visíveis na lista - cada um recebe uma
-           direção/rotação levemente diferente (variáveis setadas via JS) e um atraso
-           crescente (transition-delay, também via JS) pra cair em cascata, não tudo junto. */
+           direção/rotação/profundidade levemente diferente (variáveis setadas via JS) e um
+           atraso crescente (transition-delay, também via JS) pra cair em cascata/onda, não
+           tudo junto nem um de cada vez devagar - rápido e em cascata é o que lê como vídeo. */
         /* is-mode-transitioning fica no card durante TODO o efeito (desmontar + remontar);
            is-disassembling só controla se ele está no estado "voado" ou não. Separar os
            dois é necessário: se a transição com atraso estivesse só em ".is-disassembling",
@@ -153,14 +162,36 @@
            e a remontagem toda "estourava" de uma vez em vez de cascatear igual a desmontagem. */
         .track-card.is-mode-transitioning {
             transition:
-                transform 0.42s var(--card-delay, 0ms) cubic-bezier(0.5, 0, 0.3, 1),
-                opacity 0.42s var(--card-delay, 0ms) ease,
-                filter 0.42s var(--card-delay, 0ms) ease !important;
+                transform 0.4s var(--card-delay, 0ms) var(--ease-out-strong),
+                opacity 0.4s var(--card-delay, 0ms) ease,
+                filter 0.4s var(--card-delay, 0ms) ease !important;
         }
         .track-card.is-disassembling {
-            transform: translate(var(--card-fly-x, 50px), var(--card-fly-y, 10px)) rotate(var(--card-fly-rot, 8deg));
+            transform: perspective(900px)
+                translate3d(var(--card-fly-x, 50px), var(--card-fly-y, 10px), var(--card-fly-z, -220px))
+                rotateX(var(--card-fly-rx, 12deg))
+                rotateY(var(--card-fly-ry, 18deg));
             opacity: 0;
             filter: drop-shadow(0 0 14px rgb(var(--mode-accent-rgb)));
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .player-pane, .list-pane, .bottom-player-bar {
+                transition: opacity 0.25s ease;
+            }
+            .player-pane.is-disassembling,
+            .list-pane.is-disassembling,
+            .bottom-player-bar.is-disassembling {
+                transform: none;
+                opacity: 0;
+            }
+            .track-card.is-mode-transitioning {
+                transition: opacity 0.2s var(--card-delay, 0ms) ease !important;
+            }
+            .track-card.is-disassembling {
+                transform: none;
+                opacity: 0;
+            }
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         

@@ -8682,92 +8682,102 @@ function triggerCrossfade(nextTrack) {
         // estruturais DE VERDADE do player (.player-pane, .list-pane, .bottom-player-bar) -
         // nada de vídeo gravado, é a própria interface se "desmontando" na cor do modo e
         // voltando com tudo intacto por baixo (música, fila, conteúdo nunca somem do DOM).
-        function playPanelDisassembleEffect(holdMs) {
-            const panels = [
+        function getModeTransitionPanels() {
+            return [
                 document.querySelector(".player-pane"),
                 document.querySelector(".list-pane"),
                 document.querySelector(".bottom-player-bar")
             ].filter(Boolean);
-            if (panels.length === 0) return;
-
-            panels.forEach(p => p.classList.add("is-disassembling"));
-            setTimeout(() => {
-                panels.forEach(p => p.classList.remove("is-disassembling"));
-            }, holdMs);
         }
 
-        // Desmonta os cards de música visíveis NA TELA um por um, em cascata (atraso
-        // crescente por card, de propósito devagar pra dar pra acompanhar visualmente),
-        // cada um voando numa direção/rotação levemente diferente, e depois remonta na
-        // ordem inversa. Só pega os cards realmente visíveis na janela (não a lista
-        // inteira, que pode ter centenas de faixas fora da tela) pra não travar nada.
-        function playTrackCardsDisassembleEffect() {
+        const PANEL_TRANSITION_MS = 460;
+        const PANEL_STAGGER_MS = 70;
+
+        // Pura ida (voar pra longe) ou pura volta (reverso, voltar pro lugar) dos 3 painéis
+        // estruturais - separado em duas funções pra poder encaixar uma pausa de carregamento
+        // real entre as duas fases, em vez de só soltar e já agendar a volta sozinha.
+        function disassemblePanels(reduceMotion) {
+            const panels = getModeTransitionPanels();
+            panels.forEach((p, i) => {
+                p.style.transitionDelay = reduceMotion ? "0ms" : `${i * PANEL_STAGGER_MS}ms`;
+                requestAnimationFrame(() => p.classList.add("is-disassembling"));
+            });
+            return panels.length ? (panels.length - 1) * PANEL_STAGGER_MS + PANEL_TRANSITION_MS : 0;
+        }
+        function reassemblePanels(panels, reduceMotion) {
+            panels.slice().reverse().forEach((p, i) => {
+                p.style.transitionDelay = reduceMotion ? "0ms" : `${i * PANEL_STAGGER_MS}ms`;
+                requestAnimationFrame(() => p.classList.remove("is-disassembling"));
+            });
+            setTimeout(() => panels.forEach(p => { p.style.transitionDelay = ""; }),
+                panels.length ? (panels.length - 1) * PANEL_STAGGER_MS + PANEL_TRANSITION_MS : 0);
+        }
+
+        const CARD_TRANSITION_MS = 400;
+        const CARD_STAGGER_MS = 45;
+
+        // Pega os cards de música realmente visíveis na tela (não a lista inteira, que pode
+        // ter centenas fora da tela) pra desmontar em cascata rápida (onda, não um por um
+        // devagar) com profundidade 3D de verdade (ver CSS) - isso é o que lê como "vídeo",
+        // não a duração. Separado em ida/volta pelo mesmo motivo dos painéis: dá pra encaixar
+        // a pausa de carregamento no meio sem precisar agendar a volta sozinha aqui dentro.
+        function getVisibleTrackCards() {
             const activePane = Array.from(document.querySelectorAll(".pane-view")).find(p => p.style.display !== "none" && p.offsetParent !== null);
             const container = activePane || document;
             const allCards = Array.from(container.querySelectorAll(".track-card"));
             const viewportH = window.innerHeight;
-            const cards = allCards.filter(c => {
+            return allCards.filter(c => {
                 const r = c.getBoundingClientRect();
                 return r.bottom > 0 && r.top < viewportH && r.height > 0;
             }).slice(0, 14);
-
-            if (cards.length === 0) return { cascadeMs: 0 };
-
-            // Cada card leva CARD_TRANSITION_MS pra sumir/voltar, e só o próximo começa
-            // quando o anterior praticamente já terminou (stagger >= duração) - sequencial
-            // de verdade, um de cada vez, não uma onda sobreposta. Se tiver poucos cards
-            // visíveis, aumenta o intervalo entre eles pra garantir pelo menos uns 8-9s de
-            // efeito total (desmontagem + pausa + remontagem), como pedido.
-            const CARD_TRANSITION_MS = 420;
-            const PHASE_GAP_MS = 400;
-            const MIN_TOTAL_MS = 8500;
-            const n = cards.length;
-
-            let staggerMs = CARD_TRANSITION_MS;
-            let disassembleSpan = (n - 1) * staggerMs + CARD_TRANSITION_MS;
-            let totalMs = disassembleSpan * 2 + PHASE_GAP_MS;
-            if (n > 1 && totalMs < MIN_TOTAL_MS) {
-                staggerMs = Math.ceil(((MIN_TOTAL_MS - PHASE_GAP_MS) / 2 - CARD_TRANSITION_MS) / (n - 1));
-                disassembleSpan = (n - 1) * staggerMs + CARD_TRANSITION_MS;
-                totalMs = disassembleSpan * 2 + PHASE_GAP_MS;
-            }
+        }
+        function disassembleTrackCards(reduceMotion) {
+            const cards = getVisibleTrackCards();
+            if (cards.length === 0) return { cascadeMs: 0, cards };
 
             cards.forEach((card, i) => {
                 const dir = i % 2 === 0 ? 1 : -1;
                 card.style.setProperty("--card-fly-x", `${dir * (45 + Math.random() * 40)}px`);
                 card.style.setProperty("--card-fly-y", `${(Math.random() - 0.3) * 30}px`);
-                card.style.setProperty("--card-fly-rot", `${dir * (6 + Math.random() * 8)}deg`);
-                card.style.setProperty("--card-delay", `${i * staggerMs}ms`);
+                card.style.setProperty("--card-fly-z", `${-180 - Math.random() * 120}px`);
+                card.style.setProperty("--card-fly-rx", `${(Math.random() - 0.5) * 24}deg`);
+                card.style.setProperty("--card-fly-ry", `${dir * (12 + Math.random() * 14)}deg`);
+                card.style.setProperty("--card-delay", reduceMotion ? "0ms" : `${i * CARD_STAGGER_MS}ms`);
                 // Fica até o fim das duas fases - ver comentário no CSS sobre por que não
                 // dá pra confiar só em is-disassembling pra carregar a transição com atraso.
                 card.classList.add("is-mode-transitioning");
             });
-
             requestAnimationFrame(() => {
                 cards.forEach(card => card.classList.add("is-disassembling"));
             });
 
-            // Só começa a remontar depois que TODOS já desmontaram de vez (disassembleSpan
-            // + uma pausa extra de "site todo desfeito") - remonta em cascata também, na
-            // ordem inversa, pra fechar como um "zíper" se recompondo um a um.
+            const cascadeMs = reduceMotion ? CARD_TRANSITION_MS : (cards.length - 1) * CARD_STAGGER_MS + CARD_TRANSITION_MS;
+            return { cascadeMs, cards };
+        }
+        function reassembleTrackCards(cards, reduceMotion) {
+            if (!cards || cards.length === 0) return;
+            cards.slice().reverse().forEach((card, i) => {
+                card.style.setProperty("--card-delay", reduceMotion ? "0ms" : `${i * CARD_STAGGER_MS}ms`);
+            });
+            requestAnimationFrame(() => {
+                cards.forEach(card => card.classList.remove("is-disassembling"));
+            });
+            const cascadeMs = reduceMotion ? CARD_TRANSITION_MS : (cards.length - 1) * CARD_STAGGER_MS + CARD_TRANSITION_MS;
             setTimeout(() => {
-                cards.slice().reverse().forEach((card, i) => {
-                    card.style.setProperty("--card-delay", `${i * staggerMs}ms`);
+                cards.forEach(card => {
+                    card.style.removeProperty("--card-delay");
+                    card.classList.remove("is-mode-transitioning");
                 });
-                requestAnimationFrame(() => {
-                    cards.forEach(card => card.classList.remove("is-disassembling"));
-                });
-                setTimeout(() => {
-                    cards.forEach(card => {
-                        card.style.removeProperty("--card-delay");
-                        card.classList.remove("is-mode-transitioning");
-                    });
-                }, disassembleSpan);
-            }, disassembleSpan + PHASE_GAP_MS);
-
-            return { cascadeMs: totalMs };
+            }, cascadeMs);
         }
 
+        // Sequência em 3 tempos, nessa ordem (pedido explícito do usuário: o site se
+        // desmonta primeiro feito um vídeo, SÓ DEPOIS aparece o carregamento centralizado
+        // com o nome do modo, e só então o site remonta/reabre) - antes essas 3 coisas
+        // rodavam tudo junto, e o resultado lia como "só mais lento", não como um vídeo de
+        // verdade. Agora: (1) desmonta painéis+cards em cascata rápida, (2) com tudo
+        // invisível, mostra a tela de carregamento centralizada por um tempo fixo pra dar
+        // pra ler o nome do modo, (3) remonta em cascata e esconde a tela de carregamento.
         function showModeTransitionOverlay(mode, label) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
@@ -8782,35 +8792,47 @@ function triggerCrossfade(nextTrack) {
             const isAggressive = mode === "drop";
             overlay.classList.toggle("is-aggressive", isAggressive);
 
-            // Dispara a cascata de cards PRIMEIRO pra saber quanto tempo ela precisa (com o
-            // mínimo de ~8.5s pedido) - a tela de transição fica de pé até ela terminar.
-            const cardsResult = playTrackCardsDisassembleEffect();
-            const baseWashDuration = isAggressive ? 1300 : 1600;
-            const washDuration = Math.max(baseWashDuration, cardsResult.cascadeMs + 300);
+            const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            // HOLD_MS é quanto tempo a tela de carregamento centralizada (nome do modo +
+            // barra) fica sozinha na tela, com o site todo já invisível por trás - tinha
+            // ficado curto demais (850/1000ms) pra realmente dar tempo de notar que ela
+            // apareceu, ainda mais descontando os 0.35s de fade-in/fade-out do próprio
+            // overlay (ver .mode-transition-overlay no CSS) que comem parte desse tempo.
+            const HOLD_MS = isAggressive ? 1200 : 1400;
 
-            if (barFill) barFill.style.width = "0%";
-            overlay.classList.add("is-active");
+            if (window.__modeTransitionTimers) {
+                window.__modeTransitionTimers.forEach(t => clearTimeout(t));
+            }
+            window.__modeTransitionTimers = [];
+            const schedule = (fn, ms) => { window.__modeTransitionTimers.push(setTimeout(fn, ms)); };
 
-            // Os painéis grandes ficam desmontados por QUASE toda a duração da cascata de
-            // cards (não só a metade) - o site inteiro fica "em pedaços" junto, e tudo
-            // remonta perto do mesmo instante no fim, em vez dos painéis voltarem no meio
-            // do caminho enquanto os cards ainda estão se desmontando/remontando.
-            playPanelDisassembleEffect(Math.max(600, washDuration - 350));
+            // Tempo 1: desmonta painéis e cards juntos (profundidade 3D, cascata rápida).
+            const panels = getModeTransitionPanels();
+            const panelMs = disassemblePanels(reduceMotion);
+            const { cascadeMs: cardMs, cards } = disassembleTrackCards(reduceMotion);
+            const disassembleMs = reduceMotion ? 0 : Math.max(panelMs, cardMs);
 
-            // Força o reflow antes de animar a barra, senão o navegador às vezes funde os
-            // dois estados (0% -> 100%) num só frame e a transição não é visível. A duração
-            // da barra acompanha washDuration (que cresce se a cascata de cards precisar
-            // de mais tempo), senão a barra terminaria antes da cascata de verdade.
-            if (barFill) barFill.style.transitionDuration = `${washDuration}ms`;
-            void overlay.offsetWidth;
-            requestAnimationFrame(() => {
-                if (barFill) barFill.style.width = "100%";
-            });
+            schedule(() => {
+                // Tempo 2: site todo invisível - mostra o carregamento centralizado com o
+                // nome do modo, segurando por HOLD_MS (a barra enche nesse exato tempo).
+                if (barFill) {
+                    barFill.style.width = "0%";
+                    barFill.style.transitionDuration = "0ms";
+                }
+                overlay.classList.add("is-active");
+                void overlay.offsetWidth;
+                if (barFill) {
+                    barFill.style.transitionDuration = `${HOLD_MS}ms`;
+                    requestAnimationFrame(() => { barFill.style.width = "100%"; });
+                }
 
-            if (window.__modeTransitionTimer) clearTimeout(window.__modeTransitionTimer);
-            window.__modeTransitionTimer = setTimeout(() => {
-                overlay.classList.remove("is-active");
-            }, washDuration);
+                schedule(() => {
+                    // Tempo 3: esconde o carregamento e remonta painéis + cards em cascata.
+                    overlay.classList.remove("is-active");
+                    reassemblePanels(panels, reduceMotion);
+                    reassembleTrackCards(cards, reduceMotion);
+                }, HOLD_MS);
+            }, disassembleMs);
         }
 
         function setDjMode(mode, isUserSelection = false) {
