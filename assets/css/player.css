@@ -151,11 +151,33 @@
             transform-origin: center center;
         }
 
+        /* Camada própria da logo (ver comentário no HTML) - cobre a tela inteira, sem fundo
+           e sem bloquear clique, só pra centralizar a #modeTransitionLogoBox de verdade
+           (a de dentro do overlay escuro é só um espaço reservado vazio). Fica ACIMA do
+           overlay (z-index maior) pra nunca ficar escondida atrás do fade do fundo. */
+        .mode-transition-logo-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .mode-transition-logo-layer .transicao-logo-box {
+            opacity: 0;
+            transition: opacity 0.15s linear;
+        }
+        /* O JS liga/desliga esta classe exatamente quando a logo deve estar visível (do
+           início do voo de ida até o fim do voo de volta) - independente do fundo escuro
+           (.mode-transition-overlay.is-active), que seguiu seu próprio tempo de fade. */
+        .mode-transition-logo-layer.is-flying .transicao-logo-box {
+            opacity: 1;
+        }
+
         /* Logo do site em código (SVG), não mais uma imagem - usada tanto no cabeçalho
-           (estática, já "desenhada") quanto aqui no overlay (se desenha do zero quando a
-           transição fica ativa). Mesmo elemento visual nos dois lugares, só muda de tamanho
-           e de estado (ver animateHeaderLogoToOverlay/animateOverlayLogoToHeader no JS, que
-           fazem ele "voar" do cabeçalho pro centro e de volta). */
+           (estática, já "desenhada") quanto na camada de transição (se desenha do zero
+           quando entra em voo). Mesmo elemento visual nos dois lugares, só muda de tamanho. */
         .app-logo-glyph {
             width: 30px;
             height: 30px;
@@ -174,15 +196,14 @@
             will-change: transform;
             transform-origin: 50% 50%;
         }
-        /* Dentro do overlay, a logo começa "não desenhada" e se desenha quando a transição
-           fica ativa - reaproveita a técnica de stroke-dasharray/dashoffset com pathLength=1
-           (não precisa calcular o comprimento real do traço). A duração aqui (0.45s) termina
-           perto de quando o voo de entrada da logo chega (0.35s, ver JS) - ela "pousa" e
-           acaba de se desenhar quase junto, em vez de ficar visivelmente atrasada. */
+        /* Começa "não desenhada" e se desenha quando entra em voo - reaproveita a técnica de
+           stroke-dasharray/dashoffset com pathLength=1 (não precisa calcular o comprimento
+           real do traço). Duração (0.45s) perto da do voo de entrada (0.34s, ver JS) - ela
+           "pousa" e acaba de se desenhar quase junto, em vez de ficar visivelmente atrasada. */
         .transicao-logo-box .app-logo-glyph .logo-glyph-band {
             stroke-dashoffset: 1;
         }
-        .mode-transition-overlay.is-active .transicao-logo-box .app-logo-glyph .logo-glyph-band {
+        .mode-transition-logo-layer.is-flying .transicao-logo-box .app-logo-glyph .logo-glyph-band {
             animation: logoGlyphDraw 0.45s cubic-bezier(.65, 0, .35, 1) both;
         }
         .transicao-logo-box .app-logo-glyph .logo-glyph-pulse {
@@ -190,7 +211,7 @@
             transform: scale(0.4);
             transform-origin: 12px 11px;
         }
-        .mode-transition-overlay.is-active .transicao-logo-box .app-logo-glyph .logo-glyph-pulse {
+        .mode-transition-logo-layer.is-flying .transicao-logo-box .app-logo-glyph .logo-glyph-pulse {
             animation: logoGlyphPulseIn 0.3s cubic-bezier(.4, 0, .2, 1) 0.4s both,
                        logoGlyphPulseBeat 0.85s ease-in-out 0.7s infinite;
         }

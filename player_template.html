@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_24">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_25">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -1243,7 +1243,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_24"></script>
+    <script src="/assets/js/player.js?v=20261119_25"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -2010,21 +2010,32 @@
             <span></span><span></span><span></span><span></span>
             <span></span><span></span><span></span><span></span>
         </div>
-        <!-- Mesma logo (SVG por código) do cabeçalho, aqui maior e com a animação de
-             "se desenhar" - é o mesmo objeto visual voando do cabeçalho pra cá e de volta,
-             não uma imagem separada (ver animateHeaderLogoToOverlay/animateOverlayLogoToHeader). -->
-        <div class="transicao-logo-box" id="modeTransitionLogoBox">
-            <svg class="app-logo-glyph" id="modeTransitionLogoSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
-                <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
-            </svg>
-        </div>
+        <!-- Espaço reservado do tamanho da logo, só pra empurrar o texto/barra pra baixo na
+             mesma posição de antes - a logo de verdade mora na camada separada abaixo. -->
+        <div class="transicao-logo-box" aria-hidden="true"></div>
         <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
         <div class="mode-transition-eq" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span>
         </div>
         <div class="mode-transition-bar-track">
             <div class="mode-transition-bar-fill" id="modeTransitionBarFill"></div>
+        </div>
+    </div>
+
+    <!-- Logo (SVG por código, mesma do cabeçalho) que "voa" do ícone do cabeçalho até o
+         centro da tela e de volta quando o modo muda. Camada própria, SEM fundo e com
+         opacidade independente do overlay escuro acima - assim ela fica visível voando por
+         cima do site ainda normal/claro antes do fundo escurecer (e nos últimos instantes
+         depois dele clarear de novo), em vez de só aparecer quando o fundo já está escuro
+         (o que lia como "vem do nada"/"não volta", porque ficava escondida atrás do próprio
+         fade do fundo). Sempre centralizada neste wrapper fixo em tela cheia - o "pouso" é
+         sempre exatamente o centro, sem deslocamento residual. -->
+    <div id="modeTransitionLogoLayer" class="mode-transition-logo-layer" aria-hidden="true">
+        <div class="transicao-logo-box" id="modeTransitionLogoBox">
+            <svg class="app-logo-glyph" id="modeTransitionLogoSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
+                <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
+            </svg>
         </div>
     </div>
 
