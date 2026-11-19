@@ -7419,7 +7419,11 @@ function triggerCrossfade(nextTrack) {
             updateUpcomingTrackUI();
             updateLiveBpmPanel();
             updateDjIdealHelper(track);
-            recordTrackInHistory(track);
+            // NÃO chamar recordTrackInHistory aqui: esta função só atualiza textos/imagens na
+            // tela e é invocada de dentro de playTrackInstant/triggerCrossfade, que já chamam
+            // recordTrackInHistory uma vez, no momento certo (início real da faixa). Chamar de
+            // novo aqui contava cada play em dobro (e por tabela diluía a taxa de skip pela
+            // metade na curadoria).
         }
 
         function showToast(msg) {
@@ -9327,7 +9331,7 @@ function triggerCrossfade(nextTrack) {
             const pct = Math.round((track.skip_rate || 0) * 100);
             const statHtml = section === "promote"
                 ? `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${track.plays}x tocada${track.skips ? ` • pulada ${track.skips}x` : ""}</span>`
-                : `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays + track.skips})</span>`;
+                : `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays})</span>`;
 
             const actionsHtml = section === "promote"
                 ? `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>

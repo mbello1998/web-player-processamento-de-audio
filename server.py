@@ -431,16 +431,19 @@ def build_curation_suggestions() -> dict:
             continue  # já não está mais na biblioteca - nada a sugerir sobre ela
         plays = s.get("plays", 0)
         skips = s.get("skips", 0)
-        total = plays + skips
-        if total < CURATION_MIN_SAMPLES:
+        if plays < CURATION_MIN_SAMPLES:
             continue
-        skip_rate = skips / total if total else 0.0
+        # "plays" já conta TODA vez que a faixa começou a tocar, inclusive as que depois
+        # viraram skip - skips é um SUBCONJUNTO de plays, não uma contagem separada. Taxa
+        # de pulo é skips/plays (pulou 8 de 10 vezes que tocou = 80%), nunca
+        # skips/(plays+skips), que diluiria pela metade uma faixa pulada quase sempre.
+        skip_rate = min(1.0, skips / plays) if plays else 0.0
         item = dict(track)
         item["plays"] = plays
         item["skips"] = skips
         item["skip_rate"] = round(skip_rate, 2)
 
-        if plays >= CURATION_MIN_SAMPLES and skip_rate <= CURATION_PROMOTE_MAX_SKIP_RATE:
+        if skip_rate <= CURATION_PROMOTE_MAX_SKIP_RATE:
             promote.append(item)
         elif skip_rate >= CURATION_REMOVE_MIN_SKIP_RATE:
             remove_candidates.append(item)
