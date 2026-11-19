@@ -8934,14 +8934,17 @@ function triggerCrossfade(nextTrack) {
         // voltando com tudo intacto por baixo (música, fila, conteúdo nunca somem do DOM).
         function getModeTransitionPanels() {
             return [
+                document.querySelector(".top-header-area"),
                 document.querySelector(".player-pane"),
                 document.querySelector(".list-pane"),
                 document.querySelector(".bottom-player-bar")
             ].filter(Boolean);
         }
 
-        const PANEL_TRANSITION_MS = 460;
-        const PANEL_STAGGER_MS = 70;
+        // Mais lento que antes (era 460/70) - o efeito de onda tava rápido demais pra dar
+        // tempo de realmente ler o site se desmontando/remontando.
+        const PANEL_TRANSITION_MS = 650;
+        const PANEL_STAGGER_MS = 100;
 
         // Pura ida (voar pra longe) ou pura volta (reverso, voltar pro lugar) dos 3 painéis
         // estruturais - separado em duas funções pra poder encaixar uma pausa de carregamento
@@ -8963,8 +8966,8 @@ function triggerCrossfade(nextTrack) {
                 panels.length ? (panels.length - 1) * PANEL_STAGGER_MS + PANEL_TRANSITION_MS : 0);
         }
 
-        const CARD_TRANSITION_MS = 400;
-        const CARD_STAGGER_MS = 45;
+        const CARD_TRANSITION_MS = 560;
+        const CARD_STAGGER_MS = 65;
 
         // Pega os cards de música realmente visíveis na tela (não a lista inteira, que pode
         // ter centenas fora da tela) pra desmontar em cascata rápida (onda, não um por um
@@ -9028,82 +9031,225 @@ function triggerCrossfade(nextTrack) {
         // verdade. Agora: (1) desmonta painéis+cards em cascata rápida, (2) com tudo
         // invisível, mostra a tela de carregamento centralizada por um tempo fixo pra dar
         // pra ler o nome do modo, (3) remonta em cascata e esconde a tela de carregamento.
-        // Voa a #modeTransitionLogoBox (na camada própria modeTransitionLogoLayer, acima do
-        // overlay escuro e com opacidade independente dele - ver CSS/HTML) de um elemento de
-        // origem até o centro da tela. Chama onDone só quando o voo realmente termina (não um
-        // tempo chutado), pra poder encadear as próximas fases na ordem certa de verdade.
-        function flipModeLogoToCenter(originEl, onDone) {
-            const logoLayer = document.getElementById("modeTransitionLogoLayer");
-            const logoBox = document.getElementById("modeTransitionLogoBox");
-            const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            if (!logoLayer || !logoBox || !originEl || !logoBox.animate || reduceMotion) {
-                if (onDone) onDone();
-                return;
-            }
-            logoLayer.classList.add("is-flying");
-            const origem = originEl.getBoundingClientRect();
-            const destino = logoBox.getBoundingClientRect();
-            if (origem.width === 0 || destino.width === 0) { onDone && onDone(); return; }
-            const escala = Math.max(0.15, origem.height / destino.height);
-            const dx = (origem.left + origem.width / 2) - (destino.left + destino.width / 2);
-            const dy = (origem.top + origem.height / 2) - (destino.top + destino.height / 2);
-            const voo = logoBox.animate([
-                { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, opacity: 0.5 },
-                { transform: "none", opacity: 1 }
-            ], { duration: 320, easing: "cubic-bezier(0.23, 1, 0.32, 1)", fill: "forwards" });
-            voo.onfinish = () => { voo.cancel(); if (onDone) onDone(); };
+        // .transicao-logo-box tem tamanho fixo (100x100, ver CSS) e dentro da camada própria
+        // (#modeTransitionLogoLayer) é posicionada só por transform:translate() a partir de
+        // top:0/left:0 - nunca por flex-center. Isso dá posição ABSOLUTA e exata sempre,
+        // calculada contra o retângulo real de qualquer elemento (cabeçalho ou espaço
+        // reservado dentro do overlay) a cada voo, sem acumular/herdar transform de um voo
+        // anterior nem depender do centro genérico da tela coincidir com onde o conteúdo do
+        // overlay realmente deixa o espaço livre (o que causava a logo ficar desalinhada,
+        // sobrepondo o texto "Mudando para...").
+        const LOGO_BOX_SIZE = 100;
+        function logoTransformFor(rect, scale) {
+            const s = scale || 1;
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            // IMPORTANTE: "translate(x,y) scale(s)" aplica o scale primeiro (em torno do
+            // transform-origin, 50% 50% da caixa de 100x100 sem transform nenhum) e só DEPOIS
+            // o translate, que desloca em pixels absolutos não afetados pela escala - por
+            // isso aqui é sempre metade do tamanho ORIGINAL (100/2=50), nunca metade do
+            // tamanho já escalado. Usar o escalado fazia o centro final ficar deslocado em
+            // (metade do encolhimento, metade do encolhimento) do alvo real.
+            const x = cx - LOGO_BOX_SIZE / 2;
+            const y = cy - LOGO_BOX_SIZE / 2;
+            return `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) scale(${s.toFixed(3)})`;
+        }
+        // Onde a logo "repousa" durante o hold: o espaço reservado de verdade dentro do
+        // overlay (não o centro genérico da tela), pra sempre bater com onde o texto/barra
+        // abaixo dela realmente começam.
+        function getLogoRestRect() {
+            const placeholder = document.querySelector("#modeTransitionOverlay .transicao-logo-box");
+            return placeholder ? placeholder.getBoundingClientRect() : null;
         }
 
-        // Voa de volta do centro até o elemento de destino (mesma lógica em espelho). A
-        // opacidade só cai no último trecho (offset 0.7-1) - com ela interpolada junto com a
-        // translação inteira pela mesma curva de ease-out forte (que sobe/desce rápido logo
-        // no início), a logo ficava quase invisível bem cedo no voo e "sumia" antes de dar
-        // pra ver ela realmente chegando (reportado como "vai pro loading mas não volta").
-        function flipModeLogoFromCenter(targetEl, modeColor, onDone) {
+        // Voa a #modeTransitionLogoBox de um elemento de origem (o ícone real do cabeçalho)
+        // até o espaço reservado no overlay. Chama onDone só quando o voo realmente termina
+        // (não um tempo chutado), pra encadear as próximas fases na ordem certa de verdade.
+        function flipModeLogoToCenter(originEl, originRect, onDone) {
             const logoLayer = document.getElementById("modeTransitionLogoLayer");
             const logoBox = document.getElementById("modeTransitionLogoBox");
             const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            if (!logoLayer || !logoBox || !targetEl || !logoBox.animate || reduceMotion) {
-                if (logoLayer) logoLayer.classList.remove("is-flying");
+            const restRect = getLogoRestRect();
+            if (!logoLayer || !logoBox || !originEl || !restRect || restRect.width === 0) {
                 if (onDone) onDone();
                 return;
             }
-            const de = logoBox.getBoundingClientRect();
-            const para = targetEl.getBoundingClientRect();
-            if (de.width === 0 || para.width === 0) {
-                logoLayer.classList.remove("is-flying");
+            const restT = logoTransformFor(restRect, 1);
+            if (!logoBox.animate || reduceMotion) {
+                // Sem animação: só posiciona direto no lugar de repouso e mostra.
+                logoBox.style.transform = restT;
+                logoBox.style.opacity = "1";
+                logoLayer.classList.add("is-flying");
                 if (onDone) onDone();
                 return;
             }
-            const escala = Math.max(0.2, para.height / de.height);
-            const dx = (para.left + para.width / 2) - (de.left + de.width / 2);
-            const dy = (para.top + para.height / 2) - (de.top + de.height / 2);
+            const origem = originRect || originEl.getBoundingClientRect();
+            if (origem.width === 0) { onDone && onDone(); return; }
+            const escalaOrigem = Math.max(0.15, origem.height / LOGO_BOX_SIZE);
+            const fromT = logoTransformFor(origem, escalaOrigem);
+
+            // Esconde a logo REAL do cabeçalho assim que a cópia que voa aparece no lugar
+            // dela - senão ficam as duas visíveis ao mesmo tempo (uma parada, uma voando) no
+            // instante em que o voo começa.
+            if (originEl.classList) originEl.classList.add("is-mode-flying");
+
+            logoLayer.classList.add("is-flying");
+            logoBox.style.transform = fromT;
+            logoBox.style.opacity = "0.5";
+            void logoBox.offsetWidth;
+
             const voo = logoBox.animate([
-                { transform: "none", opacity: 1, offset: 0 },
-                { transform: `translate(${(dx * 0.92).toFixed(2)}px, ${(dy * 0.92).toFixed(2)}px) scale(${(escala * 1.05).toFixed(3)})`, opacity: 1, offset: 0.7 },
-                { transform: `translate(${dx}px, ${dy}px) scale(${escala})`, opacity: 0, offset: 1 }
-            ], { duration: 420, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" });
+                { transform: fromT, opacity: 0.5 },
+                { transform: restT, opacity: 1 }
+            ], { duration: 480, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
             voo.onfinish = () => {
                 voo.cancel();
-                logoLayer.classList.remove("is-flying");
-                // Pulso de pouso suave no cabeçalho - fecha o ciclo.
-                if (targetEl.animate && modeColor) {
-                    targetEl.animate([
-                        { transform: "scale(1.18)", boxShadow: `0 0 25px rgba(${modeColor.rgb}, 0.8)` },
-                        { transform: "none", boxShadow: "none" }
-                    ], { duration: 340, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
-                }
+                // Fixa a posição de repouso de verdade (o animate com fill:forwards some
+                // assim que algo chama .cancel() nela - precisa do valor final gravado à parte).
+                logoBox.style.transform = restT;
+                logoBox.style.opacity = "1";
                 if (onDone) onDone();
             };
         }
 
-        function showModeTransitionOverlay(mode, label) {
+        // Voa de volta do espaço reservado até o retângulo de destino (mesma lógica em
+        // espelho de flipModeLogoToCenter). Recebe o retângulo PRONTO (targetRect), não um
+        // elemento pra medir na hora - nesse ponto da sequência o cabeçalho ainda está
+        // desmontado (transform 3D de is-disassembling), então medir ele agora pegaria a
+        // posição deslocada/girada, não o lugar real de pouso (bug: "trajetória de retorno
+        // errada, diferente de onde a logo realmente está"). Por isso showModeTransitionOverlay
+        // mede o cabeçalho UMA vez, ainda no estado normal, antes de desmontar qualquer coisa,
+        // e reaproveita esse mesmo retângulo aqui.
+        function flipModeLogoFromCenter(targetEl, targetRect, modeColor, onDone) {
+            const logoLayer = document.getElementById("modeTransitionLogoLayer");
+            const logoBox = document.getElementById("modeTransitionLogoBox");
+            const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            function limpar() {
+                if (logoLayer) logoLayer.classList.remove("is-flying");
+                if (logoBox) {
+                    logoBox.style.transform = "";
+                    logoBox.style.opacity = "";
+                    logoBox.classList.remove("is-rebuilding");
+                    logoBox.style.removeProperty("--logo-current-rgb");
+                }
+                if (targetEl && targetEl.classList) targetEl.classList.remove("is-mode-flying");
+            }
+            if (!logoLayer || !logoBox || !targetEl || !targetRect) { limpar(); if (onDone) onDone(); return; }
+            const para = targetRect;
+            const de = getLogoRestRect();
+            if (!logoBox.animate || reduceMotion || !de || de.width === 0 || para.width === 0) {
+                limpar();
+                if (onDone) onDone();
+                return;
+            }
+            const fromT = logoTransformFor(de, 1);
+            const escalaDestino = Math.max(0.2, para.height / LOGO_BOX_SIZE);
+            const toT = logoTransformFor(para, escalaDestino);
+
+            // Mesma curva e duração da ida (flipModeLogoToCenter), espelhada. Ao pousar ela
+            // FICA ali, sólida e parada, ocupando de verdade o espaço que tinha saído - não
+            // esconde a cópia nem revela a logo real do cabeçalho ainda. Isso é de propósito:
+            // o cabeçalho ainda está desmontado nesse instante (o resto dele só vai remontar
+            // depois, chamado por quem usa essa função), e se a logo real aparecesse e o
+            // handoff rolasse já aqui, o cabeçalho reapareceria com a logo "grudada" nele,
+            // os dois se movendo juntos como um bloco só - exatamente o que foi reportado como
+            // errado ("o cabeçalho tá sendo remontado com a logo"). Em vez disso, quem chama
+            // isso aqui remonta o resto do cabeçalho primeiro, com a cópia já presa no lugar
+            // certo e parada, e só troca pela logo real (onLanded) depois que o cabeçalho
+            // já reapareceu ao redor dela - lendo como "o resto remonta a partir de onde a
+            // logo já está", não como um bloco rígido carregando ela junto.
+            const voo = logoBox.animate([
+                { transform: fromT, opacity: 1 },
+                { transform: toT, opacity: 1 }
+            ], { duration: 480, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+            voo.onfinish = () => {
+                voo.cancel();
+                // Trava a cópia sólida exatamente no lugar de pouso - não limpa/esconde ainda.
+                logoBox.style.transform = toT;
+                logoBox.style.opacity = "1";
+                if (onDone) onDone();
+            };
+        }
+
+        // Troca --mode-accent-rgb/--accent/--accent-glow (usadas no site inteiro - botões,
+        // bordas, cards, badges) - chamada direto quando não tem transição (restaurando o
+        // modo salvo), ou adiada até o handoff final quando tem (showModeTransitionOverlay),
+        // pra cor do site só mudar de verdade depois que a transição termina, não antes.
+        function applyModeAccentColors(modeColor) {
+            document.documentElement.style.setProperty("--mode-accent-rgb", modeColor.rgb);
+            document.documentElement.style.setProperty("--accent", modeColor.hex);
+            document.documentElement.style.setProperty("--accent-glow", `rgba(${modeColor.rgb}, 0.4)`);
+        }
+
+        // Handoff final: troca a cópia que ficou parada no lugar de pouso pela logo real do
+        // cabeçalho (já com o cabeçalho remontado ao redor dela) - sem instante nenhum com as
+        // duas visíveis nem nenhum com nenhuma visível, já que as duas ocupam o mesmo ponto
+        // exato (headerRestRect).
+        function commitLogoHandoff(targetEl, modeColor) {
+            const logoLayer = document.getElementById("modeTransitionLogoLayer");
+            const logoBox = document.getElementById("modeTransitionLogoBox");
+            if (logoLayer) logoLayer.classList.remove("is-flying");
+            if (logoBox) {
+                logoBox.style.transform = "";
+                logoBox.style.opacity = "";
+                // Limpa o estado do efeito de remontagem/troca de cor pra não vazar pro
+                // próximo ciclo (senão a próxima troca de modo já nasceria com a cor velha
+                // de uma transição anterior presa em --logo-current-rgb).
+                logoBox.classList.remove("is-rebuilding");
+                logoBox.style.removeProperty("--logo-current-rgb");
+                logoBox.style.removeProperty("--logo-target-rgb");
+            }
+            if (targetEl && targetEl.classList) targetEl.classList.remove("is-mode-flying");
+            // Pulso de pouso suave no cabeçalho - fecha o ciclo.
+            if (targetEl && targetEl.animate && modeColor) {
+                targetEl.animate([
+                    { transform: "scale(1.18)", boxShadow: `0 0 25px rgba(${modeColor.rgb}, 0.8)` },
+                    { transform: "none", boxShadow: "none" }
+                ], { duration: 340, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+            }
+        }
+
+        // Disparado assim que o hold começa (logo já parada no lugar de repouso, fundo
+        // escuro recém ativado) - faz ela parecer estar se "remontando" e trocando de cor pra
+        // a do novo modo nesse exato instante, reaproveitando o mesmo traço (stroke-dashoffset)
+        // do desenho inicial, mas disparado de novo (não é o mesmo .is-flying, que já tinha
+        // tocado na ida). Precisa remover+forçar reflow+adicionar a classe pra reiniciar a
+        // animação CSS de verdade a cada troca de modo, já que só adicionar de novo numa
+        // classe que já está lá não reinicia nada.
+        function playLogoRebuildEffect() {
+            const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (reduceMotion) return;
+            const logoBox = document.getElementById("modeTransitionLogoBox");
+            if (!logoBox) return;
+            logoBox.classList.remove("is-rebuilding");
+            void logoBox.offsetWidth;
+            logoBox.classList.add("is-rebuilding");
+        }
+
+        function showModeTransitionOverlay(mode, label, previousModeColor) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
             const labelEl = document.getElementById("modeTransitionLabel");
             const barFill = document.getElementById("modeTransitionBarFill");
             const headerLogo = document.getElementById("headerMainLogo");
             const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
+
+            // A logo "chega" no carregamento ainda na cor do modo ANTERIOR, e só na hora do
+            // efeito de remontagem (playLogoRebuildEffect) é que troca de verdade pra cor do
+            // modo NOVO - --logo-current-rgb e --logo-target-rgb são locais (setadas só neste
+            // elemento), porque --mode-accent-rgb (a global, usada no site inteiro) só é
+            // atualizada bem no final de tudo (applyModeAccentColors, no handoff) - não dá
+            // pra essa logo depender da global pra saber a cor nova, já que a global ainda
+            // não mudou nesse ponto.
+            const logoBoxEl = document.getElementById("modeTransitionLogoBox");
+            if (logoBoxEl) {
+                logoBoxEl.style.setProperty("--logo-target-rgb", modeColor.rgb);
+                if (previousModeColor && previousModeColor.rgb !== modeColor.rgb) {
+                    logoBoxEl.style.setProperty("--logo-current-rgb", previousModeColor.rgb);
+                } else {
+                    logoBoxEl.style.removeProperty("--logo-current-rgb");
+                }
+            }
 
             // O emoji do modo (ex: ⚡) vai junto do nome agora, não mais como selo em cima da
             // logo - ficava sobreposto bem no centro do fone de ouvido, brigando com o desenho
@@ -9116,7 +9262,7 @@ function triggerCrossfade(nextTrack) {
             const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             // HOLD_MS é quanto tempo a tela de carregamento centralizada (nome do modo +
             // barra) fica sozinha na tela, com o site todo já invisível por trás.
-            const HOLD_MS = isAggressive ? 1200 : 1400;
+            const HOLD_MS = isAggressive ? 1350 : 1400;
 
             if (window.__modeTransitionTimers) {
                 window.__modeTransitionTimers.forEach(t => clearTimeout(t));
@@ -9136,7 +9282,14 @@ function triggerCrossfade(nextTrack) {
             // 4) a logo volta sozinha pro cabeçalho, com o fundo ainda escuro atrás dela;
             // 5) só quando ela pousa de volta é que o fundo clareia E o site remonta juntos -
             //    revelação final em vez de competir com o voo de volta.
-            flipModeLogoToCenter(headerLogo, () => {
+            //
+            // headerRestRect é medido AGORA, com o cabeçalho ainda no estado normal (nenhuma
+            // desmontagem rolou ainda) - é o mesmo retângulo usado tanto pra origem da ida
+            // quanto pro destino da volta, pra garantir que as duas pousem no MESMO lugar de
+            // verdade. Medir o cabeçalho de novo depois (já desmontado, com transform 3D)
+            // pegaria uma posição deslocada e girada, não a real.
+            const headerRestRect = headerLogo ? headerLogo.getBoundingClientRect() : null;
+            flipModeLogoToCenter(headerLogo, headerRestRect, () => {
                 const panels = getModeTransitionPanels();
                 const panelMs = disassemblePanels(reduceMotion);
                 const { cascadeMs: cardMs, cards } = disassembleTrackCards(reduceMotion);
@@ -9149,16 +9302,33 @@ function triggerCrossfade(nextTrack) {
                     }
                     overlay.classList.add("is-active");
                     void overlay.offsetWidth;
+                    playLogoRebuildEffect();
                     if (barFill) {
                         barFill.style.transitionDuration = `${HOLD_MS}ms`;
                         requestAnimationFrame(() => { barFill.style.width = "100%"; });
                     }
 
                     schedule(() => {
-                        flipModeLogoFromCenter(headerLogo, modeColor, () => {
+                        flipModeLogoFromCenter(headerLogo, headerRestRect, modeColor, () => {
+                            // A cópia da logo já pousou e ficou parada, sólida, exatamente no
+                            // lugar que o cabeçalho real vai ocupar - só AGORA o resto do
+                            // cabeçalho (e os outros painéis/cards) remonta, crescendo a
+                            // partir de onde ela já está, em vez de reaparecer como um bloco
+                            // só já carregando a logo junto.
                             overlay.classList.remove("is-active");
+                            // Só agora, com a tela de carregamento (a "transição" propriamente
+                            // dita) terminada e o site começando a remontar, é que a cor de
+                            // destaque vira pra cor do modo novo no site inteiro - não mais lá
+                            // no clique, que fazia tudo mudar de cor antes da tela de
+                            // carregamento sequer aparecer.
+                            applyModeAccentColors(modeColor);
                             reassemblePanels(panels, reduceMotion);
                             reassembleTrackCards(cards, reduceMotion);
+                            const reassembleMs = reduceMotion ? 0 :
+                                (panels.length ? (panels.length - 1) * PANEL_STAGGER_MS + PANEL_TRANSITION_MS : 0);
+                            schedule(() => {
+                                commitLogoHandoff(headerLogo, modeColor);
+                            }, reassembleMs);
                         });
                     }, HOLD_MS);
                 }, disassembleMs);
@@ -9166,6 +9336,10 @@ function triggerCrossfade(nextTrack) {
         }
 
         function setDjMode(mode, isUserSelection = false) {
+            // Guardado ANTES de trocar djPlayMode/--mode-accent-rgb - é a cor que a logo
+            // "chega" no carregamento (a do modo que estava ativo até agora), pra depois se
+            // remontar trocando de verdade pra cor nova, em vez de nascer já na cor nova.
+            const previousModeColor = DJ_MODE_COLORS[djPlayMode] || DJ_MODE_COLORS.match;
             djPlayMode = mode;
             const shortLabels = {
                 match: "🎯 Match Perfeito",
@@ -9179,12 +9353,18 @@ function triggerCrossfade(nextTrack) {
             const activeLabel = document.getElementById("djActModeActiveLabel");
             if (activeLabel) activeLabel.textContent = shortLabels[mode] || mode;
 
-            // Troca a cor de destaque do modo no site inteiro de uma vez via CSS var -
-            // --accent já é usada em botões, bordas e destaques por quase toda a interface.
             const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
-            document.documentElement.style.setProperty("--mode-accent-rgb", modeColor.rgb);
-            document.documentElement.style.setProperty("--accent", modeColor.hex);
-            document.documentElement.style.setProperty("--accent-glow", `rgba(${modeColor.rgb}, 0.4)`);
+            // Troca a cor de destaque do modo no site inteiro via CSS var - --accent já é
+            // usada em botões, bordas e destaques por quase toda a interface. Quando tem
+            // transição rolando (isUserSelection), essa troca é ADIADA pra acontecer só no
+            // fim de verdade da sequência (showModeTransitionOverlay chama
+            // applyModeAccentColors no handoff) - trocar aqui na hora fazia o site inteiro
+            // mudar de cor antes mesmo da tela de carregamento aparecer, antecipando o que
+            // devia só ser revelado depois da transição. Sem transição (restaurando o modo
+            // salvo ao carregar a página), não tem nada a esperar - aplica direto.
+            if (!isUserSelection) {
+                applyModeAccentColors(modeColor);
+            }
 
             // A animação de transição e a troca automática de gênero (preset) só rodam
             // quando o PRÓPRIO usuário escolhe o modo - não ao restaurar o modo salvo no
@@ -9294,7 +9474,7 @@ function triggerCrossfade(nextTrack) {
             // dela fazia os cards recém-animados serem substituídos no meio do efeito,
             // e a desmontagem nunca chegava a aparecer na tela.
             if (isUserSelection) {
-                showModeTransitionOverlay(mode, shortLabels[mode] || mode);
+                showModeTransitionOverlay(mode, shortLabels[mode] || mode, previousModeColor);
             }
 
             if (nextTrack) {

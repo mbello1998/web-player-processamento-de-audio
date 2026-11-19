@@ -152,21 +152,25 @@
         }
 
         /* Camada própria da logo (ver comentário no HTML) - cobre a tela inteira, sem fundo
-           e sem bloquear clique, só pra centralizar a #modeTransitionLogoBox de verdade
-           (a de dentro do overlay escuro é só um espaço reservado vazio). Fica ACIMA do
-           overlay (z-index maior) pra nunca ficar escondida atrás do fade do fundo. */
+           e sem bloquear clique (a de dentro do overlay escuro é só um espaço reservado
+           vazio, pra empurrar o texto/barra pra baixo no lugar certo). Fica ACIMA do overlay
+           (z-index maior) pra nunca ficar escondida atrás do fade do fundo. Posicionamento
+           em coordenadas absolutas (translate a partir de top:0/left:0), não mais
+           flex-center: o "repouso" precisa bater exatamente com onde o espaço reservado
+           dentro do overlay fica (que muda de posição conforme o resto do conteúdo do
+           overlay), não com o centro genérico da tela - com flex-center os dois podiam
+           divergir e a logo ficava desalinhada, sobrepondo o texto abaixo dela. */
         .mode-transition-logo-layer {
             position: fixed;
             inset: 0;
             z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             pointer-events: none;
         }
         .mode-transition-logo-layer .transicao-logo-box {
+            position: fixed;
+            top: 0;
+            left: 0;
             opacity: 0;
-            transition: opacity 0.15s linear;
         }
         /* O JS liga/desliga esta classe exatamente quando a logo deve estar visível (do
            início do voo de ida até o fim do voo de volta) - independente do fundo escuro
@@ -181,18 +185,26 @@
         .app-logo-glyph {
             width: 30px;
             height: 30px;
-            color: #00f2fe;
+            color: rgb(var(--mode-accent-rgb, 0, 242, 254));
+            transition: color 0.4s ease;
             overflow: visible;
         }
         .app-logo-glyph .logo-glyph-band {
-            stroke-dasharray: 1;
+            stroke-dasharray: 1 1.5;
             stroke-dashoffset: 0;
         }
+        /* --logo-current-rgb (cor do modo ANTERIOR) e --logo-target-rgb (cor do modo NOVO)
+           são locais, setadas via JS (showModeTransitionOverlay) só neste elemento - a
+           global --mode-accent-rgb só é atualizada bem mais tarde, no handoff final
+           (applyModeAccentColors), pra cor do site inteiro não mudar antes da transição
+           acabar. --logo-current-rgb tem prioridade: é o que faz a logo "chegar" no
+           carregamento ainda na cor antiga, pra só então trocar de verdade pra --logo-target-
+           rgb durante o efeito de remontagem (logoGlyphRebuildColor, abaixo). */
         .transicao-logo-box .app-logo-glyph {
             width: 60px;
             height: 60px;
-            color: rgb(var(--mode-accent-rgb, 0, 242, 254));
-            filter: drop-shadow(0 0 16px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.75));
+            color: rgb(var(--logo-current-rgb, var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254))));
+            filter: drop-shadow(0 0 16px rgba(var(--logo-current-rgb, var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254))), 0.75));
             will-change: transform;
             transform-origin: 50% 50%;
         }
@@ -201,10 +213,26 @@
            real do traço). Duração (0.45s) perto da do voo de entrada (0.34s, ver JS) - ela
            "pousa" e acaba de se desenhar quase junto, em vez de ficar visivelmente atrasada. */
         .transicao-logo-box .app-logo-glyph .logo-glyph-band {
+            stroke: rgb(var(--logo-current-rgb, var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254))));
             stroke-dashoffset: 1;
         }
         .mode-transition-logo-layer.is-flying .transicao-logo-box .app-logo-glyph .logo-glyph-band {
             animation: logoGlyphDraw 0.45s cubic-bezier(.65, 0, .35, 1) both;
+        }
+        /* Traçado "de pintura": por cima do de baixo, sempre na cor do modo NOVO
+           (--logo-target-rgb) mas começa invisível (não desenhado) - só se desenha durante o
+           efeito de remontagem (#modeTransitionLogoBox.is-rebuilding, mais abaixo), cobrindo
+           o traço de baixo conforme avança, como uma linha contornando o fone e pintando ele
+           na cor nova. */
+        .transicao-logo-box .app-logo-glyph .logo-glyph-band-paint {
+            stroke: rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+            /* vão (1.5) maior que o traço (1) de propósito - com os dois do mesmo tamanho,
+               "nada desenhado" cai exatamente na fronteira entre o fim do traço e o início do
+               vão, e a ponta arredondada (stroke-linecap: round) do traço pinta um pontinho
+               bem ali mesmo com 0% "pintado" - lido como "já vem com um ponto da cor nova".
+               Com folga, o traço fica bem dentro do vão em repouso, sem esse pontinho. */
+            stroke-dasharray: 1 1.5;
+            stroke-dashoffset: 1;
         }
         .transicao-logo-box .app-logo-glyph .logo-glyph-pulse {
             opacity: 0;
@@ -226,6 +254,46 @@
         @keyframes logoGlyphPulseBeat {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.22); }
+        }
+
+        /* Efeito de "se remontando e trocando de cor" assim que o hold começa (logo já
+           parada no centro da tela de carregamento) - redesenha o traço do zero (mesma
+           técnica de stroke-dashoffset) NO MESMO TEMPO em que a cor sai da cor do modo
+           ANTERIOR (--logo-current-rgb, setada em showModeTransitionOverlay antes da logo
+           sair do cabeçalho) até a cor do modo NOVO (--logo-target-rgb, idem) - as duas
+           coisas com a mesma duração, pra ler como "ela se
+           remonta JÁ trocando de cor", uma coisa só, não duas animações por cima uma da
+           outra. Disparado via JS (classe is-rebuilding, removida+readicionada a cada troca
+           pra reiniciar a animação de verdade). */
+        /* #modeTransitionLogoBox (seletor de ID) de propósito - a animação de voo
+           (.mode-transition-logo-layer.is-flying .transicao-logo-box ...) continua marcada
+           o hold inteiro (só desliga bem depois, no handoff) e tem mais classes empilhadas,
+           então venceria no empate de especificidade contra um seletor só de classes. */
+        #modeTransitionLogoBox.is-rebuilding .app-logo-glyph {
+            animation: logoGlyphRebuildColor 1.05s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+        /* O traço de baixo (cor antiga) fica parado, já todo desenhado - é o de CIMA
+           (logo-glyph-band-paint, cor nova) que se desenha agora, cobrindo-o conforme avança. */
+        #modeTransitionLogoBox.is-rebuilding .app-logo-glyph .logo-glyph-band-paint {
+            animation: logoGlyphRebuildDraw 1.05s cubic-bezier(.65, 0, .35, 1) both;
+        }
+        #modeTransitionLogoBox.is-rebuilding .app-logo-glyph .logo-glyph-pulse {
+            animation: logoGlyphPulseIn 0.35s cubic-bezier(.4, 0, .2, 1) 0.7s both,
+                       logoGlyphPulseBeat 0.85s ease-in-out 1.05s infinite;
+        }
+        @keyframes logoGlyphRebuildDraw {
+            0% { stroke-dashoffset: 1; }
+            100% { stroke-dashoffset: 0; }
+        }
+        @keyframes logoGlyphRebuildColor {
+            0% {
+                color: rgb(var(--logo-current-rgb, 255, 255, 255));
+                filter: drop-shadow(0 0 22px rgba(var(--logo-current-rgb, 255, 255, 255), 0.85));
+            }
+            100% {
+                color: rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+                filter: drop-shadow(0 0 16px rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.75));
+            }
         }
 
         @keyframes modeTransitionPulse {
@@ -373,10 +441,19 @@
            transforma visualmente - o áudio e o conteúdo (música tocando, fila etc.)
            continuam intactos por baixo.
            ========================================================== */
+        .top-header-area,
         .player-pane,
         .list-pane,
         .bottom-player-bar {
-            transition: transform 0.46s var(--ease-out-strong), opacity 0.46s var(--ease-out-strong), filter 0.46s ease;
+            transition: transform 0.65s var(--ease-out-strong), opacity 0.65s var(--ease-out-strong), filter 0.65s ease;
+        }
+        /* O cabeçalho some junto com o resto (só a logo, que já saiu voando antes disso via
+           #modeTransitionLogoBox numa camada própria, continua visível) - some pra cima, de
+           onde ele mora na tela. */
+        .top-header-area.is-disassembling {
+            transform: perspective(1000px) translateY(-90px) translateZ(-220px) rotateX(-28deg);
+            opacity: 0;
+            filter: drop-shadow(0 0 24px rgb(var(--mode-accent-rgb)));
         }
         .player-pane.is-disassembling {
             transform: perspective(1000px) translateX(-110px) translateZ(-260px) rotateY(-32deg);
@@ -406,9 +483,9 @@
            e a remontagem toda "estourava" de uma vez em vez de cascatear igual a desmontagem. */
         .track-card.is-mode-transitioning {
             transition:
-                transform 0.4s var(--card-delay, 0ms) var(--ease-out-strong),
-                opacity 0.4s var(--card-delay, 0ms) ease,
-                filter 0.4s var(--card-delay, 0ms) ease !important;
+                transform 0.56s var(--card-delay, 0ms) var(--ease-out-strong),
+                opacity 0.56s var(--card-delay, 0ms) ease,
+                filter 0.56s var(--card-delay, 0ms) ease !important;
         }
         .track-card.is-disassembling {
             transform: perspective(900px)
@@ -420,9 +497,10 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .player-pane, .list-pane, .bottom-player-bar {
+            .top-header-area, .player-pane, .list-pane, .bottom-player-bar {
                 transition: opacity 0.25s ease;
             }
+            .top-header-area.is-disassembling,
             .player-pane.is-disassembling,
             .list-pane.is-disassembling,
             .bottom-player-bar.is-disassembling {
@@ -517,16 +595,22 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            background: radial-gradient(circle at center, rgba(0, 242, 254, 0.2), rgba(10, 14, 24, 0.85) 75%);
-            border: 1.5px solid rgba(0, 242, 254, 0.45);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.35), inset 0 0 10px rgba(0, 242, 254, 0.2);
+            background: radial-gradient(circle at center, rgba(var(--mode-accent-rgb, 0, 242, 254), 0.2), rgba(10, 14, 24, 0.85) 75%);
+            border: 1.5px solid rgba(var(--mode-accent-rgb, 0, 242, 254), 0.45);
+            box-shadow: 0 0 20px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.35), inset 0 0 10px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.2);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: visible;
         }
+        /* Enquanto a cópia que "voa" pro carregamento está em cena, a logo real do cabeçalho
+           some suavemente (mesma transition de 0.3s que o resto do .brand-headphone-box já
+           usa) - evita ter duas logos visíveis juntas, uma parada e uma voando. */
+        .brand-headphone-box.is-mode-flying {
+            opacity: 0;
+        }
         .brand-headphone-box:hover {
             transform: scale(1.08);
-            border-color: #00f2fe;
-            box-shadow: 0 0 30px rgba(0, 242, 254, 0.7), inset 0 0 15px rgba(0, 242, 254, 0.4);
+            border-color: rgb(var(--mode-accent-rgb, 0, 242, 254));
+            box-shadow: 0 0 30px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.7), inset 0 0 15px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.4);
         }
         .header-brand .app-logo-glyph {
             width: 30px;
@@ -536,7 +620,7 @@
             position: absolute;
             inset: -6px;
             border-radius: 18px;
-            background: radial-gradient(circle, rgba(0, 242, 254, 0.35) 0%, rgba(168, 85, 247, 0.2) 50%, transparent 80%);
+            background: radial-gradient(circle, rgba(var(--mode-accent-rgb, 0, 242, 254), 0.35) 0%, rgba(var(--mode-accent-rgb, 0, 242, 254), 0.15) 50%, transparent 80%);
             filter: blur(10px);
             pointer-events: none;
             opacity: 0.7;
@@ -546,7 +630,7 @@
             position: absolute;
             inset: -8px;
             border-radius: 20px;
-            border: 1.5px solid rgba(0, 242, 254, 0.4);
+            border: 1.5px solid rgba(var(--mode-accent-rgb, 0, 242, 254), 0.4);
             opacity: 0;
             pointer-events: none;
         }

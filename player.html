@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_25">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_39">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -13,7 +13,7 @@
         <div class="header-main-row">
             <div class="header-brand">
                 <div class="brand-headphone-box" id="headerMainLogo" title="Central de Músicas - Epicentro dos Efeitos" onclick="pulseHeaderLogo()">
-                    <svg class="app-logo-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg class="app-logo-glyph" viewBox="0 1 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
                         <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
                     </svg>
@@ -1243,7 +1243,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_25"></script>
+    <script src="/assets/js/player.js?v=20261119_39"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -2032,8 +2032,12 @@
          sempre exatamente o centro, sem deslocamento residual. -->
     <div id="modeTransitionLogoLayer" class="mode-transition-logo-layer" aria-hidden="true">
         <div class="transicao-logo-box" id="modeTransitionLogoBox">
-            <svg class="app-logo-glyph" id="modeTransitionLogoSvg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="app-logo-glyph" id="modeTransitionLogoSvg" viewBox="0 1 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
+                <!-- Traçado por cima, na cor do modo NOVO, que se desenha de novo em cima do
+                     de baixo (na cor antiga) durante o efeito de remontagem - como uma linha
+                     contornando o fone e pintando ele na cor nova conforme avança. -->
+                <path class="logo-glyph-band-paint" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" aria-hidden="true" />
                 <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
             </svg>
         </div>
