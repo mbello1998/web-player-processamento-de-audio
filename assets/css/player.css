@@ -460,10 +460,7 @@
         .tabs-wrapper {
             flex: 1;
             min-width: 0;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+            overflow-x: visible;
             padding: 2px 2px;
             box-sizing: border-box;
         }
@@ -472,8 +469,9 @@
         }
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             gap: 8px;
-            width: max-content;
+            width: 100%;
             align-items: center;
         }
         .tabs::before,
@@ -530,6 +528,13 @@
         }
         .tabs-scroll-btn.left { }
         .tabs-scroll-btn.right { }
+        /* As abas agora quebram em várias linhas em vez de rolar - todo gênero fica visível
+           e clicável de uma vez, sem precisar arrastar/rolar pra achar o filtro certo. As
+           setinhas de rolagem não têm mais função, então somem (regra por último pra vencer
+           o !important de display do bloco acima). */
+        .tabs-scroll-btn {
+            display: none !important;
+        }
         .tab-btn {
             background: var(--surface);
             border: 1px solid var(--border);
