@@ -9269,7 +9269,19 @@ function triggerCrossfade(nextTrack) {
             if (!container) return;
             container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-dim);">Carregando histórico...</div>`;
 
-            const history = await loadPlaybackHistory();
+            await loadPlaybackHistory();
+            renderHistoryModalList();
+        }
+
+        // Redesenha a modal do histórico a partir do playbackHistory que já está em memória,
+        // SEM buscar no servidor de novo. Buscar de novo logo depois de uma remoção otimista
+        // é uma corrida: o GET podia voltar com os dados antigos (antes do POST de remoção
+        // terminar) e a música removida reaparecia na hora - exatamente o bug reportado de
+        // "não remove de primeira".
+        function renderHistoryModalList() {
+            const container = document.getElementById("historyModalItems");
+            if (!container) return;
+            const history = playbackHistory;
             if (!history || history.length === 0) {
                 container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--text-dim);">Nenhuma música tocada no histórico recente ainda.<br><span style="font-size: 11px;">Músicas tocadas nos modos DJ e sugestões aparecerão aqui para você salvar na biblioteca.</span></div>`;
                 return;
@@ -9416,7 +9428,7 @@ function triggerCrossfade(nextTrack) {
                 await fetch("/api/history/clear", { method: "POST" });
                 playbackHistory = [];
                 updateHistoryBadge(0);
-                renderHistoryModal();
+                renderHistoryModalList();
                 showToast("Histórico limpo!");
             } catch (e) {
                 showToast("Erro ao limpar histórico.");
@@ -9427,7 +9439,7 @@ function triggerCrossfade(nextTrack) {
             const removedTrack = (playbackHistory || []).find(t => t.video_id === videoId);
             playbackHistory = (playbackHistory || []).filter(t => t.video_id !== videoId);
             updateHistoryBadge(playbackHistory.length);
-            renderHistoryModal();
+            renderHistoryModalList();
             const label = removedTrack ? removedTrack.title : "Música";
             showToast(`🗑️ "${label.slice(0, 40)}" removida do histórico!`);
             try {
