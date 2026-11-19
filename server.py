@@ -712,6 +712,41 @@ def build_curation_discovery(limit: int = 15) -> dict:
     }
 
 
+def build_curation_discovery_per_favorite(limit_per_favorite: int = 8, max_favorites: int = 3) -> dict:
+    """Mesma ideia de build_curation_discovery, mas em vez de misturar o sinal de todas as
+    favoritas numa busca só, roda uma busca "Faixas Parecidas" dedicada pra CADA favorita
+    (reaproveitando discover_related_tracks, a mesma função do botão 📻 Parecidas) - pra
+    mostrar, dentro do próprio modal de Curadoria, uma lista de novidades por favorita."""
+    suggestions = build_curation_suggestions()
+    favorites = suggestions.get("promote", [])[:max_favorites]
+    if not favorites:
+        return {
+            "favorites": [],
+            "message": "Ainda não há favoritas suficientes na curadoria pra basear a busca. Continue ouvindo normalmente.",
+        }
+
+    results = []
+    for fav in favorites:
+        tracks = discover_related_tracks(
+            fav.get("title", ""),
+            fav.get("artist", ""),
+            fav.get("category", "Outros"),
+            current_video_id=fav.get("video_id"),
+            target_bpm=fav.get("bpm"),
+            limit=limit_per_favorite,
+        )
+        results.append({
+            "video_id": fav.get("video_id"),
+            "title": fav.get("title"),
+            "artist": fav.get("artist"),
+            "cover_url": fav.get("cover_url"),
+            "plays": fav.get("plays"),
+            "tracks": tracks,
+        })
+
+    return {"favorites": results}
+
+
 OFFICIAL_CATEGORIES = [
     "Mega Funk & Ritmadas",
     "Funk Paulista, BH & Mandelão",
@@ -899,6 +934,10 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
 
             if path == "/api/curation/discover":
                 self.send_json(build_curation_discovery())
+                return
+
+            if path == "/api/curation/discover-per-favorite":
+                self.send_json(build_curation_discovery_per_favorite())
                 return
 
             if path == "/api/suggestions/discover":

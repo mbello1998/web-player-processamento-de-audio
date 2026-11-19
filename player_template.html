@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_13">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_15">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -1233,7 +1233,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_13"></script>
+    <script src="/assets/js/player.js?v=20261119_15"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -1839,16 +1839,15 @@
                 <button class="eq-close-btn" onclick="closeCurationModal()" title="Fechar Curadoria" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
             <div class="history-modal-body">
-                <!-- Descoberta: usa as favoritas de verdade (seção "promote" abaixo) como
-                     semente pra buscar música NOVA, fora da biblioteca, no mesmo padrão de
-                     gênero/ritmo/artista - mais preciso que "parecidas com a faixa atual"
-                     porque olha várias favoritas reais de uma vez. -->
-                <div class="queue-modal-section-title">🧭 Descobrir novidades baseadas no que você curte</div>
+                <!-- Descoberta por favorita: roda uma busca "Faixas Parecidas" dedicada pra CADA
+                     uma das suas favoritas de verdade (não uma mistura só) e mostra uma lista de
+                     novidades separada por favorita, tudo dentro deste mesmo modal. -->
+                <div class="queue-modal-section-title">🧭 Novidades, favorita por favorita</div>
                 <div id="curationDiscoveryIntro" style="font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px;">
-                    Busca música nova (fora da sua biblioteca) parecida com suas favoritas reais.
+                    Pra cada favorita de verdade, busca música nova (fora da sua biblioteca) parecida com ela.
                 </div>
                 <button class="btn-sync-yt" id="btnCurationDiscover" onclick="runCurationDiscovery()" style="width: 100%; margin: 0 0 14px 0; background: linear-gradient(135deg, #1ed760, #00b0ff); color: #000;">
-                    🔍 Buscar Novidades Baseadas nos Favoritos
+                    🔍 Buscar Novidades por Favorita
                 </button>
                 <div id="curationDiscoveryItems"></div>
 

@@ -1330,10 +1330,17 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 }
             }
 
+            // analyserNode só recebe sinal de verdade no engine "audio" (Web Audio HD): ele é
+            // alimentado pelos <audio> dos decks via deckMixer. No engine "video" (iframe do
+            // YouTube), o áudio sai direto do iframe, nunca passa pelo Web Audio API - então
+            // o analyser ficava lendo silêncio o tempo todo nesse modo, fazendo energy <= 12
+            // disparar quase sempre e cortar a faixa cedo demais por "silêncio" que não existia
+            // de verdade. É exatamente esse o caso "impreciso" quando o motor está em "video".
             let energy = 0;
+            let canMeasureRealEnergy = true;
             if (window._simulatedDropEnergy !== undefined && window._simulatedDropEnergy !== null) {
                 energy = window._simulatedDropEnergy;
-            } else if (analyserNode) {
+            } else if (engineMode === "audio" && analyserNode) {
                 const freqData = new Uint8Array(analyserNode.frequencyBinCount);
                 analyserNode.getByteFrequencyData(freqData);
 
@@ -1348,8 +1355,12 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 const midAvg = midSum / 14;
 
                 energy = Math.min(100, Math.round((bassAvg / 255 * 0.65 + midAvg / 255 * 0.35) * 100));
-            } else {
+            } else if (engineMode === "audio") {
                 energy = Math.floor(45 + Math.random() * 40);
+            } else {
+                // Engine "video": não dá pra medir energia de verdade, não finge que dá.
+                canMeasureRealEnergy = false;
+                energy = 50; // valor neutro só pro medidor visual, nunca conta como silêncio
             }
 
             if (energyVal) energyVal.textContent = energy + "% 🔥";
@@ -1386,7 +1397,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 if (curTime > 0) remainingTrackSec = dur - curTime;
             }
 
-            if (energy <= 12) {
+            if (canMeasureRealEnergy && energy <= 12) {
                 consecutiveSilenceCount++;
             } else {
                 consecutiveSilenceCount = 0;
@@ -9406,77 +9417,97 @@ function triggerCrossfade(nextTrack) {
             addToQueue(track);
         }
 
-        // --- DESCOBERTA DE NOVIDADES BASEADA NAS FAVORITAS (curadoria) ---
+        // --- DESCOBERTA DE NOVIDADES, UMA LISTA POR FAVORITA (curadoria) ---
+        // currentCurationDiscovery: [{video_id, title, artist, tracks: [...]}, ...] - uma
+        // entrada por favorita, cada uma com sua própria lista de novidades (não uma busca
+        // única misturando o sinal de todas).
         let currentCurationDiscovery = [];
+
+        function curationDiscoveryTrackCardHtml(t, favIdx, trackIdx) {
+            const bpm = t.bpm || 128;
+            return `
+                <div class="history-track-card" id="curDiscCard_${favIdx}_${t.video_id}">
+                    <div class="history-card-left">
+                        <div class="history-thumb-box">
+                            <img src="${getTrackThumbnailUrl(t)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title" title="${escapeQuotes(t.title)}">${escapeQuotes(t.title)}</div>
+                            <div class="history-sub">
+                                <span class="history-artist-text">${escapeQuotes(t.artist || t.category || "")}</span>
+                                <span class="badge-bpm-chip">⚡ ${bpm} BPM</span>
+                                ${getTrackSourceBadgeHtml(t)}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn-history-play" onclick="playCurationDiscoveryTrack(${favIdx}, ${trackIdx})" title="Tocar esta faixa agora">▶</button>
+                        <button class="btn-add-playlist" onclick="saveCurationDiscoveryTrack(${favIdx}, ${trackIdx})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ + Playlist</button>
+                        <button class="btn-add-queue" onclick="queueCurationDiscoveryTrack(${favIdx}, ${trackIdx})">+ Fila</button>
+                    </div>
+                </div>
+            `;
+        }
 
         async function runCurationDiscovery() {
             const btn = document.getElementById("btnCurationDiscover");
             const container = document.getElementById("curationDiscoveryItems");
             if (!container) return;
             if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Buscando..."; }
-            container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">Analisando suas favoritas e minerando novidades no YouTube/SoundCloud...</div>`;
+            container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">Analisando suas favoritas e minerando novidades, uma a uma, no YouTube/SoundCloud...</div>`;
 
             try {
-                const res = await fetchWithTimeout("/api/curation/discover", {}, 40000);
+                // Até 3 favoritas, cada uma com várias sub-buscas (YouTube + SoundCloud) -
+                // prazo maior que a busca agregada porque roda mais consultas no total.
+                const res = await fetchWithTimeout("/api/curation/discover-per-favorite", {}, 70000);
                 const data = await res.json();
-                currentCurationDiscovery = data.tracks || [];
+                currentCurationDiscovery = data.favorites || [];
 
                 if (currentCurationDiscovery.length === 0) {
                     container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">${escapeHtml(data.message || "Nenhuma novidade encontrada agora. Tente de novo mais tarde.")}</div>`;
                     return;
                 }
 
-                const basedOnNames = (data.based_on || []).slice(0, 3).map(t => escapeHtml(t.title)).join(", ");
-                let html = `<div style="font-size: 10.5px; color: var(--text-dim); margin-bottom: 8px;">Baseado em: ${basedOnNames}${(data.based_on || []).length > 3 ? "…" : ""}</div>`;
-                html += currentCurationDiscovery.map((t, i) => {
-                    const bpm = t.bpm || 128;
-                    return `
-                        <div class="history-track-card" id="curDiscCard_${t.video_id}">
-                            <div class="history-card-left">
-                                <div class="history-thumb-box">
-                                    <img src="${getTrackThumbnailUrl(t)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
-                                </div>
-                                <div class="history-info">
-                                    <div class="history-title" title="${escapeQuotes(t.title)}">${escapeQuotes(t.title)}</div>
-                                    <div class="history-sub">
-                                        <span class="history-artist-text">${escapeQuotes(t.artist || t.category || "")}</span>
-                                        <span class="badge-bpm-chip">⚡ ${bpm} BPM</span>
-                                        ${getTrackSourceBadgeHtml(t)}
-                                    </div>
-                                </div>
+                let html = "";
+                currentCurationDiscovery.forEach((fav, favIdx) => {
+                    html += `
+                        <div class="curation-discovery-group">
+                            <div class="curation-discovery-group-title">
+                                <span title="${escapeQuotes(fav.title)}">🎯 Curadoria pra "${escapeHtml((fav.title || "").slice(0, 46))}${(fav.title || "").length > 46 ? "…" : ""}"</span>
+                                <span class="count-badge">${fav.tracks.length} ${fav.tracks.length === 1 ? "novidade" : "novidades"}</span>
                             </div>
-                            <div class="history-actions">
-                                <button class="btn-history-play" onclick="playCurationDiscoveryTrack(${i})" title="Tocar esta faixa agora">▶</button>
-                                <button class="btn-add-playlist" onclick="saveCurationDiscoveryTrack(${i})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ + Playlist</button>
-                                <button class="btn-add-queue" onclick="queueCurationDiscoveryTrack(${i})">+ Fila</button>
-                            </div>
-                        </div>
                     `;
-                }).join("");
+                    if (fav.tracks.length === 0) {
+                        html += `<div style="font-size: 11px; color: var(--text-dim); padding: 6px 0 10px;">Nenhuma novidade parecida encontrada agora pra essa favorita.</div>`;
+                    } else {
+                        html += fav.tracks.map((t, trackIdx) => curationDiscoveryTrackCardHtml(t, favIdx, trackIdx)).join("");
+                    }
+                    html += `</div>`;
+                });
                 container.innerHTML = html;
             } catch (e) {
                 container.innerHTML = `<div style="text-align: center; padding: 16px; color: #ff5555;">Erro ao buscar novidades. Tente de novo.</div>`;
             } finally {
-                if (btn) { btn.disabled = false; btn.innerHTML = "🔍 Buscar Novidades Baseadas nos Favoritos"; }
+                if (btn) { btn.disabled = false; btn.innerHTML = "🔍 Buscar Novidades por Favorita"; }
             }
         }
 
-        function playCurationDiscoveryTrack(idx) {
-            const t = currentCurationDiscovery[idx];
+        function playCurationDiscoveryTrack(favIdx, trackIdx) {
+            const t = currentCurationDiscovery[favIdx] && currentCurationDiscovery[favIdx].tracks[trackIdx];
             if (!t) return;
             playCustomTrack(t.video_id, t.title, t.artist || "", t.category || "", "Curadoria IA • Descoberta", t.bpm || 128);
         }
 
-        function queueCurationDiscoveryTrack(idx) {
-            const t = currentCurationDiscovery[idx];
+        function queueCurationDiscoveryTrack(favIdx, trackIdx) {
+            const t = currentCurationDiscovery[favIdx] && currentCurationDiscovery[favIdx].tracks[trackIdx];
             if (!t) return;
             addToQueue(t);
         }
 
-        function saveCurationDiscoveryTrack(idx) {
-            const t = currentCurationDiscovery[idx];
+        function saveCurationDiscoveryTrack(favIdx, trackIdx) {
+            const t = currentCurationDiscovery[favIdx] && currentCurationDiscovery[favIdx].tracks[trackIdx];
             if (!t) return;
-            const cardEl = document.getElementById(`curDiscCard_${t.video_id}`);
+            const cardEl = document.getElementById(`curDiscCard_${favIdx}_${t.video_id}`);
             addTrackToPlaylist(t, cardEl);
         }
 
