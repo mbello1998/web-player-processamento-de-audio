@@ -25526,5 +25526,115 @@
         "source": "Spotify - Sonido Profesional & Latinos Fiesteros"
       }
     ]
+  },
+  "cachengue_djs_argentina": {
+    "meta": {
+      "id": "cachengue_djs_argentina",
+      "name": "Fer Palacio, Yayo, Alan Gomez & Jona Mix",
+      "badge": "🎧 Cachengue DJs",
+      "icon": "🎧",
+      "genre": "Previa & Cachengue Set en Vivo",
+      "desc": "Os sets ao vivo mais pedidos da cena de previa e cachengue argentina: Fer Palacio, DJ Yayo, Alan Gomez e Jona Mix.",
+      "bpm": 127,
+      "cover_url": "https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da8440833b9d15c8229f0c3ce282"
+    },
+    "tracks": [
+      {
+        "rank": 1,
+        "title": "MIX LO NUEVO 2026 | Enganchado | Cachengue | Fer Palacio Set en vivo @ oso.okkk",
+        "artist": "Fer Palacio",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "HQ6UCBKXqEM",
+        "duration": 1858,
+        "bpm": 128,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 2,
+        "title": "Mix lo nuevo 2025 | Cachengue | Enganchado | Fer Palacio Set en vivo @ oso.okkk",
+        "artist": "Fer Palacio",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "Gi55jQM7bp8",
+        "duration": 1968,
+        "bpm": 128,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 3,
+        "title": "SET LIVE #1 | ENGANCHADO REMIX - DJ Yayo & Kevo DJ / invitado “El Bandido”",
+        "artist": "DJ Yayo",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "NxemeGNEHO4",
+        "duration": 1524,
+        "bpm": 126,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 4,
+        "title": "SET LIVE #2 - DJ Yayo / ENGANCHADO REMIX",
+        "artist": "DJ Yayo",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "LXXeMFHw_rQ",
+        "duration": 755,
+        "bpm": 126,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 5,
+        "title": "LIVE SET (RETRO EDITION #1) - Alan Gomez, Maty Deejay (Lo mejor de Previa & Cachengue 2021)",
+        "artist": "Alan Gomez",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "g91MHh2hzZQ",
+        "duration": 747,
+        "bpm": 125,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 6,
+        "title": "SESSION ALAN GOMEZ VOL. 1 / REGGAETON - CACHENGUE / DICIEMBRE 2020 | ARGENTINA REMIX",
+        "artist": "Alan Gomez",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "LXkUH_54DPQ",
+        "duration": 873,
+        "bpm": 125,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 7,
+        "title": "MIX ENGANCHADO CACHENGUE #02 (LO MAS NUEVO 2023) - JONA MIX",
+        "artist": "Jona Mix",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "Cs3rRurEeLY",
+        "duration": 1640,
+        "bpm": 129,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      },
+      {
+        "rank": 8,
+        "title": "Mix Enganchado Navideño (Cachengue 2022) - Jona Mix",
+        "artist": "Jona Mix",
+        "category": "Reggaeton, Cachengue & Latino",
+        "playlist_id": "cachengue_djs_argentina",
+        "playlist_badge": "🎧 Cachengue DJs",
+        "video_id": "RonKP_xpXv0",
+        "duration": 1474,
+        "bpm": 129,
+        "source": "Spotify - Fer Palacio, Yayo, Alan Gomez & Jona Mix"
+      }
+    ]
   }
 }
