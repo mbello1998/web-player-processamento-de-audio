@@ -22,6 +22,7 @@ cumbia_tracks_cache.json
 audio_catalog_resolved.json
 genre_rotation.json
 suggested_tracks.json
+track_stats.json
 
 # Lixo de teste/backup
 *.bak

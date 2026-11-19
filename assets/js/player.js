@@ -7139,6 +7139,16 @@ function triggerCrossfade(nextTrack) {
 
         // Transição Manual (Spotify Priority Queue + Modos DJ)
         function manualTransition(dir) {
+            // Sinal de curadoria: pular manualmente pra próxima faixa quando ela ainda tocou
+            // menos de 40% é o sinal mais forte de "não curti isso" que dá pra captar sem
+            // pedir nada ao usuário - acabar a faixa naturalmente ou trocar pela fila/crossfade
+            // automático não conta (só decisão explícita e precoce de pular).
+            if (dir === "next" && nowPlayingTrack && nowPlayingTrack.video_id) {
+                const { curr, dur } = getCurrentPlaybackPosition();
+                if (dur > 0 && curr < dur * 0.4) {
+                    recordSkipStat(nowPlayingTrack.video_id);
+                }
+            }
             let nextTrack = null;
             if (dir === "next") {
                 if (pendingQueue && pendingQueue.length > 0) {
@@ -9180,9 +9190,55 @@ function triggerCrossfade(nextTrack) {
         // ==========================================================
         let playbackHistory = [];
 
+        // --- CURADORIA DE MÚSICAS (ASSISTIDA POR IA) ---
+        // Conta plays/skips por faixa pra alimentar /api/curation/suggestions - "play" é
+        // registrado toda vez que uma faixa começa a tocar de verdade (mesmo ponto que já
+        // disparava recordTrackInHistory); "skip" é registrado só quando o usuário pula
+        // manualmente (botão ⏭) e a faixa anterior mal tinha começado - ver manualTransition.
+        function recordPlayStat(videoId) {
+            if (!videoId) return;
+            fetch("/api/stats/play", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ video_id: videoId })
+            }).catch(() => {});
+        }
+
+        function recordSkipStat(videoId) {
+            if (!videoId) return;
+            fetch("/api/stats/skip", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ video_id: videoId })
+            }).catch(() => {});
+        }
+
+        // Lê a posição atual de reprodução nos dois modos de engine (Web Audio HD e iframe do
+        // YouTube) - mesma lógica usada pelo monitor de crossfade em startTimeMonitor.
+        function getCurrentPlaybackPosition() {
+            let curr = 0, dur = 0;
+            if (engineMode === "audio") {
+                const curAudio = (typeof getActiveAudioDeck === "function") ? getActiveAudioDeck() : null;
+                if (curAudio) {
+                    curr = curAudio.currentTime || 0;
+                    dur = curAudio.duration || 0;
+                }
+            } else {
+                const activeP = (typeof getActivePlayer === "function") ? getActivePlayer() : null;
+                if (activeP && typeof activeP.getCurrentTime === "function" && typeof activeP.getDuration === "function") {
+                    try {
+                        curr = activeP.getCurrentTime() || 0;
+                        dur = activeP.getDuration() || 0;
+                    } catch (e) {}
+                }
+            }
+            return { curr, dur };
+        }
+
         async function recordTrackInHistory(track) {
             if (!track || !track.video_id) return;
             recordTrackInRecentHistory(track.video_id);
+            recordPlayStat(track.video_id);
             try {
                 const payload = {
                     track: {
@@ -9245,6 +9301,111 @@ function triggerCrossfade(nextTrack) {
                 modal.classList.remove("open");
             }
         }
+
+        // --- MODAL DE CURADORIA DE MÚSICAS (ASSISTIDA POR IA) ---
+        let currentCurationData = { promote: [], remove_candidates: [] };
+
+        async function openCurationModal() {
+            const modal = document.getElementById("curationModal");
+            if (!modal) return;
+            modal.style.display = "flex";
+            modal.classList.add("open");
+            await renderCurationModal();
+        }
+
+        function closeCurationModal(e) {
+            if (e && e.target && e.target !== e.currentTarget && !e.target.classList.contains("eq-modal-overlay")) return;
+            const modal = document.getElementById("curationModal");
+            if (modal) {
+                modal.style.display = "none";
+                modal.classList.remove("open");
+            }
+        }
+
+        function curationTrackCardHtml(track, idx, section) {
+            const bpmVal = track.bpm || 128;
+            const pct = Math.round((track.skip_rate || 0) * 100);
+            const statHtml = section === "promote"
+                ? `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${track.plays}x tocada${track.skips ? ` • pulada ${track.skips}x` : ""}</span>`
+                : `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays + track.skips})</span>`;
+
+            const actionsHtml = section === "promote"
+                ? `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
+                   <button class="btn-add-queue" onclick="queueCurationTrack(${idx}, '${section}')">+ Fila</button>`
+                : `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
+                   <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">🗑️ Remover</button>`;
+
+            return `
+                <div class="history-track-card" id="curCard_${section}_${track.video_id}">
+                    <div class="history-card-left">
+                        <div class="history-thumb-box">
+                            <img src="${getTrackThumbnailUrl(track)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                        </div>
+                        <div class="history-info">
+                            <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
+                            <div class="history-sub">
+                                <span class="history-artist-text">${escapeQuotes(track.artist || track.category || "")}</span>
+                                <span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>
+                                ${statHtml}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-actions">${actionsHtml}</div>
+                </div>
+            `;
+        }
+
+        async function renderCurationModal() {
+            const container = document.getElementById("curationModalItems");
+            if (!container) return;
+            container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-dim);">Analisando seus plays e skips...</div>`;
+
+            try {
+                const res = await fetchWithTimeout("/api/curation/suggestions");
+                const data = await res.json();
+                currentCurationData = data;
+
+                if ((!data.promote || data.promote.length === 0) && (!data.remove_candidates || data.remove_candidates.length === 0)) {
+                    container.innerHTML = `<div style="text-align: center; padding: 30px; color: var(--text-dim);">
+                        Ainda não há dados suficientes pra sugerir nada.<br>
+                        <span style="font-size: 11px;">Continue ouvindo e pulando faixas normalmente - a curadoria aprende sozinha com o uso (precisa de pelo menos 3 plays/pulos numa mesma faixa pra opinar sobre ela).</span>
+                    </div>`;
+                    return;
+                }
+
+                let html = "";
+                if (data.promote && data.promote.length > 0) {
+                    html += `<div class="queue-modal-section-title">🔥 Suas favoritas de verdade (toca muito, quase nunca pula)</div>`;
+                    html += data.promote.map((t, i) => curationTrackCardHtml(t, i, "promote")).join("");
+                }
+                if (data.remove_candidates && data.remove_candidates.length > 0) {
+                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">⚠️ Candidatas a sair da rotação (você pula na maioria das vezes)</div>`;
+                    html += data.remove_candidates.map((t, i) => curationTrackCardHtml(t, i, "remove")).join("");
+                }
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div style="text-align: center; padding: 25px; color: #ff5555;">Erro ao carregar a curadoria. Tente novamente.</div>`;
+            }
+        }
+
+        function playCurationTrack(idx, section) {
+            const list = section === "promote" ? currentCurationData.promote : currentCurationData.remove_candidates;
+            const track = list && list[idx];
+            if (!track) return;
+            playCustomTrack(track.video_id, track.title, track.artist || "", track.category || "", "Curadoria IA", track.bpm || 128);
+        }
+
+        function queueCurationTrack(idx, section) {
+            const list = section === "promote" ? currentCurationData.promote : currentCurationData.remove_candidates;
+            const track = list && list[idx];
+            if (!track) return;
+            addToQueue(track);
+        }
+
+        window.openCurationModal = openCurationModal;
+        window.closeCurationModal = closeCurationModal;
+        window.playCurationTrack = playCurationTrack;
+        window.queueCurationTrack = queueCurationTrack;
 
         window.openHistoryModal = openHistoryModal;
         window.closeHistoryModal = closeHistoryModal;
@@ -9473,6 +9634,7 @@ function triggerCrossfade(nextTrack) {
                 closeSpotifyQueueModal();
                 closeBpmModal();
                 closeHistoryModal();
+                closeCurationModal();
             }
         });
 

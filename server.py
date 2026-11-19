@@ -17,6 +17,7 @@ SEEN_FILE = Path("seen_suggested_ids.json")
 ROTATION_FILE = Path("genre_rotation.json")
 LIBRARY_FILE = Path("complete_library.json")
 HISTORY_FILE = Path("playback_history.json")
+TRACK_STATS_FILE = Path("track_stats.json")
 
 AUDIO_CACHE = {}
 AUDIO_CACHE_TTL = 3600  # 1 hora para evitar expiração de token do YouTube
@@ -384,6 +385,76 @@ def save_queue(queue: list[dict]) -> None:
         pass
 
 
+# --- CURADORIA DE MÚSICAS (ASSISTIDA POR IA) ---
+# Guarda, por faixa, quantas vezes ela tocou até o fim/crossfade natural (plays) vs quantas
+# vezes o usuário pulou ela manualmente ainda no começo (skips) - é o sinal real de "gosto"
+# usado pra sugerir o que promover (toca muito, quase nunca pulada) e o que tirar da rotação
+# (pulada na maioria das vezes que toca).
+def load_track_stats() -> dict:
+    if not TRACK_STATS_FILE.exists():
+        return {}
+    try:
+        with open(TRACK_STATS_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_track_stats(stats: dict) -> None:
+    try:
+        with open(TRACK_STATS_FILE, "w", encoding="utf-8") as f:
+            json.dump(stats, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print("Erro ao salvar track_stats.json:", e)
+
+
+CURATION_MIN_SAMPLES = 3  # amostra mínima pra uma faixa entrar nas sugestões (evita opinar sobre 1 play/skip isolado)
+CURATION_PROMOTE_MAX_SKIP_RATE = 0.15
+CURATION_REMOVE_MIN_SKIP_RATE = 0.5
+
+
+def build_curation_suggestions() -> dict:
+    stats = load_track_stats()
+    lib = []
+    if LIBRARY_FILE.exists():
+        try:
+            with open(LIBRARY_FILE, "r", encoding="utf-8") as f:
+                lib = json.load(f)
+        except Exception:
+            lib = []
+    lib_by_id = {t.get("video_id"): t for t in lib if t.get("video_id")}
+
+    promote, remove_candidates = [], []
+    for vid, s in stats.items():
+        track = lib_by_id.get(vid)
+        if not track:
+            continue  # já não está mais na biblioteca - nada a sugerir sobre ela
+        plays = s.get("plays", 0)
+        skips = s.get("skips", 0)
+        total = plays + skips
+        if total < CURATION_MIN_SAMPLES:
+            continue
+        skip_rate = skips / total if total else 0.0
+        item = dict(track)
+        item["plays"] = plays
+        item["skips"] = skips
+        item["skip_rate"] = round(skip_rate, 2)
+
+        if plays >= CURATION_MIN_SAMPLES and skip_rate <= CURATION_PROMOTE_MAX_SKIP_RATE:
+            promote.append(item)
+        elif skip_rate >= CURATION_REMOVE_MIN_SKIP_RATE:
+            remove_candidates.append(item)
+
+    promote.sort(key=lambda x: (-x["plays"], x["skip_rate"]))
+    remove_candidates.sort(key=lambda x: (-x["skip_rate"], -x["skips"]))
+
+    return {
+        "promote": promote[:15],
+        "remove_candidates": remove_candidates[:15],
+        "tracked_count": len(stats),
+    }
+
+
 def load_seen_ids() -> set[str]:
     if not SEEN_FILE.exists():
         return set()
@@ -738,6 +809,10 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_json(catalog)
                 return
 
+            if path == "/api/curation/suggestions":
+                self.send_json(build_curation_suggestions())
+                return
+
             if path == "/api/suggestions/discover":
                 params = urllib.parse.parse_qs(parsed.query)
                 cat = params.get("category", ["Mega Funk & Ritmadas"])[0]
@@ -1007,6 +1082,31 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
                 category = data.get("category", "")
                 res = search_tracks(query, category)
                 self.send_json(res)
+                return
+
+            if self.path == "/api/stats/play":
+                video_id = data.get("video_id")
+                if not video_id:
+                    self.send_json({"error": "video_id required"}, status=400)
+                    return
+                stats = load_track_stats()
+                entry = stats.setdefault(video_id, {"plays": 0, "skips": 0, "last_played": None})
+                entry["plays"] = entry.get("plays", 0) + 1
+                entry["last_played"] = time.time()
+                save_track_stats(stats)
+                self.send_json({"success": True})
+                return
+
+            if self.path == "/api/stats/skip":
+                video_id = data.get("video_id")
+                if not video_id:
+                    self.send_json({"error": "video_id required"}, status=400)
+                    return
+                stats = load_track_stats()
+                entry = stats.setdefault(video_id, {"plays": 0, "skips": 0, "last_played": None})
+                entry["skips"] = entry.get("skips", 0) + 1
+                save_track_stats(stats)
+                self.send_json({"success": True})
                 return
 
             if self.path == "/api/history/add":

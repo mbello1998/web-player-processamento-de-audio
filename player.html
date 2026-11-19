@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_10">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_11">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
@@ -499,6 +499,9 @@
                         </div>
                         <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube e SoundCloud com IA">
                             ⚡ Pesquisa Livre
+                        </button>
+                        <button class="btn-search-ext-quick" onclick="openCurationModal()" title="Sugestões de curadoria com base no que você mais toca e mais pula">
+                            🎯 Curadoria
                         </button>
                     </div>
 
@@ -1230,7 +1233,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_10"></script>
+    <script src="/assets/js/player.js?v=20261119_11"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -1815,6 +1818,31 @@
             </div>
             <div class="queue-modal-footer">
                 <button class="btn-modal-done" onclick="closeHistoryModal()">✓ Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CURADORIA DE MÚSICAS (ASSISTIDA POR IA) - sugere o que promover (toca muito,
+         quase nunca pulada) e o que tirar de rotação (pulada na maioria das vezes), com base
+         nos plays/skips reais registrados em /api/stats/play e /api/stats/skip. -->
+    <div class="eq-modal-overlay" id="curationModal" onclick="closeCurationModal(event)">
+        <div class="eq-modal-card history-modal-card" onclick="event.stopPropagation()">
+            <div class="eq-modal-header">
+                <div>
+                    <div class="eq-modal-title">
+                        <span>🎯 Curadoria de Músicas (IA)</span>
+                    </div>
+                    <div class="eq-modal-sub">
+                        Baseado no que você mais toca e mais pula de verdade. Quanto mais você usa o player, mais precisa fica.
+                    </div>
+                </div>
+                <button class="eq-close-btn" onclick="closeCurationModal()" title="Fechar Curadoria" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            </div>
+            <div class="history-modal-body">
+                <div id="curationModalItems" class="history-modal-list"></div>
+            </div>
+            <div class="queue-modal-footer">
+                <button class="btn-modal-done" onclick="closeCurationModal()">✓ Fechar</button>
             </div>
         </div>
     </div>
