@@ -145,8 +145,19 @@
         /* Desmontagem faixa por faixa dos cards visíveis na lista - cada um recebe uma
            direção/rotação levemente diferente (variáveis setadas via JS) e um atraso
            crescente (transition-delay, também via JS) pra cair em cascata, não tudo junto. */
+        /* is-mode-transitioning fica no card durante TODO o efeito (desmontar + remontar);
+           is-disassembling só controla se ele está no estado "voado" ou não. Separar os
+           dois é necessário: se a transição com atraso estivesse só em ".is-disassembling",
+           TIRAR essa classe pra remontar fazia o card cair de volta na transição genérica
+           da base (".track-card { transition: all 0.2s ease }", sem --card-delay nenhum),
+           e a remontagem toda "estourava" de uma vez em vez de cascatear igual a desmontagem. */
+        .track-card.is-mode-transitioning {
+            transition:
+                transform 0.42s var(--card-delay, 0ms) cubic-bezier(0.5, 0, 0.3, 1),
+                opacity 0.42s var(--card-delay, 0ms) ease,
+                filter 0.42s var(--card-delay, 0ms) ease !important;
+        }
         .track-card.is-disassembling {
-            transition: transform 0.45s cubic-bezier(0.5, 0, 0.3, 1), opacity 0.45s ease, filter 0.45s ease !important;
             transform: translate(var(--card-fly-x, 50px), var(--card-fly-y, 10px)) rotate(var(--card-fly-rot, 8deg));
             opacity: 0;
             filter: drop-shadow(0 0 14px rgb(var(--mode-accent-rgb)));

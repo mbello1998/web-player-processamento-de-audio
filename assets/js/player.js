@@ -8672,41 +8672,63 @@ function triggerCrossfade(nextTrack) {
             const cards = allCards.filter(c => {
                 const r = c.getBoundingClientRect();
                 return r.bottom > 0 && r.top < viewportH && r.height > 0;
-            }).slice(0, 24);
+            }).slice(0, 14);
 
             if (cards.length === 0) return { cascadeMs: 0 };
 
-            const STAGGER_MS = 55;
+            // Cada card leva CARD_TRANSITION_MS pra sumir/voltar, e só o próximo começa
+            // quando o anterior praticamente já terminou (stagger >= duração) - sequencial
+            // de verdade, um de cada vez, não uma onda sobreposta. Se tiver poucos cards
+            // visíveis, aumenta o intervalo entre eles pra garantir pelo menos uns 8-9s de
+            // efeito total (desmontagem + pausa + remontagem), como pedido.
+            const CARD_TRANSITION_MS = 420;
+            const PHASE_GAP_MS = 400;
+            const MIN_TOTAL_MS = 8500;
+            const n = cards.length;
+
+            let staggerMs = CARD_TRANSITION_MS;
+            let disassembleSpan = (n - 1) * staggerMs + CARD_TRANSITION_MS;
+            let totalMs = disassembleSpan * 2 + PHASE_GAP_MS;
+            if (n > 1 && totalMs < MIN_TOTAL_MS) {
+                staggerMs = Math.ceil(((MIN_TOTAL_MS - PHASE_GAP_MS) / 2 - CARD_TRANSITION_MS) / (n - 1));
+                disassembleSpan = (n - 1) * staggerMs + CARD_TRANSITION_MS;
+                totalMs = disassembleSpan * 2 + PHASE_GAP_MS;
+            }
+
             cards.forEach((card, i) => {
                 const dir = i % 2 === 0 ? 1 : -1;
                 card.style.setProperty("--card-fly-x", `${dir * (45 + Math.random() * 40)}px`);
                 card.style.setProperty("--card-fly-y", `${(Math.random() - 0.3) * 30}px`);
                 card.style.setProperty("--card-fly-rot", `${dir * (6 + Math.random() * 8)}deg`);
-                card.style.transitionDelay = `${i * STAGGER_MS}ms`;
+                card.style.setProperty("--card-delay", `${i * staggerMs}ms`);
+                // Fica até o fim das duas fases - ver comentário no CSS sobre por que não
+                // dá pra confiar só em is-disassembling pra carregar a transição com atraso.
+                card.classList.add("is-mode-transitioning");
             });
-
-            const cardTransitionMs = 450;
-            const disassembleSpan = (cards.length - 1) * STAGGER_MS + cardTransitionMs;
 
             requestAnimationFrame(() => {
                 cards.forEach(card => card.classList.add("is-disassembling"));
             });
 
-            // Remonta em cascata também, na ordem inversa - a última faixa a se desmontar
-            // é a primeira a voltar, criando um efeito de "fecha o zíper" ao recompor a lista.
+            // Só começa a remontar depois que TODOS já desmontaram de vez (disassembleSpan
+            // + uma pausa extra de "site todo desfeito") - remonta em cascata também, na
+            // ordem inversa, pra fechar como um "zíper" se recompondo um a um.
             setTimeout(() => {
                 cards.slice().reverse().forEach((card, i) => {
-                    card.style.transitionDelay = `${i * STAGGER_MS}ms`;
+                    card.style.setProperty("--card-delay", `${i * staggerMs}ms`);
                 });
                 requestAnimationFrame(() => {
                     cards.forEach(card => card.classList.remove("is-disassembling"));
                 });
                 setTimeout(() => {
-                    cards.forEach(card => { card.style.transitionDelay = ""; });
+                    cards.forEach(card => {
+                        card.style.removeProperty("--card-delay");
+                        card.classList.remove("is-mode-transitioning");
+                    });
                 }, disassembleSpan);
-            }, disassembleSpan + 120);
+            }, disassembleSpan + PHASE_GAP_MS);
 
-            return { cascadeMs: disassembleSpan * 2 + 120 };
+            return { cascadeMs: totalMs };
         }
 
         function showModeTransitionOverlay(mode, label) {
@@ -8723,9 +8745,8 @@ function triggerCrossfade(nextTrack) {
             const isAggressive = mode === "drop";
             overlay.classList.toggle("is-aggressive", isAggressive);
 
-            // Dispara a cascata de cards PRIMEIRO pra saber quanto tempo ela precisa -
-            // com muitas faixas visíveis a cascata pode levar mais tempo que o fade padrão,
-            // e a tela de transição/painéis precisam ficar de pé até ela terminar de verdade.
+            // Dispara a cascata de cards PRIMEIRO pra saber quanto tempo ela precisa (com o
+            // mínimo de ~8.5s pedido) - a tela de transição fica de pé até ela terminar.
             const cardsResult = playTrackCardsDisassembleEffect();
             const baseWashDuration = isAggressive ? 1300 : 1600;
             const washDuration = Math.max(baseWashDuration, cardsResult.cascadeMs + 300);
@@ -8733,10 +8754,11 @@ function triggerCrossfade(nextTrack) {
             if (barFill) barFill.style.width = "0%";
             overlay.classList.add("is-active");
 
-            // Desmonta no pico de cor e já dispara a remontagem (a troca de classe some
-            // sozinha após "holdMs" - ver playPanelDisassembleEffect), ficando desfeito
-            // bem no meio da duração total, igual o fade de fundo.
-            playPanelDisassembleEffect(Math.round(washDuration * 0.55));
+            // Os painéis grandes ficam desmontados por QUASE toda a duração da cascata de
+            // cards (não só a metade) - o site inteiro fica "em pedaços" junto, e tudo
+            // remonta perto do mesmo instante no fim, em vez dos painéis voltarem no meio
+            // do caminho enquanto os cards ainda estão se desmontando/remontando.
+            playPanelDisassembleEffect(Math.max(600, washDuration - 350));
 
             // Força o reflow antes de animar a barra, senão o navegador às vezes funde os
             // dois estados (0% -> 100%) num só frame e a transição não é visível. A duração
