@@ -630,6 +630,87 @@ def discover_related_tracks(title: str, artist: str, category: str, current_vide
     return results
 
 
+def build_curation_discovery(limit: int = 15) -> dict:
+    """Usa as faixas que o usuário REALMENTE gosta (seção "promote" da curadoria: toca muito,
+    quase nunca pula) como semente pra descobrir música NOVA, de fora da biblioteca, parecida
+    no padrão de gênero/ritmo/artista dessas favoritas - mais preciso que "parecidas com a
+    faixa atual" porque olha várias favoritas reais de uma vez, não só a que está tocando."""
+    import random
+    from collections import Counter
+
+    suggestions = build_curation_suggestions()
+    favorites = suggestions.get("promote", [])
+    if not favorites:
+        return {
+            "tracks": [],
+            "based_on": [],
+            "message": "Ainda não há favoritas suficientes na curadoria pra basear a busca. Continue ouvindo normalmente.",
+        }
+
+    seed = favorites[:5]
+    based_on = [{"title": t.get("title"), "artist": t.get("artist")} for t in seed]
+
+    cat_counter = Counter(t.get("category") for t in seed if t.get("category"))
+    dominant_category = cat_counter.most_common(1)[0][0] if cat_counter else "Outros"
+
+    bpms = [t.get("bpm") for t in seed if t.get("bpm")]
+    avg_bpm = round(sum(bpms) / len(bpms)) if bpms else GENRE_BPM_RANGES.get(dominant_category, (115, 130, 124))[2]
+
+    artists = []
+    seen_artists = set()
+    for t in seed:
+        a = re.sub(r'\(.*?\)|\[.*?\]', '', t.get("artist") or "").strip()
+        key = a.lower()
+        if a and key not in seen_artists:
+            seen_artists.add(key)
+            artists.append(a)
+
+    excluded_ids = set()
+    if LIBRARY_FILE.exists():
+        try:
+            with open(LIBRARY_FILE, "r", encoding="utf-8") as f:
+                lib = json.load(f)
+                excluded_ids.update(t.get("video_id") for t in lib if t.get("video_id"))
+        except Exception:
+            pass
+    excluded_ids.update(t.get("video_id") for t in load_queue() if t.get("video_id"))
+    seen_ids = load_seen_ids()
+    excluded_ids.update(seen_ids)
+
+    queries = [
+        f"{dominant_category} {avg_bpm} bpm lancamento",
+        f"novidades {dominant_category} {avg_bpm} bpm hits 2026",
+    ]
+    genre_list = GENRE_SEARCH_QUERIES.get(dominant_category, [])
+    if genre_list:
+        queries.extend(random.sample(genre_list, min(2, len(genre_list))))
+    for artist in artists[:3]:
+        queries.append(f"artistas parecidos com {artist}")
+        queries.append(f"{artist} lancamento {avg_bpm} bpm")
+
+    results = []
+    yt_quota = max(1, round(limit * 0.6))
+    for i, q in enumerate(queries):
+        if len(results) >= limit:
+            break
+        if i % 2 == 0:
+            if len(results) >= yt_quota:
+                continue
+            run_music_search(q, "youtube", excluded_ids, results, dominant_category, yt_quota, add_bpm_source_label=True)
+        else:
+            run_music_search(q, "soundcloud", excluded_ids, results, dominant_category, limit, add_bpm_source_label=True)
+
+    new_ids = {r["video_id"] for r in results}
+    seen_ids.update(new_ids)
+    save_seen_ids(seen_ids)
+
+    return {
+        "tracks": results[:limit],
+        "based_on": based_on,
+        "category": dominant_category,
+        "avg_bpm": avg_bpm,
+    }
+
 
 OFFICIAL_CATEGORIES = [
     "Mega Funk & Ritmadas",
@@ -814,6 +895,10 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
 
             if path == "/api/curation/suggestions":
                 self.send_json(build_curation_suggestions())
+                return
+
+            if path == "/api/curation/discover":
+                self.send_json(build_curation_discovery())
                 return
 
             if path == "/api/suggestions/discover":

@@ -9406,10 +9406,88 @@ function triggerCrossfade(nextTrack) {
             addToQueue(track);
         }
 
+        // --- DESCOBERTA DE NOVIDADES BASEADA NAS FAVORITAS (curadoria) ---
+        let currentCurationDiscovery = [];
+
+        async function runCurationDiscovery() {
+            const btn = document.getElementById("btnCurationDiscover");
+            const container = document.getElementById("curationDiscoveryItems");
+            if (!container) return;
+            if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Buscando..."; }
+            container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">Analisando suas favoritas e minerando novidades no YouTube/SoundCloud...</div>`;
+
+            try {
+                const res = await fetchWithTimeout("/api/curation/discover", {}, 40000);
+                const data = await res.json();
+                currentCurationDiscovery = data.tracks || [];
+
+                if (currentCurationDiscovery.length === 0) {
+                    container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">${escapeHtml(data.message || "Nenhuma novidade encontrada agora. Tente de novo mais tarde.")}</div>`;
+                    return;
+                }
+
+                const basedOnNames = (data.based_on || []).slice(0, 3).map(t => escapeHtml(t.title)).join(", ");
+                let html = `<div style="font-size: 10.5px; color: var(--text-dim); margin-bottom: 8px;">Baseado em: ${basedOnNames}${(data.based_on || []).length > 3 ? "…" : ""}</div>`;
+                html += currentCurationDiscovery.map((t, i) => {
+                    const bpm = t.bpm || 128;
+                    return `
+                        <div class="history-track-card" id="curDiscCard_${t.video_id}">
+                            <div class="history-card-left">
+                                <div class="history-thumb-box">
+                                    <img src="${getTrackThumbnailUrl(t)}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
+                                </div>
+                                <div class="history-info">
+                                    <div class="history-title" title="${escapeQuotes(t.title)}">${escapeQuotes(t.title)}</div>
+                                    <div class="history-sub">
+                                        <span class="history-artist-text">${escapeQuotes(t.artist || t.category || "")}</span>
+                                        <span class="badge-bpm-chip">⚡ ${bpm} BPM</span>
+                                        ${getTrackSourceBadgeHtml(t)}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn-history-play" onclick="playCurationDiscoveryTrack(${i})" title="Tocar esta faixa agora">▶</button>
+                                <button class="btn-add-playlist" onclick="saveCurationDiscoveryTrack(${i})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ + Playlist</button>
+                                <button class="btn-add-queue" onclick="queueCurationDiscoveryTrack(${i})">+ Fila</button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = `<div style="text-align: center; padding: 16px; color: #ff5555;">Erro ao buscar novidades. Tente de novo.</div>`;
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerHTML = "🔍 Buscar Novidades Baseadas nos Favoritos"; }
+            }
+        }
+
+        function playCurationDiscoveryTrack(idx) {
+            const t = currentCurationDiscovery[idx];
+            if (!t) return;
+            playCustomTrack(t.video_id, t.title, t.artist || "", t.category || "", "Curadoria IA • Descoberta", t.bpm || 128);
+        }
+
+        function queueCurationDiscoveryTrack(idx) {
+            const t = currentCurationDiscovery[idx];
+            if (!t) return;
+            addToQueue(t);
+        }
+
+        function saveCurationDiscoveryTrack(idx) {
+            const t = currentCurationDiscovery[idx];
+            if (!t) return;
+            const cardEl = document.getElementById(`curDiscCard_${t.video_id}`);
+            addTrackToPlaylist(t, cardEl);
+        }
+
         window.openCurationModal = openCurationModal;
         window.closeCurationModal = closeCurationModal;
         window.playCurationTrack = playCurationTrack;
         window.queueCurationTrack = queueCurationTrack;
+        window.runCurationDiscovery = runCurationDiscovery;
+        window.playCurationDiscoveryTrack = playCurationDiscoveryTrack;
+        window.queueCurationDiscoveryTrack = queueCurationDiscoveryTrack;
+        window.saveCurationDiscoveryTrack = saveCurationDiscoveryTrack;
 
         window.openHistoryModal = openHistoryModal;
         window.closeHistoryModal = closeHistoryModal;
