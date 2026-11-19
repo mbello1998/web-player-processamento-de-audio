@@ -214,16 +214,6 @@
 
                 <div id="toastNotify" class="toast-notify"></div>
 
-                <!-- Tela de transição ao trocar de Modo de Atuação (puramente visual - a
-                     música que estiver tocando nunca é pausada/afetada por isso) -->
-                <div id="modeTransitionOverlay" class="mode-transition-overlay">
-                    <div class="mode-transition-icon" id="modeTransitionIcon">⚡</div>
-                    <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
-                    <div class="mode-transition-bar-track">
-                        <div class="mode-transition-bar-fill" id="modeTransitionBarFill"></div>
-                    </div>
-                </div>
-
                 <!-- PAINEL FIXO DE SINCRONIZAÇÃO DE BPM (ABAIXO DO ÁUDIO HD / PLAYER DO YOUTUBE) -->
                 <div class="bpm-live-sync-panel" id="bpmLiveSyncPanel">
                     <div class="bpm-live-header">
@@ -1910,6 +1900,23 @@
                 <button type="button" class="btn-modal-cancel-remove" onclick="closeConfirmRemoveModal()">Cancelar</button>
                 <button type="button" class="btn-modal-confirm-remove" id="btnConfirmDeleteTrack" onclick="executeRemoveLibraryTrack()">🗑️ Sim, Remover</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Tela de transição ao trocar de Modo de Atuação (puramente visual - a música que
+         estiver tocando nunca é pausada/afetada por isso). PRECISA ficar filha direta do
+         <body>, fora de .player-pane/.list-pane/.bottom-player-bar: esses 3 painéis recebem
+         transform (perspective/translateZ/rotate) durante a desmontagem, e por spec CSS um
+         ancestral com transform vira o "containing block" de qualquer descendente
+         position:fixed - estando dentro de .player-pane, isto aqui parava de ser relativo à
+         tela inteira e passava a ser relativo à caixa do painel transformado (que fica
+         invisível/deslocada exatamente durante a desmontagem), tornando a tela de
+         carregamento impossível de ver mesmo com opacity:1 e a classe is-active aplicadas. -->
+    <div id="modeTransitionOverlay" class="mode-transition-overlay">
+        <div class="mode-transition-icon" id="modeTransitionIcon">⚡</div>
+        <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
+        <div class="mode-transition-bar-track">
+            <div class="mode-transition-bar-fill" id="modeTransitionBarFill"></div>
         </div>
     </div>
 
