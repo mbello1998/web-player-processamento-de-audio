@@ -4381,7 +4381,20 @@ function triggerCrossfade(nextTrack) {
                             toAudio.preservesPitch = true;
                         }).catch(() => {});
                     }).catch(err => {
+                        // Antes disso só logava e seguia o crossfade em frente mesmo sem áudio
+                        // no deck de entrada (ex.: faixa do SoundCloud com DRM) - o deck que saía
+                        // terminava de baixar o volume até 0, o watchdog "finalizava" a transição
+                        // como se tivesse dado certo, e o player ficava mudo e travado pra sempre
+                        // na faixa quebrada, sem nenhum aviso. Agora cancela a transição de vez
+                        // (solta o watchdog e o timer de crossfade) e pula pra próxima faixa de
+                        // verdade, igual já fazia o toque direto de uma faixa (playTrackInstant).
                         console.warn("Falha ao carregar a próxima faixa no crossfade:", err);
+                        cancelTransition();
+                        hasFadedCurrentTrack = false;
+                        showToast("⚠️ Não foi possível tocar a próxima faixa. Pulando...");
+                        setTimeout(() => {
+                            if (typeof autoAdvanceWithFade === "function") autoAdvanceWithFade();
+                        }, 900);
                     });
                 }
 
