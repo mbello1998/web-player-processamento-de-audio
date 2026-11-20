@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central de Músicas - Web Audio HD & Crossfade Spotify</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎧</text></svg>">
-    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_39">
+    <title>DropHunter Studio - Web Audio HD & Crossfade Spotify</title>
+    <link rel="icon" id="siteFavicon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2300f2fe%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M3 18v-6a9 9 0 0 1 18 0v6%22/><path d=%22M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z%22/></svg>">
+    <link rel="stylesheet" href="/assets/css/player.css?v=20261119_49">
 </head>
 <body>
     <!-- Cabeçalho Superior Fixo -->
     <div class="top-header-area">
         <div class="header-main-row">
             <div class="header-brand">
-                <div class="brand-headphone-box" id="headerMainLogo" title="Central de Músicas - Epicentro dos Efeitos" onclick="pulseHeaderLogo()">
+                <div class="brand-headphone-box" id="headerMainLogo" title="DropHunter Studio - Epicentro dos Efeitos" onclick="pulseHeaderLogo()">
                     <svg class="app-logo-glyph" viewBox="0 1 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path class="logo-glyph-band" d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3" pathLength="1" />
                         <circle class="logo-glyph-pulse" cx="12" cy="11" r="1.6" fill="currentColor" stroke="none" />
@@ -21,37 +21,37 @@
                     <span class="brand-headphone-ring"></span>
                 </div>
                 <div class="header-brand-info">
-                    <h1>Central de Músicas</h1>
+                    <h1>DropHunter Studio</h1>
                     <p>Web Audio HD • Equalizador Spotify • Super Volume VLC (200%)</p>
                 </div>
             </div>
             <!-- Navegação Principal com 5 Abas -->
             <div class="top-nav">
-                <button class="nav-btn active" id="navLibrary" onclick="switchView('library')">
-                    <span id="navLibraryText">📚 Minha Biblioteca (__LIBRARY_COUNT__)</span>
+                <button class="nav-btn active" id="navLibrary" onclick="switchView('library', event)">
+                    <span id="navLibraryText"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Minha Biblioteca (__LIBRARY_COUNT__)</span>
                 </button>
-                <button class="nav-btn" id="navSpotify" onclick="switchView('spotify')" title="Playlists Oficiais do Spotify Brasil & Mundo">
-                    <span>🟢 Playlists Spotify</span>
+                <button class="nav-btn" id="navSpotify" onclick="switchView('spotify', event)" title="Playlists Oficiais do Spotify Brasil & Mundo">
+                    <span><span class="status-indicator-dot dot-green"></span> Playlists Spotify</span>
                     <span class="spotify-badge-pill" id="spotifyBadgePill">__SPOTIFY_COUNT__</span>
                 </button>
-                <button class="nav-btn" id="navSearch" onclick="switchView('search')">
-                    <span>🔍 Pesquisa Livre</span>
+                <button class="nav-btn" id="navSearch" onclick="switchView('search', event)">
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Pesquisa Livre</span>
                 </button>
-                <button class="nav-btn" id="navSuggestions" onclick="switchView('suggestions')">
-                    <span>✨ Músicas Sugeridas (IA)</span>
+                <button class="nav-btn" id="navSuggestions" onclick="switchView('suggestions', event)">
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg> Músicas Sugeridas (IA)</span>
                 </button>
-                <button class="nav-btn" id="navQueue" onclick="switchView('queue')">
-                    <span>📋 Minha Fila</span>
+                <button class="nav-btn" id="navQueue" onclick="switchView('queue', event)">
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg> Minha Fila</span>
                     <span class="queue-badge" id="queueBadgeCount">0</span>
                 </button>
                 <button class="nav-btn" id="navHistory" onclick="openHistoryModal(event)" title="Histórico de reprodução e músicas descobertas (salve na sua biblioteca)">
-                    <span>📜 Histórico</span>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Histórico</span>
                     <span class="queue-badge" id="historyBadgeCount" style="background: rgba(0, 242, 254, 0.25); color: var(--accent);">0</span>
                 </button>
             </div>
             <!-- BOTÃO SINCRONIZAR COM O YOUTUBE NO CABEÇALHO (ZERO OBSTRUÇÃO DE CARDS) -->
             <button class="floating-sync-btn" id="floatingSyncBtn" onclick="triggerYouTubeSync()" title="Sincronizar sua playlist do YouTube com um clique">
-                <span class="sync-icon">🔄</span>
+                <span class="sync-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path></svg></span>
                 <span id="syncBtnText">Sincronizar com YouTube</span>
             </button>
         </div>
@@ -94,7 +94,7 @@
 
                         <!-- Indicador de Crossfade Flutuante (Overlay dentro do Container de Vídeo) -->
                         <div id="crossfadeIndicator" class="crossfade-indicator">
-                            🎚️ Fazendo Crossfade suave para a próxima música...
+                            <svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Fazendo Crossfade suave para a próxima música...
                         </div>
 
                         <!-- HUD DINÂMICO DE TRANSIÇÃO DJ: CROSSOVER 3-BANDAS & EFEITOS AO VIVO -->
@@ -105,22 +105,22 @@
                                 <div class="drop-hud-top-bar">
                                     <div class="drop-hud-title-wrap">
                                         <span class="hud-strobe-dot drop-dot"></span>
-                                        <span class="drop-hud-title">⚡ DROP HUNTER</span>
+                                        <span class="drop-hud-title"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> DROP HUNTER</span>
                                     </div>
                                     <div class="drop-hud-status-wrap">
-                                        <span id="dropStatusPill" class="drop-status-pill analyzing">🔍 Analisando...</span>
+                                        <span id="dropStatusPill" class="drop-status-pill analyzing"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Analisando...</span>
                                     </div>
                                 </div>
 
                                 <!-- Linha 2: Botões de Ação de DJ bem distribuídos -->
                                 <div class="drop-hud-actions-row">
-                                    <button class="btn-drop-action" id="btnSkipToDrop" onclick="smartSkipToDrop()" title="Pular introdução lenta e ir direto para o Drop da música atual">⚡ Pular pro Drop</button>
-                                    <button class="btn-drop-action cut-next" id="btnCutToNextDrop" onclick="smartCutToNextDrop()" title="Corte Inteligente: corta agora para o Drop da próxima música">✂️ Cortar no Drop</button>
-                                    <button class="btn-drop-action auto-toggle active" id="btnAutoDropToggle" onclick="toggleAutoDropMode()" title="Ativar/Desativar modo automático">🤖 Auto: ON</button>
+                                    <button class="btn-drop-action" id="btnSkipToDrop" onclick="smartSkipToDrop()" title="Pular introdução lenta e ir direto para o Drop da música atual"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Pular pro Drop</button>
+                                    <button class="btn-drop-action cut-next" id="btnCutToNextDrop" onclick="smartCutToNextDrop()" title="Corte Inteligente: corta agora para o Drop da próxima música"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg> Cortar no Drop</button>
+                                    <button class="btn-drop-action auto-toggle active" id="btnAutoDropToggle" onclick="toggleAutoDropMode()" title="Ativar/Desativar modo automático"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="16" y1="16" x2="16.01" y2="16"></line></svg> Auto: ON</button>
                                 </div>
 
                                 <!-- Botão Especial para Mixes Longos (Aparece apenas quando mix > 5 min) -->
-                                <button class="btn-drop-action mix-jump" id="btnMixJump" onclick="smartMixSegmentJump()" style="display: none; width: 100%; justify-content: center;" title="Pular para o próximo refrão dentro deste mix longo">🔀 Próximo Refrão do Mix (+75s)</button>
+                                <button class="btn-drop-action mix-jump" id="btnMixJump" onclick="smartMixSegmentJump()" style="display: none; width: 100%; justify-content: center;" title="Pular para o próximo refrão dentro deste mix longo"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg> Próximo Refrão do Mix (+75s)</button>
 
                                 <!-- Linha 3: Medidores com Tipografia Clara e Legível -->
                                 <div class="drop-meters-container">
@@ -140,8 +140,8 @@
                                             <div style="display: flex; align-items: center; gap: 6px;">
                                                 <span class="drop-freq-name"><span class="drop-freq-dot timer-dot">●</span> JANELA DO REFRÃO</span>
                                                 <div class="drop-window-adjust-btns" style="display: inline-flex; gap: 3px; align-items: center;">
-                                                    <button type="button" class="btn-drop-win-adjust" id="btnDropWinMinus" onclick="adjustDropWindow(-10)" title="Diminuir refrão em 10 segundos">➖ 10s</button>
-                                                    <button type="button" class="btn-drop-win-adjust" id="btnDropWinPlus" onclick="adjustDropWindow(+10)" title="Aumentar refrão em 10 segundos">➕ 10s</button>
+                                                    <button type="button" class="btn-drop-win-adjust" id="btnDropWinMinus" onclick="adjustDropWindow(-10)" title="Diminuir refrão em 10 segundos"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line></svg> 10s</button>
+                                                    <button type="button" class="btn-drop-win-adjust" id="btnDropWinPlus" onclick="adjustDropWindow(+10)" title="Aumentar refrão em 10 segundos"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> 10s</button>
                                                 </div>
                                             </div>
                                             <span id="dropTimerVal" class="drop-meter-val">00:00 / 01:15s</span>
@@ -154,7 +154,7 @@
 
                                 <!-- Linha 4: Dica e Status de Mix Longo -->
                                 <div class="drop-hud-footer">
-                                    <span id="dropHudFooterText">💡 <strong>Auto Drop DJ:</strong> Refrão Completo Protegido: Toca o refrão inteiro (75s a 95s) antes de virar para a próxima!</span>
+                                    <span id="dropHudFooterText"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5.76.76 1.23 1.52 1.41 2.5z"></path></svg> <strong>Auto Drop DJ:</strong> Refrão Completo Protegido: Toca o refrão inteiro (75s a 95s) antes de virar para a próxima!</span>
                                 </div>
                             </div>
                         </div>
@@ -164,10 +164,10 @@
                                 <div class="dj-hud-top-bar">
                                     <div class="dj-hud-badge-club">
                                         <span class="hud-strobe-dot"></span>
-                                        <span id="djHudModeTag">🔥 BALADA & CLUB DJ</span>
+                                        <span id="djHudModeTag"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> BALADA & CLUB DJ</span>
                                     </div>
                                     <div id="djHudFxBadge" class="dj-hud-fx-badge">
-                                        <span class="fx-icon">⚡</span>
+                                        <span class="fx-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                                         <span id="djHudFxName">FX: Vinyl Brake & 808 Sub Drop</span>
                                     </div>
                                 </div>
@@ -178,7 +178,7 @@
                                         <div class="dj-meter-label-wrap">
                                             <span class="meter-freq-dot bass-dot">●</span>
                                             <span class="meter-freq-name">BAIXOS (BASS SWAP)</span>
-                                            <span id="djHudBassStatus" class="meter-status-val">Deck A 100% ➔ Deck B 0%</span>
+                                            <span id="djHudBassStatus" class="meter-status-val">Deck A 100% <svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> Deck B 0%</span>
                                         </div>
                                         <div class="dj-meter-dual-track">
                                             <div id="djBarBassA" class="meter-bar-fill bass-a" style="width: 100%;"></div>
@@ -214,8 +214,8 @@
                                 </div>
 
                                 <div class="dj-hud-footer-bar">
-                                    <span id="djHudTransitionState" class="hud-footer-text">🎚️ MIXANDO: Deck A ➔ Deck B</span>
-                                    <span id="djHudDropIndicator" class="hud-drop-badge">💥 PREPARANDO DROP</span>
+                                    <span id="djHudTransitionState" class="hud-footer-text"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> MIXANDO: Deck A <svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> Deck B</span>
+                                    <span id="djHudDropIndicator" class="hud-drop-badge"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> PREPARANDO DROP</span>
                                 </div>
                             </div>
                         </div>
@@ -226,12 +226,12 @@
                 <div class="bpm-live-sync-panel" id="bpmLiveSyncPanel">
                     <div class="bpm-live-header">
                         <div class="bpm-live-title-wrap">
-                            <span class="bpm-live-icon pulse">⚡</span>
+                            <span class="bpm-live-icon pulse"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                             <span class="bpm-live-title">SINCRONIZAÇÃO DE RITMO</span>
                         </div>
                         <div class="bpm-live-header-actions">
                             <span class="bpm-live-status-pill" id="bpmLiveStatusPill">Original (1.0x)</span>
-                            <button class="bpm-live-quick-btn" onclick="openBpmModal(event)" title="Abrir Ajustes Avançados de Beatmatch & Pitch">🎚️ Ajustar</button>
+                            <button class="bpm-live-quick-btn" onclick="openBpmModal(event)" title="Abrir Ajustes Avançados de Beatmatch & Pitch"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Ajustar</button>
                         </div>
                     </div>
                     
@@ -241,7 +241,7 @@
                             <span class="bpm-val-num original" id="bpmLiveOriginalVal">128 BPM</span>
                         </div>
                         <div class="bpm-arrow-wrap" id="bpmLiveArrowWrap">
-                            <span class="bpm-arrow-icon" id="bpmLiveArrow">➔</span>
+                            <span class="bpm-arrow-icon" id="bpmLiveArrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
                         </div>
                         <div class="bpm-val-group">
                             <span class="bpm-val-label">BPM Atual</span>
@@ -256,7 +256,7 @@
                     <div class="bpm-fade-progress-wrap" id="bpmFadeProgressWrap" style="display: none;">
                         <div class="bpm-fade-header-sub">
                             <span id="bpmFadeCaption">Restaurando BPM original em tempo real...</span>
-                            <span class="bpm-fade-step-num" id="bpmFadeLiveNum">132 ➔ 128 BPM</span>
+                            <span class="bpm-fade-step-num" id="bpmFadeLiveNum">132 <svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> 128 BPM</span>
                         </div>
                         <div class="bpm-fade-track">
                             <div class="bpm-fade-bar" id="bpmFadeProgressBar" style="width: 100%;"></div>
@@ -276,10 +276,10 @@
                     <!-- Linha 2: Ações Rápidas do Player (Fila Spotify & Rádio de Parecidas) -->
                     <div class="track-actions-row">
                         <button class="btn-player-action-pill" id="btnPlayerQueueMain" onclick="openSpotifyQueueModal(event)" title="Abrir Gerenciador de Fila (Estilo Spotify)">
-                            📋 Fila <span class="player-queue-badge" id="playerQueueCount">0</span>
+                            <svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg> Fila <span class="player-queue-badge" id="playerQueueCount">0</span>
                         </button>
                         <button class="btn-player-action-pill" id="btnPlayerSimilar" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas com esta música (mesmo BPM e ritmo)">
-                            📻 Faixas Parecidas
+                            <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg> Faixas Parecidas
                         </button>
                     </div>
                 </div>
@@ -289,68 +289,68 @@
                     <div class="dj-mixer-header">
                         <div class="dj-title">
                             <span class="dj-pulse-dot"></span>
-                            <span>🎧 SPOTIFY DJ MIXER</span>
+                            <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> SPOTIFY DJ MIXER</span>
                         </div>
                         <div style="display: flex; gap: 4px; align-items: center;">
-                            <button class="dj-speed-badge" id="djSpeedBadge" onclick="cyclePlaybackSpeed()" title="Velocidade da Música (Clique para alternar: 1x, 1.25x, 1.5x, 2x, 4x, 0.5x, 0.75x)">⚡ 1.0x</button>
-                            <button class="dj-bpm-sync" id="djBpmSyncBadge" onclick="openBpmModal(event)" title="Abrir Sincronizador de BPM e Beatmatch" style="background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: var(--accent); cursor: pointer; border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 700;">⚡ BPM Sync</button>
+                            <button class="dj-speed-badge" id="djSpeedBadge" onclick="cyclePlaybackSpeed()" title="Velocidade da Música (Clique para alternar: 1x, 1.25x, 1.5x, 2x, 4x, 0.5x, 0.75x)"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 1.0x</button>
+                            <button class="dj-bpm-sync" id="djBpmSyncBadge" onclick="openBpmModal(event)" title="Abrir Sincronizador de BPM e Beatmatch" style="background: rgba(0, 242, 254, 0.12); border: 1px solid rgba(0, 242, 254, 0.35); color: var(--accent); cursor: pointer; border-radius: 4px; padding: 2px 6px; font-size: 9.5px; font-weight: 700;"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Sync: BPM</button>
                         </div>
                     </div>
 
                     <!-- CAIXA COMPACTA: MODO DE ATUAÇÃO DO DJ & BLOQUEIO DE GÊNERO -->
                     <div class="dj-act-mode-box" id="djActModeBox">
                         <div class="dj-act-mode-row">
-                            <span class="dj-act-label">⚡ Modo de Atuação:</span>
+                            <span class="dj-act-label"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Modo de Atuação:</span>
                             <div class="dj-act-dropdown">
                                 <button class="btn-dj-act-trigger" id="btnDjActTrigger" onclick="toggleDjActDropdown()" title="Clique para escolher o Modo de Atuação do DJ">
-                                    <span id="djActModeActiveLabel">🎯 Match Perfeito</span>
+                                    <span id="djActModeActiveLabel"><span class="dj-act-active-icon" style="color: #00f2fe;"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></span> Match Perfeito</span>
                                     <span class="dj-dropdown-caret">▾</span>
                                 </button>
                                 <div class="dj-act-dropdown-menu" id="djActDropdownMenu" style="display: none;">
                                     <button class="dj-act-menu-opt active" id="actOpt_match" onclick="selectDjActMode('match')">
-                                        <span class="opt-icon">🎯</span>
+                                        <span class="opt-icon" style="color: #00f2fe;"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></span>
                                         <div class="opt-text">
                                             <strong>Match Perfeito</strong>
                                             <small>BPM ideal, harmonia de ritmo e busca Spotify/YouTube</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_energy" onclick="selectDjActMode('energy')">
-                                        <span class="opt-icon">⚡</span>
+                                        <span class="opt-icon" style="color: #ffaa00;"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                                         <div class="opt-text">
                                             <strong>Peak Time</strong>
                                             <small>Acelera o BPM (+2 a +8) e eleva a energia</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_shuffle" onclick="selectDjActMode('shuffle')">
-                                        <span class="opt-icon">🔀</span>
+                                        <span class="opt-icon" style="color: #a855f7;"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg></span>
                                         <div class="opt-text">
                                             <strong>Smart Shuffle</strong>
                                             <small>Aleatório inteligente dentro do mesmo gênero</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_smooth" onclick="selectDjActMode('smooth')">
-                                        <span class="opt-icon">🌊</span>
+                                        <span class="opt-icon" style="color: #4facfe;"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg></span>
                                         <div class="opt-text">
                                             <strong>Smooth Flow</strong>
                                             <small>Transições longas com crossfade suave de 8s</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_studio" onclick="selectDjActMode('studio')">
-                                        <span class="opt-icon">🎛️</span>
+                                        <span class="opt-icon" style="color: #ffd700;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg></span>
                                         <div class="opt-text">
                                             <strong>Estúdio Pro & Mastering</strong>
                                             <small>Reverb analógico, delay estéreo, compressor SSL e saturação</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_drop" onclick="selectDjActMode('drop')">
-                                        <span class="opt-icon">⚡</span>
+                                        <span class="opt-icon" style="color: #ff3b3b;"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                                         <div class="opt-text">
                                             <strong>Drop Hunter & High Energy</strong>
                                             <small>Análise de onda em tempo real: toca os drops e corta inteligente mantendo o astral no pico!</small>
                                         </div>
                                     </button>
                                     <button class="dj-act-menu-opt" id="actOpt_club" onclick="selectDjActMode('club')">
-                                        <span class="opt-icon">🔥</span>
+                                        <span class="opt-icon" style="color: #ff0055;"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg></span>
                                         <div class="opt-text">
                                             <strong>Balada & Club DJ</strong>
                                             <small>Efeitos ao vivo (Vinyl Brake, HPF Sweep, Sub Drop) e crossover visual</small>
@@ -360,21 +360,21 @@
                             </div>
                         </div>
                         <div class="dj-genre-lock-chip" id="djGenreLockChip" title="O player mantém estritamente o gênero musical atual até você selecionar manualmente outra música">
-                            <span class="lock-icon">🔒</span>
+                            <span class="lock-icon"><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
                             <span id="djGenreLockText">Gênero Bloqueado: Mega Funk & Ritmadas (Seguindo lista)</span>
                         </div>
                         <!-- Indicador Ativo do Modo Balada & Efeitos Especiais -->
                         <div class="dj-studio-active-badge" id="djStudioActiveBadge" style="display: none;">
                             <span class="hud-strobe-dot studio-dot"></span>
-                            <span>🎛️ MODO ESTÚDIO ATIVO • Mastering DSP, Reverb & Compressor Habilitados</span>
+                            <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> MODO ESTÚDIO ATIVO • Mastering DSP, Reverb & Compressor Habilitados</span>
                         </div>
                         <div class="dj-drop-active-badge" id="djDropActiveBadge" style="display: none;">
                             <span class="hud-strobe-dot drop-dot"></span>
-                            <span>⚡ DROP HUNTER ATIVO • Análise de Onda & Astral no Topo</span>
+                            <span><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> DROP HUNTER ATIVO • Análise de Onda & Astral no Topo</span>
                         </div>
                         <div class="dj-club-active-badge" id="djClubActiveBadge" style="display: none;">
                             <span class="hud-strobe-dot"></span>
-                            <span>🔥 MODO BALADA ATIVO • Efeitos Sonoros DJ & Drops habilitados</span>
+                            <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> MODO BALADA ATIVO • Efeitos Sonoros DJ & Drops habilitados</span>
                         </div>
                     </div>
 
@@ -396,7 +396,7 @@
                                             <div class="vinyl-center" id="vinylCenterA">
                                                 <img id="vinylCoverA" class="vinyl-cover-img" src="" alt="Deck A" style="display: none;">
                                                 <div class="vinyl-fallback-label" id="vinylFallbackA">
-                                                    <span class="vinyl-label-icon">🎧</span>
+                                                    <span class="vinyl-label-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg></span>
                                                 </div>
                                                 <div class="vinyl-spindle"></div>
                                             </div>
@@ -435,7 +435,7 @@
                                             <div class="vinyl-center" id="vinylCenterB">
                                                 <img id="vinylCoverB" class="vinyl-cover-img" src="" alt="Deck B" style="display: none;">
                                                 <div class="vinyl-fallback-label" id="vinylFallbackB">
-                                                    <span class="vinyl-label-icon">🎚️</span>
+                                                    <span class="vinyl-label-icon"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg></span>
                                                 </div>
                                                 <div class="vinyl-spindle"></div>
                                             </div>
@@ -461,7 +461,7 @@
 
                     <!-- Helper Visual de Próxima Música Ideal para Mixagem (Cálculo em Tempo Real) -->
                     <div class="dj-ideal-transition-helper" id="djIdealHelper" style="display: none;" onclick="playIdealNextTrack()" title="Clique para adicionar esta faixa ideal ao topo da fila">
-                        <div class="dj-ideal-icon">🎯</div>
+                        <div class="dj-ideal-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
                         <div class="dj-ideal-info">
                             <div class="dj-ideal-label">PRÓXIMA FAIXA IDEAL (BEATMATCH)</div>
                             <div class="dj-ideal-name" id="djIdealTrackName">-</div>
@@ -473,7 +473,7 @@
                     <div class="dj-crossfader-wrapper">
                         <div class="dj-crossfader-labels">
                             <span>DECK A</span>
-                            <span id="crossfaderBalanceText">🎚️ Barra de Troca de Decks (Crossfade: 4s)</span>
+                            <span id="crossfaderBalanceText"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Barra de Troca de Decks (Crossfade: 4s)</span>
                             <span>DECK B</span>
                         </div>
                         <div class="dj-fader-track" id="djFaderTrack">
@@ -502,16 +502,16 @@
                 <div class="pane-fixed-header">
                     <div class="search-bar-row">
                         <div class="search-input-box">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
                             <input type="text" id="searchInput" class="search-input-field" placeholder="Buscar música, artista, ritmo ou BPM em toda biblioteca..." oninput="handleLibrarySearch(this.value)" onkeydown="if(event.key==='Enter') goToFreeSearch(this.value)">
                             <span id="searchBadgeCount" class="search-badge"></span>
-                            <button id="btnClearSearch" class="btn-clear-search" onclick="clearLibrarySearch()" title="Limpar busca" style="display: none;">✕</button>
+                            <button id="btnClearSearch" class="btn-clear-search" onclick="clearLibrarySearch()" title="Limpar busca" style="display: none;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                         </div>
                         <button class="btn-search-ext-quick" onclick="goToFreeSearch(document.getElementById('searchInput').value)" title="Abrir Pesquisa Livre no YouTube e SoundCloud com IA">
-                            ⚡ Pesquisa Livre
+                            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Pesquisa Livre
                         </button>
                         <button class="btn-search-ext-quick" onclick="openCurationModal(event)" title="Sugestões de curadoria com base no que você mais toca e mais pula">
-                            🎯 Curadoria
+                            <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Curadoria
                         </button>
                     </div>
 
@@ -537,28 +537,28 @@
                     <!-- Barra de Busca na Playlist do Spotify -->
                     <div class="search-bar-row">
                         <div class="search-input-box">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
                             <input type="text" id="spotifySearchInput" class="search-input-field" placeholder="Buscar nas playlists do Spotify por faixa, artista ou ritmo..." oninput="handleSpotifySearch(this.value)">
                             <span id="spotifySearchBadgeCount" class="search-badge"></span>
-                            <button id="btnSpotifySearchClear" class="btn-clear-search" onclick="clearSpotifySearch()" title="Limpar busca" style="display: none;">✕</button>
+                            <button id="btnSpotifySearchClear" class="btn-clear-search" onclick="clearSpotifySearch()" title="Limpar busca" style="display: none;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                         </div>
                     </div>
 
                     <!-- Abas de Playlists Oficiais do Spotify (IDÊNTICO À MINHA BIBLIOTECA) -->
                     <div class="spotify-genre-filter-row" id="spotifyGenreFilterRow">
                         <button class="sp-genre-chip active" id="spChip_all" onclick="filterSpotifyPlaylistsByGenre('all')">Todas (__SPOTIFY_COUNT_NUM__)</button>
-                        <button class="sp-genre-chip" id="spChip_top" onclick="filterSpotifyPlaylistsByGenre('top')">🇧🇷 Top Hits</button>
-                        <button class="sp-genre-chip" id="spChip_sertanejo" onclick="filterSpotifyPlaylistsByGenre('sertanejo')">🤠 Sertanejo</button>
-                        <button class="sp-genre-chip" id="spChip_funk" onclick="filterSpotifyPlaylistsByGenre('funk')">🔥 Funk & Mandelão</button>
-                        <button class="sp-genre-chip" id="spChip_rap" onclick="filterSpotifyPlaylistsByGenre('rap')">🎤 Rap & Trap</button>
-                        <button class="sp-genre-chip" id="spChip_pagode" onclick="filterSpotifyPlaylistsByGenre('pagode')">🥁 Pagode & Samba</button>
-                        <button class="sp-genre-chip" id="spChip_eletronica" onclick="filterSpotifyPlaylistsByGenre('eletronica')">⚡ Eletrônica</button>
-                        <button class="sp-genre-chip" id="spChip_latino" onclick="filterSpotifyPlaylistsByGenre('latino')">🌴 Reggaeton</button>
-                        <button class="sp-genre-chip" id="spChip_cumbia" onclick="filterSpotifyPlaylistsByGenre('cumbia')">🎺 Cumbia (33)</button>
-                        <button class="sp-genre-chip" id="spChip_fiestero" onclick="filterSpotifyPlaylistsByGenre('fiestero')">🎉 Mix Fiesteros & Enganchados</button>
-                        <button class="sp-genre-chip" id="spChip_fronteira" onclick="filterSpotifyPlaylistsByGenre('fronteira')">🧉 Quaraí & Artigas (3)</button>
-                        <button class="sp-genre-chip" id="spChip_rock" onclick="filterSpotifyPlaylistsByGenre('rock')">🎸 Rock & MPB</button>
-                        <button class="sp-genre-chip" id="spChip_treino" onclick="filterSpotifyPlaylistsByGenre('treino')">🏋️ Treino & Vibe</button>
+                        <button class="sp-genre-chip" id="spChip_top" onclick="filterSpotifyPlaylistsByGenre('top')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Top Hits</button>
+                        <button class="sp-genre-chip" id="spChip_sertanejo" onclick="filterSpotifyPlaylistsByGenre('sertanejo')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 17c1.5 1 4 2 10 2s8.5-1 10-2"></path><path d="M6 16c0-4 1.5-8 6-8s6 4 6 8"></path><path d="M8 8c1-3 2.5-4 4-4s3 1 4 4"></path></svg> Sertanejo</button>
+                        <button class="sp-genre-chip" id="spChip_funk" onclick="filterSpotifyPlaylistsByGenre('funk')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> Funk & Mandelão</button>
+                        <button class="sp-genre-chip" id="spChip_rap" onclick="filterSpotifyPlaylistsByGenre('rap')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Rap & Trap</button>
+                        <button class="sp-genre-chip" id="spChip_pagode" onclick="filterSpotifyPlaylistsByGenre('pagode')"><svg class="ui-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="8" rx="8" ry="4"></ellipse><path d="M4 8v8c0 2.2 3.6 4 8 4s8-1.8 8-4V8"></path><line x1="6" y1="4" x2="9" y2="7"></line><line x1="18" y1="4" x2="15" y2="7"></line></svg> Pagode & Samba</button>
+                        <button class="sp-genre-chip" id="spChip_eletronica" onclick="filterSpotifyPlaylistsByGenre('eletronica')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Eletrônica</button>
+                        <button class="sp-genre-chip" id="spChip_latino" onclick="filterSpotifyPlaylistsByGenre('latino')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22v-9"></path><path d="M12 13c-3-2-5-6-5-9 3 0 6 2 8 5"></path><path d="M12 13c3-2 5-6 5-9-3 0-6 2-8 5"></path><path d="M12 13c-4 0-8-1-10-4 2-1 6-1 8 2"></path><path d="M12 13c4 0 8-1 10-4-2-1-6-1-8 2"></path></svg> Reggaeton</button>
+                        <button class="sp-genre-chip" id="spChip_cumbia" onclick="filterSpotifyPlaylistsByGenre('cumbia')"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg> Cumbia (33)</button>
+                        <button class="sp-genre-chip" id="spChip_fiestero" onclick="filterSpotifyPlaylistsByGenre('fiestero')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Mix Fiesteros & Enganchados</button>
+                        <button class="sp-genre-chip" id="spChip_fronteira" onclick="filterSpotifyPlaylistsByGenre('fronteira')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 17c1.5 1 4 2 10 2s8.5-1 10-2"></path><path d="M6 16c0-4 1.5-8 6-8s6 4 6 8"></path><path d="M8 8c1-3 2.5-4 4-4s3 1 4 4"></path></svg> Quaraí & Artigas (3)</button>
+                        <button class="sp-genre-chip" id="spChip_rock" onclick="filterSpotifyPlaylistsByGenre('rock')"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg> Rock & MPB</button>
+                        <button class="sp-genre-chip" id="spChip_treino" onclick="filterSpotifyPlaylistsByGenre('treino')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Treino & Vibe</button>
                     </div>
 
                     <!-- Botão de voltar, visível só quando uma playlist está aberta -->
@@ -573,13 +573,13 @@
                     <!-- Banner de Transição Suave Crossfade em Tempo Real no Spotify -->
                     <div class="search-transition-banner" id="spotifyTransitionBanner" style="display: none;">
                         <div class="banner-cf-top-row">
-                            <span class="banner-cf-badge">🎛️ CROSSFADE ATIVO NO SPOTIFY</span>
+                            <span class="banner-cf-badge"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> CROSSFADE ATIVO NO SPOTIFY</span>
                             <span class="banner-cf-pct" id="spotifyTransitionPct">0%</span>
                         </div>
                         <div class="banner-cf-tracks-row">
-                            <span class="banner-cf-out" id="spotifyOutgoingTrackInfo">📤 SAINDO: ...</span>
-                            <span class="banner-cf-arrow">➔</span>
-                            <span class="banner-cf-in" id="spotifyIncomingTrackInfo">📥 ENTRANDO: ...</span>
+                            <span class="banner-cf-out" id="spotifyOutgoingTrackInfo"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> SAINDO: ...</span>
+                            <span class="banner-cf-arrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                            <span class="banner-cf-in" id="spotifyIncomingTrackInfo"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> ENTRANDO: ...</span>
                         </div>
                         <div class="banner-cf-progress-track">
                             <div class="banner-cf-progress-fill" id="spotifyTransitionFill"></div>
@@ -600,41 +600,41 @@
                 <div class="pane-fixed-header">
                     <div class="search-bar-row">
                         <div class="search-input-box">
-                            <span class="search-icon">🔍</span>
+                            <span class="search-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
                             <input type="text" id="freeSearchInput" class="search-input-field" placeholder="Pesquise qualquer música, artista, ritmo ou BPM na Biblioteca, YouTube e SoundCloud..." oninput="handleFreeSearchInput(this.value)" onkeydown="if(event.key==='Enter') executeFreeSearch(this.value)">
-                            <button id="btnFreeSearchClear" class="btn-clear-search" onclick="clearFreeSearch()" title="Limpar busca" style="display: none;">✕</button>
+                            <button id="btnFreeSearchClear" class="btn-clear-search" onclick="clearFreeSearch()" title="Limpar busca" style="display: none;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                         </div>
                         <button class="btn-search-ia-action" onclick="executeFreeSearch(document.getElementById('freeSearchInput').value)">
-                            ⚡ Buscar IA
+                            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Buscar IA
                         </button>
                     </div>
                     
                     <!-- Chips de BPM & Ritmo Rápido - só aparecem ANTES de ter resultado (depois,
                          dão lugar às abas de filtro abaixo, pra nunca empilhar as duas fileiras) -->
                     <div class="quick-bpm-chips-row" id="quickBpmChipsRow">
-                        <button class="chip-bpm" onclick="quickBpmSearch('Mega Funk 135 BPM')">⚡ 135 BPM Mega Funk</button>
-                        <button class="chip-bpm" onclick="quickBpmSearch('Mandelao 130 BPM')">🔊 130 BPM Mandelão</button>
-                        <button class="chip-bpm" onclick="quickBpmSearch('Eletronica House 126 BPM')">🎛️ 126 BPM House</button>
-                        <button class="chip-bpm" onclick="quickBpmSearch('Funk 150 BPM')">🔥 150 BPM Ritmo dos Fluxos</button>
-                        <button class="chip-bpm" onclick="quickBpmSearch('Trap Brasil')">💎 Trap Brasil</button>
+                        <button class="chip-bpm" onclick="quickBpmSearch('Mega Funk 135 BPM')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 135 BPM Mega Funk</button>
+                        <button class="chip-bpm" onclick="quickBpmSearch('Mandelao 130 BPM')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> 130 BPM Mandelão</button>
+                        <button class="chip-bpm" onclick="quickBpmSearch('Eletronica House 126 BPM')"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> 126 BPM House</button>
+                        <button class="chip-bpm" onclick="quickBpmSearch('Funk 150 BPM')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> 150 BPM Ritmo dos Fluxos</button>
+                        <button class="chip-bpm" onclick="quickBpmSearch('Trap Brasil')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3L8 9l4 12 4-12-3-6"></path><path d="M2 9h20"></path></svg> Trap Brasil</button>
                     </div>
 
                     <div class="search-filters-bar" id="searchFiltersBar" style="display: none;">
                         <button class="filter-tab-btn active" id="tabFilterAll" onclick="setSearchFilter('all')">Todas (<span id="countSearchAll">0</span>)</button>
-                        <button class="filter-tab-btn" id="tabFilterLib" onclick="setSearchFilter('library')">📚 Na Biblioteca (<span id="countSearchLib">0</span>)</button>
-                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')">✨ Novidades (<span id="countSearchNew">0</span>)</button>
+                        <button class="filter-tab-btn" id="tabFilterLib" onclick="setSearchFilter('library')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Na Biblioteca (<span id="countSearchLib">0</span>)</button>
+                        <button class="filter-tab-btn" id="tabFilterNew" onclick="setSearchFilter('new')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg> Novidades (<span id="countSearchNew">0</span>)</button>
                     </div>
 
                     <!-- Banner de Transição Suave Crossfade em Tempo Real na Pesquisa -->
                     <div class="search-transition-banner" id="searchTransitionBanner" style="display: none;">
                         <div class="banner-cf-top-row">
-                            <span class="banner-cf-badge">🎛️ CROSSFADE ATIVO NA PESQUISA</span>
+                            <span class="banner-cf-badge"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> CROSSFADE ATIVO NA PESQUISA</span>
                             <span class="banner-cf-pct" id="searchTransitionPct">0%</span>
                         </div>
                         <div class="banner-cf-tracks-row">
-                            <span class="banner-cf-out" id="searchOutgoingTrackInfo">📤 SAINDO: ...</span>
-                            <span class="banner-cf-arrow">➔</span>
-                            <span class="banner-cf-in" id="searchIncomingTrackInfo">📥 ENTRANDO: ...</span>
+                            <span class="banner-cf-out" id="searchOutgoingTrackInfo"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> SAINDO: ...</span>
+                            <span class="banner-cf-arrow"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg></span>
+                            <span class="banner-cf-in" id="searchIncomingTrackInfo"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg> ENTRANDO: ...</span>
                         </div>
                         <div class="banner-cf-progress-track">
                             <div class="banner-cf-progress-fill" id="searchTransitionFill"></div>
@@ -643,7 +643,7 @@
                 </div>
                 <div class="track-list" id="searchResultsList">
                     <div class="search-empty-state">
-                        <div class="search-empty-icon">🔍</div>
+                        <div class="search-empty-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
                         <div class="search-empty-title">Pesquisa Livre na Biblioteca, YouTube & SoundCloud</div>
                         <div class="search-empty-desc">Digite qualquer título, artista, ritmo ou BPM para encontrar instantaneamente na biblioteca ou descobrir novas faixas no YouTube e SoundCloud com transição Crossfade e adição com um clique!</div>
                     </div>
@@ -668,11 +668,11 @@
                     <!-- Campo de Busca de Novidades com IA -->
                     <div class="search-bar-row" style="margin-top: 6px; margin-bottom: 6px;">
                         <div class="search-input-box">
-                            <span class="search-icon">✨</span>
+                            <span class="search-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg></span>
                             <input type="text" id="suggSearchInput" class="search-input-field" placeholder="Buscar novas músicas por ritmo, artista ou BPM (ex: 135 bpm, mandelao)..." onkeydown="if(event.key==='Enter') executeCustomSuggestionSearch(this.value)">
                         </div>
                         <button class="btn-search-ia-action" onclick="executeCustomSuggestionSearch(document.getElementById('suggSearchInput').value)">
-                            ⚡ Buscar IA
+                            <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Buscar IA
                         </button>
                     </div>
 
@@ -682,7 +682,7 @@
                          empurrava a lista de faixas pra fora da tela. -->
                     <div class="queue-header-box queue-header-box--compact" style="margin-top: 6px;">
                         <div class="queue-title">
-                            <span id="suggestionActiveGenreTitle">✨ Novidades Recomendadas</span>
+                            <span id="suggestionActiveGenreTitle"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg> Novidades Recomendadas</span>
                             <span id="suggestionCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px; font-size: 11px;">0 inéditas</span>
                         </div>
                         <div class="queue-desc queue-desc--oneline" id="suggestionSubtext" title="Músicas buscadas em tempo real no YouTube e SoundCloud para este estilo e ritmo. Nunca se repetem.">
@@ -690,7 +690,7 @@
                         </div>
                         <div class="queue-actions-row">
                             <button class="btn-sync-yt" id="btnRefreshSuggestions" onclick="fetchFreshSuggestionsForCurrentGenre()" title="Buscar mais novas músicas sem repetir" style="flex: 1; margin-top: 0; background: linear-gradient(135deg, #ff0055, #ff5500); color: #fff;">
-                                <span>🔄 Buscar Mais Novas (Sem Repetir)</span>
+                                <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path></svg> Buscar Mais Novas (Sem Repetir)</span>
                             </button>
                             <button class="btn-sync-yt btn-sync-yt--ghost" onclick="resetSeenHistory()" style="flex: 0; margin-top: 0;" title="Resetar histórico de faixas já vistas (as sugestões passadas podem voltar a aparecer)">
                                 <span>↺</span>
@@ -706,7 +706,7 @@
                 <div class="pane-fixed-header">
                     <div class="queue-header-box queue-header-box--compact" title="Músicas adicionadas por você para tocar na sequência. Você pode abri-las todas juntas como uma playlist instantânea no YouTube!">
                         <div class="queue-title">
-                            <span>📋 Minha Fila de Reprodução</span>
+                            <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg> Minha Fila de Reprodução</span>
                             <span id="queueCountBadge" class="count-badge" style="background: rgba(0, 242, 254, 0.2); color: var(--accent); padding: 3px 8px;">0 músicas</span>
                         </div>
                         <div class="queue-actions-row">
@@ -714,7 +714,7 @@
                                 ▶ Assistir Fila Completa no YouTube
                             </button>
                             <button class="btn-sync-yt btn-sync-yt--ghost" onclick="clearAllQueue()" style="flex: 0; margin-top: 0; background: rgba(255, 0, 85, 0.2); border: 1px solid var(--primary); color: #fff;" title="Limpar a fila inteira">
-                                🗑️
+                                <svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </div>
                     </div>
@@ -733,7 +733,7 @@
                 <div class="bar-artist-row">
                     <span class="bar-artist" id="barArtist">-</span>
                     <button class="btn-bar-similar" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas com esta música">
-                        📻 Parecidas
+                        <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg> Parecidas
                     </button>
                 </div>
             </div>
@@ -742,8 +742,8 @@
         <div class="bar-center">
             <!-- Linha 1: Transporte Principal (PERFEITAMENTE CENTRALIZADO) -->
             <div class="bar-transport-cluster">
-                <button class="bar-pill-btn" id="barShuffleBtn" onclick="toggleShuffle()" title="Modo Aleatório">🔀</button>
-                <button class="bar-btn bar-nav-btn" onclick="manualTransition('prev')" title="Anterior">⏮</button>
+                <button class="bar-pill-btn" id="barShuffleBtn" onclick="toggleShuffle()" title="Modo Aleatório"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg></button>
+                <button class="bar-btn bar-nav-btn" onclick="manualTransition('prev')" title="Anterior"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><rect x="4.5" y="4" width="2.5" height="16" rx="0.5"></rect></svg></button>
                 <button class="bar-btn bar-play" id="barPlayBtn" onclick="togglePlayPause()" title="Play/Pause">
                     <span id="playIconSpan">
                         <svg class="control-svg-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="display:block; transform: translateX(1px);">
@@ -751,9 +751,9 @@
                         </svg>
                     </span>
                 </button>
-                <button class="bar-btn bar-nav-btn" onclick="manualTransition('next')" title="Próxima com Fade">⏭</button>
-                <button class="bar-pill-btn active" id="barAutoPlayBtn" onclick="toggleAutoPlay()" title="Avanço Automático">🔁 Auto</button>
-                <button class="bar-pill-btn" id="barRepeatBtn" onclick="toggleRepeatMode()" title="Modo de Repetição (Desativado / Repetir Música Atual (1) / Repetir Playlist)">🔂 Repetir</button>
+                <button class="bar-btn bar-nav-btn" onclick="manualTransition('next')" title="Próxima com Fade"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg></button>
+                <button class="bar-pill-btn active" id="barAutoPlayBtn" onclick="toggleAutoPlay()" title="Avanço Automático"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg> Auto</button>
+                <button class="bar-pill-btn" id="barRepeatBtn" onclick="toggleRepeatMode()" title="Modo de Repetição (Desativado / Repetir Música Atual (1) / Repetir Playlist)"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><text x="12" y="15" font-size="8" font-family="sans-serif" font-weight="bold" fill="currentColor" text-anchor="middle">1</text></svg> Repetir</button>
             </div>
 
             <!-- Linha 2: Timeline Scrubber (Centralizado) -->
@@ -768,36 +768,36 @@
 
             <!-- Linha 3: Ferramentas DJ e Efeitos (Alinhadas e Compactas) -->
             <div class="bar-tools-cluster">
-                <button class="bar-pill-btn fade-active" id="barCrossfadeBtn" onclick="toggleCrossfadeSetting()" title="Ajustar tempo de crossfade">🎚️ Fade: 4s</button>
-                <button class="bar-pill-btn bpm-sync-active" id="barBpmSyncBtn" onclick="openBpmModal(event)" title="Sincronizador de BPM & Beatmatch Automático">⚡ BPM Sync</button>
-                <button class="bar-pill-btn active" id="barIntroSkipBtn" onclick="toggleIntroSkip()" title="Pular silêncio/intro inicial">⚡ Silêncio: 2s</button>
-                <button class="bar-pill-btn eq-active" id="barEqBtn" onclick="openEqualizerModal(event)" title="Equalizador Spotify e Super Volume VLC">🎛️ EQ: <span id="barEqLabel">Grave</span></button>
-                <button class="bar-pill-btn stems-active" id="barStemsBtn" onclick="openStemsModal(event)" title="Stems DJ">🎧 Stems DJ</button>
-                <button class="bar-pill-btn studio-active" id="barStudioBtn" onclick="openStudioModal(event)" title="Console de Estúdio, Mastering DSP e Efeitos">🎚️ Estúdio Pro</button>
-                <button class="bar-pill-btn" id="barQueueBtn" onclick="openSpotifyQueueModal(event)" title="Gerenciar Fila de Músicas (Estilo Spotify)">📋 Fila <span id="barQueueCountBadge" class="bar-queue-chip">0</span></button>
-                <button class="bar-pill-btn" id="barControlSimilarBtn" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas">📻 Parecidas</button>
+                <button class="bar-pill-btn fade-active" id="barCrossfadeBtn" onclick="toggleCrossfadeSetting()" title="Ajustar tempo de crossfade"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Fade: 4s</button>
+                <button class="bar-pill-btn bpm-sync-active" id="barBpmSyncBtn" onclick="openBpmModal(event)" title="Sincronizador de BPM & Beatmatch Automático"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> BPM Sync</button>
+                <button class="bar-pill-btn active" id="barIntroSkipBtn" onclick="toggleIntroSkip()" title="Pular silêncio/intro inicial"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Silêncio: 2s</button>
+                <button class="bar-pill-btn eq-active" id="barEqBtn" onclick="openEqualizerModal(event)" title="Equalizador Spotify e Super Volume VLC"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> EQ: <span id="barEqLabel">Grave</span></button>
+                <button class="bar-pill-btn stems-active" id="barStemsBtn" onclick="openStemsModal(event)" title="Stems DJ"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Stems DJ</button>
+                <button class="bar-pill-btn studio-active" id="barStudioBtn" onclick="openStudioModal(event)" title="Console de Estúdio, Mastering DSP e Efeitos"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Estúdio Pro</button>
+                <button class="bar-pill-btn" id="barQueueBtn" onclick="openSpotifyQueueModal(event)" title="Gerenciar Fila de Músicas (Estilo Spotify)"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg> Fila <span id="barQueueCountBadge" class="bar-queue-chip">0</span></button>
+                <button class="bar-pill-btn" id="barControlSimilarBtn" onclick="openRadioForCurrentTrack()" title="Buscar faixas parecidas"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg> Parecidas</button>
                 
                 <!-- Controle de Velocidade -->
                 <div class="speed-control-wrapper">
                     <button class="bar-pill-btn speed-pill-btn" id="barSpeedBtn" onclick="toggleSpeedMenu(event)" title="Velocidade da Música">
-                        <span id="barSpeedLabel">⚡ 1.0x</span>
+                        <span id="barSpeedLabel"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 1.0x</span>
                     </button>
                     <div class="speed-menu-dropdown" id="speedMenuDropdown">
                         <div class="speed-menu-header">Velocidade da Música</div>
                         <div class="speed-options-grid">
-                            <button class="speed-opt-btn" data-speed="0.5" onclick="setPlaybackSpeed(0.5)">🐢 0.5x Slow</button>
-                            <button class="speed-opt-btn" data-speed="0.75" onclick="setPlaybackSpeed(0.75)">🐢 0.75x Slow</button>
-                            <button class="speed-opt-btn active" data-speed="1.0" id="speedOpt1" onclick="setPlaybackSpeed(1.0)">🎵 1.0x Normal</button>
-                            <button class="speed-opt-btn" data-speed="1.25" onclick="setPlaybackSpeed(1.25)">⚡ 1.25x</button>
-                            <button class="speed-opt-btn" data-speed="1.5" onclick="setPlaybackSpeed(1.5)">⚡ 1.5x</button>
-                            <button class="speed-opt-btn" data-speed="2.0" onclick="setPlaybackSpeed(2.0)">🚀 2.0x Rápido</button>
-                            <button class="speed-opt-btn" data-speed="4.0" onclick="setPlaybackSpeed(4.0)">🔥 4.0x Ultra</button>
+                            <button class="speed-opt-btn" data-speed="0.5" onclick="setPlaybackSpeed(0.5)">0.5x Slow</button>
+                            <button class="speed-opt-btn" data-speed="0.75" onclick="setPlaybackSpeed(0.75)">0.75x Slow</button>
+                            <button class="speed-opt-btn active" data-speed="1.0" id="speedOpt1" onclick="setPlaybackSpeed(1.0)">1.0x Normal</button>
+                            <button class="speed-opt-btn" data-speed="1.25" onclick="setPlaybackSpeed(1.25)">1.25x</button>
+                            <button class="speed-opt-btn" data-speed="1.5" onclick="setPlaybackSpeed(1.5)">1.5x</button>
+                            <button class="speed-opt-btn" data-speed="2.0" onclick="setPlaybackSpeed(2.0)">2.0x Rápido</button>
+                            <button class="speed-opt-btn" data-speed="4.0" onclick="setPlaybackSpeed(4.0)"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> 4.0x Ultra</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Toggle de Áudio HD vs Clipe -->
-                <button class="bar-pill-btn" id="barEngineModeBtn" onclick="toggleEngineMode()" title="Alternar entre Áudio HD e Clipe">🎵 Áudio HD</button>
+                <button class="bar-pill-btn" id="barEngineModeBtn" onclick="toggleEngineMode()" title="Alternar entre Áudio HD e Clipe"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Áudio HD</button>
             </div>
 
             <!-- Linha de Status com a Música Tocando e a Próxima -->
@@ -807,10 +807,10 @@
         </div>
 
         <div class="bar-right">
-            <button class="bar-btn" id="barMuteBtn" onclick="toggleMute()" title="Mute/Unmute">🔊</button>
+            <button class="bar-btn" id="barMuteBtn" onclick="toggleMute()" title="Mute/Unmute"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg></button>
             <input type="range" min="0" max="200" value="100" id="volumeSlider" class="volume-slider" oninput="setMasterVolume(this.value)" onchange="setMasterVolume(this.value)" title="Volume VLC (0% a 200%)">
             <span class="vol-text" id="volText">100%</span>
-            <button class="vlc-chip-btn" onclick="cycleVlcBoost()" title="Alternar presets VLC (100%, 125%, 150%, 200%)">⚡ VLC</button>
+            <button class="vlc-chip-btn" onclick="cycleVlcBoost()" title="Alternar presets VLC (100%, 125%, 150%, 200%)"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> VLC</button>
         </div>
     </div>
 
@@ -820,7 +820,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>🎛️ Equalizador Spotify Pro & Super Volume VLC</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> Equalizador Spotify Pro & Super Volume VLC</span>
                         <span class="eq-badge-mode">10 BANDAS ISO</span>
                     </div>
                     <div class="eq-modal-sub">
@@ -829,7 +829,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="btn-eq-reset" onclick="resetEqToFlat()" title="Redefinir todas as bandas para 0 dB (Flat)">
-                        🔄 Flat (0 dB)
+                        <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path></svg> Flat (0 dB)
                     </button>
                     <button class="eq-close-btn" onclick="closeEqualizerModal()" title="Fechar Equalizador" aria-label="Fechar">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -843,7 +843,7 @@
             <!-- Visualização da Curva de Equalização em Tempo Real -->
             <div class="eq-curve-container">
                 <div class="eq-curve-header">
-                    <span class="eq-curve-title">📈 Curva de Resposta Acústica (Tempo Real)</span>
+                    <span class="eq-curve-title"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg> Curva de Resposta Acústica (Tempo Real)</span>
                     <span id="eqActivePresetTag" class="eq-curve-tag">Preset: Padrão (Flat)</span>
                 </div>
                 <canvas id="eqCurveCanvas" width="680" height="60" class="eq-curve-canvas"></canvas>
@@ -856,98 +856,98 @@
             </div>
             <div class="eq-presets-grid-scroll">
                 <div class="eq-preset-card" id="eqCard_padrao" onclick="selectEqPreset('padrao')">
-                    <span class="eq-preset-icon">🎵</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Padrão (Flat)</span>
                         <span class="eq-preset-desc">Original de estúdio</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_grave" onclick="selectEqPreset('grave')">
-                    <span class="eq-preset-icon">💥</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Mega Bass / 808</span>
                         <span class="eq-preset-desc">Subwoofer & batidas</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_funk" onclick="selectEqPreset('funk')">
-                    <span class="eq-preset-icon">🔥</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Funk & Mandelão</span>
                         <span class="eq-preset-desc">Punch no kick & caixa</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_balada" onclick="selectEqPreset('balada')">
-                    <span class="eq-preset-icon">⚡</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Balada / Club</span>
                         <span class="eq-preset-desc">Curva em V com pressão</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_eletronica" onclick="selectEqPreset('eletronica')">
-                    <span class="eq-preset-icon">🌀</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">House & Desande</span>
                         <span class="eq-preset-desc">Sub firme & agudo limpo</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_cumbia" onclick="selectEqPreset('cumbia')">
-                    <span class="eq-preset-icon">🎺</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Cumbia & Charanga</span>
                         <span class="eq-preset-desc">Médios quentes & chimbais</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_gaucho" onclick="selectEqPreset('gaucho')">
-                    <span class="eq-preset-icon">🤠</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 17c1.5 1 4 2 10 2s8.5-1 10-2"></path><path d="M6 16c0-4 1.5-8 6-8s6 4 6 8"></path><path d="M8 8c1-3 2.5-4 4-4s3 1 4 4"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Gaúcho & Vanera</span>
                         <span class="eq-preset-desc">Bombo & acordeom brilhante</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_trap" onclick="selectEqPreset('trap')">
-                    <span class="eq-preset-icon">🎤</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Trap & 808 Slide</span>
                         <span class="eq-preset-desc">Subwoofer & voz seca</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_voz" onclick="selectEqPreset('voz')">
-                    <span class="eq-preset-icon">🎙️</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Vocal Cristalino</span>
                         <span class="eq-preset-desc">Voz em destaque & clareza</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_fone" onclick="selectEqPreset('fone')">
-                    <span class="eq-preset-icon">🎧</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Fone de Ouvido</span>
                         <span class="eq-preset-desc">Curva Harman estéreo</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_sala" onclick="selectEqPreset('sala')">
-                    <span class="eq-preset-icon">🏛️</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Sala / Espacial</span>
                         <span class="eq-preset-desc">Palco sonoro amplo</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_rock" onclick="selectEqPreset('rock')">
-                    <span class="eq-preset-icon">🎸</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Rock & Guitarras</span>
                         <span class="eq-preset-desc">Médios para cordas & ataque</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_acustico" onclick="selectEqPreset('acustico')">
-                    <span class="eq-preset-icon">🪕</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Acústico & Cordas</span>
                         <span class="eq-preset-desc">Timbre quente natural</span>
                     </div>
                 </div>
                 <div class="eq-preset-card" id="eqCard_claridade" onclick="selectEqPreset('claridade')">
-                    <span class="eq-preset-icon">✨</span>
+                    <span class="eq-preset-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg></span>
                     <div class="eq-preset-info">
                         <span class="eq-preset-name">Máxima Definição</span>
                         <span class="eq-preset-desc">Air & agudos estendidos</span>
@@ -959,7 +959,7 @@
             <div class="eq-section-header">
                 <span class="eq-section-title">Equalizador Gráfico de Precisão (10 Bandas ISO)</span>
                 <div class="eq-preamp-wrap">
-                    <span class="preamp-label">🎚️ Pre-Amp:</span>
+                    <span class="preamp-label"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Pre-Amp:</span>
                     <input type="range" min="-6" max="6" value="0" step="0.5" id="eqPreAmpSlider" class="preamp-slider" oninput="setEqPreAmp(this.value)">
                     <span id="eqPreAmpVal" class="preamp-val">0 dB</span>
                 </div>
@@ -1020,7 +1020,7 @@
             <!-- Super Volume VLC Booster (Até 200%) -->
             <div class="eq-boost-box">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 11.5px; font-weight: 700; color: #ffaa00;">⚡ Super Volume VLC Booster (0% a 200%)</span>
+                    <span style="font-size: 11.5px; font-weight: 700; color: #ffaa00;"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Super Volume VLC Booster (0% a 200%)</span>
                     <span id="eqBoostText" style="font-size: 12px; font-weight: 800; color: #ffaa00;">100%</span>
                 </div>
                 <input type="range" min="0" max="200" value="100" id="eqVolumeSlider" class="volume-slider" style="width: 100%; max-width: none;" oninput="setMasterVolume(this.value)">
@@ -1033,8 +1033,8 @@
             </div>
 
             <div class="eq-footer">
-                <span class="eq-badge-saved">✓ Preferências salvas automaticamente no navegador</span>
-                <button class="btn-modal-done" onclick="closeEqualizerModal()">✓ Concluído</button>
+                <span class="eq-badge-saved"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Preferências salvas automaticamente no navegador</span>
+                <button class="btn-modal-done" onclick="closeEqualizerModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Concluído</button>
             </div>
         </div>
     </div>
@@ -1046,7 +1046,7 @@
                 <div>
                     <div class="eq-modal-title">
                         <span class="stems-pulse-dot"></span>
-                        <span>🎧 DJ STEMS PRO • ISOLAMENTO E SEPARAÇÃO 100% EM TEMPO REAL</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> DJ STEMS PRO • ISOLAMENTO E SEPARAÇÃO 100% EM TEMPO REAL</span>
                         <span class="stems-badge-pro">PRO 4-STEM DSP</span>
                     </div>
                     <div class="eq-modal-sub">
@@ -1064,7 +1064,7 @@
                 </div>
                 <div class="stems-live-right">
                     <span id="stemsEngagedBadge" class="stems-status-pill">MIX ORIGINAL (FLAT)</span>
-                    <span id="stemsTrackNowBpm" class="badge-bpm-chip">⚡ 138 BPM</span>
+                    <span id="stemsTrackNowBpm" class="badge-bpm-chip"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> 138 BPM</span>
                 </div>
             </div>
 
@@ -1072,67 +1072,67 @@
             <!-- Perfil Acústico Adaptativo por Ritmo (Anti-Vazamento Cirúrgico) -->
             <div class="stems-profile-selector-bar">
                 <div class="stems-profile-header">
-                    <span class="stems-profile-label">🎯 PERFIL DE RITMO CALIBRADO (ZERO VAZAMENTO):</span>
-                    <span id="stemsProfileActiveBadge" class="stems-profile-badge">⚡ AUTO: FUNK & MANDELÃO</span>
+                    <span class="stems-profile-label"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> PERFIL DE RITMO CALIBRADO (ZERO VAZAMENTO):</span>
+                    <span id="stemsProfileActiveBadge" class="stems-profile-badge"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> AUTO: FUNK & MANDELÃO</span>
                 </div>
                 <div class="stems-profile-chips">
-                    <button class="stem-profile-chip active" id="stProfile_auto" onclick="setStemGenreProfile('auto')" title="Detecta automaticamente o ritmo da música tocando">⚡ Auto (Gênero Atual)</button>
-                    <button class="stem-profile-chip" id="stProfile_funk" onclick="setStemGenreProfile('funk')" title="Otimizado para sub 808 pesado, batida seca e voz MC de funk">🔥 Funk & Mandelão</button>
-                    <button class="stem-profile-chip" id="stProfile_sertanejo" onclick="setStemGenreProfile('sertanejo')" title="Otimizado para 1ª e 2ª voz harmonizadas, viola e baixo acústico">🤠 Sertanejo & Modão</button>
-                    <button class="stem-profile-chip" id="stProfile_pagode" onclick="setStemGenreProfile('pagode')" title="Otimizado para roda de samba, surdo, tantã, cavaquinho e coro">🥁 Samba & Pagode</button>
-                    <button class="stem-profile-chip" id="stProfile_eletronica" onclick="setStemGenreProfile('eletronica')" title="Otimizado para kick 4x4, sub synth puro e drops EDM/House">⚡ Eletrônica & House</button>
-                    <button class="stem-profile-chip" id="stProfile_trap" onclick="setStemGenreProfile('trap')" title="Otimizado para 808 slides, autotune e hi-hat rolls rápidos">🎤 Trap & Rap</button>
-                    <button class="stem-profile-chip" id="stProfile_latino" onclick="setStemGenreProfile('latino')" title="Otimizado para dembow, güiro e cumbia">🌴 Reggaeton & Cumbia</button>
-                    <button class="stem-profile-chip" id="stProfile_rock" onclick="setStemGenreProfile('rock')" title="Otimizado para bateria acústica, baixo e guitarras">🎸 Rock & Pop</button>
+                    <button class="stem-profile-chip active" id="stProfile_auto" onclick="setStemGenreProfile('auto')" title="Detecta automaticamente o ritmo da música tocando"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Auto (Gênero Atual)</button>
+                    <button class="stem-profile-chip" id="stProfile_funk" onclick="setStemGenreProfile('funk')" title="Otimizado para sub 808 pesado, batida seca e voz MC de funk"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> Funk & Mandelão</button>
+                    <button class="stem-profile-chip" id="stProfile_sertanejo" onclick="setStemGenreProfile('sertanejo')" title="Otimizado para 1ª e 2ª voz harmonizadas, viola e baixo acústico"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 17c1.5 1 4 2 10 2s8.5-1 10-2"></path><path d="M6 16c0-4 1.5-8 6-8s6 4 6 8"></path><path d="M8 8c1-3 2.5-4 4-4s3 1 4 4"></path></svg> Sertanejo & Modão</button>
+                    <button class="stem-profile-chip" id="stProfile_pagode" onclick="setStemGenreProfile('pagode')" title="Otimizado para roda de samba, surdo, tantã, cavaquinho e coro"><svg class="ui-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="8" rx="8" ry="4"></ellipse><path d="M4 8v8c0 2.2 3.6 4 8 4s8-1.8 8-4V8"></path><line x1="6" y1="4" x2="9" y2="7"></line><line x1="18" y1="4" x2="15" y2="7"></line></svg> Samba & Pagode</button>
+                    <button class="stem-profile-chip" id="stProfile_eletronica" onclick="setStemGenreProfile('eletronica')" title="Otimizado para kick 4x4, sub synth puro e drops EDM/House"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Eletrônica & House</button>
+                    <button class="stem-profile-chip" id="stProfile_trap" onclick="setStemGenreProfile('trap')" title="Otimizado para 808 slides, autotune e hi-hat rolls rápidos"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Trap & Rap</button>
+                    <button class="stem-profile-chip" id="stProfile_latino" onclick="setStemGenreProfile('latino')" title="Otimizado para dembow, güiro e cumbia"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22v-9"></path><path d="M12 13c-3-2-5-6-5-9 3 0 6 2 8 5"></path><path d="M12 13c3-2 5-6 5-9-3 0-6 2-8 5"></path><path d="M12 13c-4 0-8-1-10-4 2-1 6-1 8 2"></path><path d="M12 13c4 0 8-1 10-4-2-1-6-1-8 2"></path></svg> Reggaeton & Cumbia</button>
+                    <button class="stem-profile-chip" id="stProfile_rock" onclick="setStemGenreProfile('rock')" title="Otimizado para bateria acústica, baixo e guitarras"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg> Rock & Pop</button>
                 </div>
             </div>
 
-            <div class="eq-section-title">⚡ Ações Rápidas de DJ (Isolamento Cirúrgico em 1-Clique)</div>
+            <div class="eq-section-title"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Ações Rápidas de DJ (Isolamento Cirúrgico em 1-Clique)</div>
             <div class="stems-pads-grid">
                 <div class="stem-pad-btn active" id="stemPad_full" onclick="applyStemPreset('full')">
-                    <span class="stem-pad-icon">🎚️</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg></span>
                     <span class="stem-pad-title">Mix Original</span>
                     <span class="stem-pad-desc">Todos Stems 100%</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_vocal" onclick="applyStemPreset('vocal')">
-                    <span class="stem-pad-icon">🎤</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></span>
                     <span class="stem-pad-title">Apenas Vocal</span>
                     <span class="stem-pad-desc">Acapella Isolada</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_beat" onclick="applyStemPreset('beat')">
-                    <span class="stem-pad-icon">🥁</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="8" rx="8" ry="4"></ellipse><path d="M4 8v8c0 2.2 3.6 4 8 4s8-1.8 8-4V8"></path><line x1="6" y1="4" x2="9" y2="7"></line><line x1="18" y1="4" x2="15" y2="7"></line></svg></span>
                     <span class="stem-pad-title">Apenas Batida</span>
                     <span class="stem-pad-desc">Beat Puro / Transientes</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_inst" onclick="applyStemPreset('inst')">
-                    <span class="stem-pad-icon">🎸</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg></span>
                     <span class="stem-pad-title">Instrumental</span>
                     <span class="stem-pad-desc">Karaoke / Vocal Kill</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_basskill" onclick="applyStemPreset('basskill')">
-                    <span class="stem-pad-icon">⚡</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                     <span class="stem-pad-title">Bass Kill</span>
                     <span class="stem-pad-desc">Corta Grave Pré-Drop</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_bassonly" onclick="applyStemPreset('bassonly')">
-                    <span class="stem-pad-icon">💣</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></span>
                     <span class="stem-pad-title">Apenas Grave</span>
                     <span class="stem-pad-desc">Sub 808 Solo</span>
                 </div>
                 <div class="stem-pad-btn" id="stemPad_harmonly" onclick="applyStemPreset('harmonly')">
-                    <span class="stem-pad-icon">🎹</span>
+                    <span class="stem-pad-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
                     <span class="stem-pad-title">Apenas Melodia</span>
                     <span class="stem-pad-desc">Sintes & Ambiência</span>
                 </div>
             </div>
 
             <!-- Faders de 4 Canais (Vocal, Batida, Baixo, Instrumental) -->
-            <div class="eq-section-title">🎛️ Faders de Stems Individuais & Medidores LED Real-Time (0% a 150%)</div>
+            <div class="eq-section-title"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> Faders de Stems Individuais & Medidores LED Real-Time (0% a 150%)</div>
             <div class="stems-channels-grid">
                 <!-- Canal 1: VOCAL -->
                 <div class="stem-card stem-card-vocal">
                     <div class="stem-header">
-                        <span class="stem-icon">🎤</span>
+                        <span class="stem-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg></span>
                         <span class="stem-name">Vocal & Acapella</span>
                         <span class="stem-freq">Voz, MC & Refrão (Formantes 300Hz-4.5kHz)</span>
                         <span class="stem-val" id="stemVal_vocal">100%</span>
@@ -1148,15 +1148,15 @@
                         <input type="range" min="0" max="150" value="100" class="stem-slider" id="stemSlider_vocal" oninput="onStemSliderChange('vocal', this.value)">
                     </div>
                     <div class="stem-btn-row">
-                        <button class="stem-action-btn" id="stemMuteBtn_vocal" onclick="toggleStemMute('vocal')">🔇 Mute</button>
-                        <button class="stem-action-btn" id="stemSoloBtn_vocal" onclick="toggleStemSolo('vocal')">🎧 Solo</button>
+                        <button class="stem-action-btn" id="stemMuteBtn_vocal" onclick="toggleStemMute('vocal')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Mute</button>
+                        <button class="stem-action-btn" id="stemSoloBtn_vocal" onclick="toggleStemSolo('vocal')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Solo</button>
                     </div>
                 </div>
 
                 <!-- Canal 2: DRUMS (BATIDA) -->
                 <div class="stem-card stem-card-drums">
                     <div class="stem-header">
-                        <span class="stem-icon">🥁</span>
+                        <span class="stem-icon"><svg class="ui-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="8" rx="8" ry="4"></ellipse><path d="M4 8v8c0 2.2 3.6 4 8 4s8-1.8 8-4V8"></path><line x1="6" y1="4" x2="9" y2="7"></line><line x1="18" y1="4" x2="15" y2="7"></line></svg></span>
                         <span class="stem-name">Batida & Percussão</span>
                         <span class="stem-freq">Kicks, Caixas & Chimbais (Ataque & Punch)</span>
                         <span class="stem-val" id="stemVal_drums">100%</span>
@@ -1172,15 +1172,15 @@
                         <input type="range" min="0" max="150" value="100" class="stem-slider" id="stemSlider_drums" oninput="onStemSliderChange('drums', this.value)">
                     </div>
                     <div class="stem-btn-row">
-                        <button class="stem-action-btn" id="stemMuteBtn_drums" onclick="toggleStemMute('drums')">🔇 Mute</button>
-                        <button class="stem-action-btn" id="stemSoloBtn_drums" onclick="toggleStemSolo('drums')">🎧 Solo</button>
+                        <button class="stem-action-btn" id="stemMuteBtn_drums" onclick="toggleStemMute('drums')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Mute</button>
+                        <button class="stem-action-btn" id="stemSoloBtn_drums" onclick="toggleStemSolo('drums')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Solo</button>
                     </div>
                 </div>
 
                 <!-- Canal 3: BASS (GRAVE) -->
                 <div class="stem-card stem-card-bass">
                     <div class="stem-header">
-                        <span class="stem-icon">🎸</span>
+                        <span class="stem-icon"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg></span>
                         <span class="stem-name">Baixo & Sub 808</span>
                         <span class="stem-freq">Sub & 808 (&lt; 200Hz • 24dB/oct)</span>
                         <span class="stem-val" id="stemVal_bass">100%</span>
@@ -1196,15 +1196,15 @@
                         <input type="range" min="0" max="150" value="100" class="stem-slider" id="stemSlider_bass" oninput="onStemSliderChange('bass', this.value)">
                     </div>
                     <div class="stem-btn-row">
-                        <button class="stem-action-btn" id="stemMuteBtn_bass" onclick="toggleStemMute('bass')">🔇 Mute</button>
-                        <button class="stem-action-btn" id="stemSoloBtn_bass" onclick="toggleStemSolo('bass')">🎧 Solo</button>
+                        <button class="stem-action-btn" id="stemMuteBtn_bass" onclick="toggleStemMute('bass')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Mute</button>
+                        <button class="stem-action-btn" id="stemSoloBtn_bass" onclick="toggleStemSolo('bass')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Solo</button>
                     </div>
                 </div>
 
                 <!-- Canal 4: INSTRUMENTAL (MELODIA) -->
                 <div class="stem-card stem-card-inst">
                     <div class="stem-header">
-                        <span class="stem-icon">🎹</span>
+                        <span class="stem-icon"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
                         <span class="stem-name">Melodia & Sintes</span>
                         <span class="stem-freq">Harmonia, Guitarras & Estéreo Wide (&gt; 350Hz)</span>
                         <span class="stem-val" id="stemVal_inst">100%</span>
@@ -1220,15 +1220,15 @@
                         <input type="range" min="0" max="150" value="100" class="stem-slider" id="stemSlider_inst" oninput="onStemSliderChange('inst', this.value)">
                     </div>
                     <div class="stem-btn-row">
-                        <button class="stem-action-btn" id="stemMuteBtn_inst" onclick="toggleStemMute('inst')">🔇 Mute</button>
-                        <button class="stem-action-btn" id="stemSoloBtn_inst" onclick="toggleStemSolo('inst')">🎧 Solo</button>
+                        <button class="stem-action-btn" id="stemMuteBtn_inst" onclick="toggleStemMute('inst')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Mute</button>
+                        <button class="stem-action-btn" id="stemSoloBtn_inst" onclick="toggleStemSolo('inst')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Solo</button>
                     </div>
                 </div>
             </div>
 
             <div class="eq-footer">
-                <span class="eq-badge-saved">⚡ Motor DSP 4-Stems ativo • Isolamento cirúrgico com cancelamento de fase Mid/Side</span>
-                <button class="btn-modal-done" onclick="closeStemsModal()">✓ Concluído</button>
+                <span class="eq-badge-saved"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Motor DSP 4-Stems ativo • Isolamento cirúrgico com cancelamento de fase Mid/Side</span>
+                <button class="btn-modal-done" onclick="closeStemsModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Concluído</button>
             </div>
         </div>
     </div>
@@ -1243,7 +1243,7 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <!-- hls.js: decodifica o HLS que o SoundCloud serve publicamente (sem isso, <audio> não toca) -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
-    <script src="/assets/js/player.js?v=20261119_39"></script>
+    <script src="/assets/js/player.js?v=20261119_49"></script>
     <!-- MODAL GERENCIADOR DE FILA ESTILO SPOTIFY -->
     
     <!-- MODAL ESTÚDIO PROFISSIONAL & MASTERING DSP CONSOLE -->
@@ -1254,7 +1254,7 @@
                 <div class="studio-title-box">
                     <div class="studio-modal-title">
                         <span class="studio-pulse-led"></span>
-                        <span>🎚️ CONSOLE DE ESTÚDIO & MASTERING DSP PRO [EXTENDED]</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> CONSOLE DE ESTÚDIO & MASTERING DSP PRO [EXTENDED]</span>
                         <span class="studio-badge-pro">PRO AUDIO 96kHz / 32-BIT</span>
                     </div>
                     <div class="studio-modal-sub">
@@ -1336,7 +1336,7 @@
             <!-- REAL-TIME FFT SPECTRUM ANALYZER (CANVAS) -->
             <div class="studio-spectrum-box">
                 <div class="studio-spectrum-header">
-                    <span>🎛️ ANALISADOR DE ESPECTRO EM TEMPO REAL (MASTERING FFT)</span>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg> ANALISADOR DE ESPECTRO EM TEMPO REAL (MASTERING FFT)</span>
                     <div class="spectrum-bands-legend">
                         <span class="spec-tag sub">SUB 20-60Hz</span>
                         <span class="spec-tag bass">BASS 60-250Hz</span>
@@ -1353,16 +1353,16 @@
             <div class="studio-presets-row">
                 <span class="presets-label">PRESETS DE ESTÚDIO:</span>
                 <div class="studio-presets-list">
-                    <button class="studio-preset-chip active" id="stPreset_mastering" onclick="selectStudioPreset('mastering')">🎧 Neve Warmth</button>
-                    <button class="studio-preset-chip" id="stPreset_hall" onclick="selectStudioPreset('hall')">🏰 Concert Arena</button>
-                    <button class="studio-preset-chip" id="stPreset_club" onclick="selectStudioPreset('club')">⚡ SSL Club Master</button>
-                    <button class="studio-preset-chip" id="stPreset_vocal" onclick="selectStudioPreset('vocal')">🎙️ Vocal Clarity & Air</button>
-                    <button class="studio-preset-chip" id="stPreset_lofi" onclick="selectStudioPreset('lofi')">📻 Lo-Fi Tape</button>
-                    <button class="studio-preset-chip" id="stPreset_subpunch" onclick="selectStudioPreset('subpunch')">💣 Sub-Bass 808</button>
-                    <button class="studio-preset-chip" id="stPreset_crystal" onclick="selectStudioPreset('crystal')">💎 Modern Pop/EDM</button>
-                    <button class="studio-preset-chip" id="stPreset_loudness" onclick="selectStudioPreset('loudness')">🔊 Loudness War (+6dB)</button>
-                    <button class="studio-preset-chip" id="stPreset_acoustic" onclick="selectStudioPreset('acoustic')">🎷 Acoustic Live</button>
-                    <button class="studio-preset-chip" id="stPreset_flat" onclick="selectStudioPreset('flat')">🎚️ Flat Ref</button>
+                    <button class="studio-preset-chip active" id="stPreset_mastering" onclick="selectStudioPreset('mastering')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg> Neve Warmth</button>
+                    <button class="studio-preset-chip" id="stPreset_hall" onclick="selectStudioPreset('hall')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg> Concert Arena</button>
+                    <button class="studio-preset-chip" id="stPreset_club" onclick="selectStudioPreset('club')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> SSL Club Master</button>
+                    <button class="studio-preset-chip" id="stPreset_vocal" onclick="selectStudioPreset('vocal')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg> Vocal Clarity & Air</button>
+                    <button class="studio-preset-chip" id="stPreset_lofi" onclick="selectStudioPreset('lofi')"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg> Lo-Fi Tape</button>
+                    <button class="studio-preset-chip" id="stPreset_subpunch" onclick="selectStudioPreset('subpunch')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Sub-Bass 808</button>
+                    <button class="studio-preset-chip" id="stPreset_crystal" onclick="selectStudioPreset('crystal')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3L8 9l4 12 4-12-3-6"></path><path d="M2 9h20"></path></svg> Modern Pop/EDM</button>
+                    <button class="studio-preset-chip" id="stPreset_loudness" onclick="selectStudioPreset('loudness')"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Loudness War (+6dB)</button>
+                    <button class="studio-preset-chip" id="stPreset_acoustic" onclick="selectStudioPreset('acoustic')"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg> Acoustic Live</button>
+                    <button class="studio-preset-chip" id="stPreset_flat" onclick="selectStudioPreset('flat')"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Flat Ref</button>
                 </div>
             </div>
 
@@ -1371,7 +1371,7 @@
                 <!-- MÓDULO 1: REVERB ACÚSTICO ESPACIAL -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot reverb-dot"></span> 🏛️ REVERB DE ESTÚDIO</div>
+                        <div class="rack-title"><span class="rack-dot reverb-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg> REVERB DE ESTÚDIO</div>
                         <span class="rack-badge" id="reverbTypeBadge">HALL</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1413,7 +1413,7 @@
                 <!-- MÓDULO 2: STEREO PING-PONG & TAPE DELAY -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot delay-dot"></span> ⏱️ DELAY ANALÓGICO & TAPE</div>
+                        <div class="rack-title"><span class="rack-dot delay-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> DELAY ANALÓGICO & TAPE</div>
                         <span class="rack-badge">PING-PONG</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1454,7 +1454,7 @@
                 <!-- MÓDULO 3: COMPRESSOR DE MASTERING SSL BUS -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot comp-dot"></span> 🎚️ COMPRESSOR SSL BUS GLUE</div>
+                        <div class="rack-title"><span class="rack-dot comp-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> COMPRESSOR SSL BUS GLUE</div>
                         <span class="rack-badge">G-MASTER</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1501,7 +1501,7 @@
                 <!-- MÓDULO 4: CALOR VALVULADO & IMAGEM ESTÉREO 3D -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot warm-dot"></span> 🔥 CALOR ANALÓGICO & 3D WIDE</div>
+                        <div class="rack-title"><span class="rack-dot warm-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg> CALOR ANALÓGICO & 3D WIDE</div>
                         <span class="rack-badge">NEVE TUBE</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1538,7 +1538,7 @@
                 <!-- MÓDULO 5: AURAL EXCITER & AIR BAND 12kHz+ (NOVO!) -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot air-dot"></span> 💎 AURAL EXCITER & AIR BAND</div>
+                        <div class="rack-title"><span class="rack-dot air-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3L8 9l4 12 4-12-3-6"></path><path d="M2 9h20"></path></svg> AURAL EXCITER & AIR BAND</div>
                         <span class="rack-badge">APHEX 12kHz</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1571,7 +1571,7 @@
                 <!-- MÓDULO 6: SUB-BASS ENHANCER & PULTEC LOW PUNCH (NOVO!) -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot sub-dot"></span> 💣 SUB-BASS 808 & PULTEC PUNCH</div>
+                        <div class="rack-title"><span class="rack-dot sub-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> SUB-BASS 808 & PULTEC PUNCH</div>
                         <span class="rack-badge">EQP-1A</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1609,7 +1609,7 @@
                 <!-- MÓDULO 7: DE-ESSER & CONTROLE DINÂMICO DE ESTRIDÊNCIA (NOVO!) -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot deess-dot"></span> 🛡️ DE-ESSER ANTI-ESTRIDÊNCIA</div>
+                        <div class="rack-title"><span class="rack-dot deess-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> DE-ESSER ANTI-ESTRIDÊNCIA</div>
                         <span class="rack-badge">DYNAMIC NOTCH</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1637,7 +1637,7 @@
                 <!-- MÓDULO 8: BRICKWALL MASTER LIMITER & MAXIMIZER (NOVO!) -->
                 <div class="studio-rack-card">
                     <div class="rack-card-header">
-                        <div class="rack-title"><span class="rack-dot limit-dot"></span> 🔊 BRICKWALL MAXIMIZER & LIMITER</div>
+                        <div class="rack-title"><span class="rack-dot limit-dot"></span> <svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> BRICKWALL MAXIMIZER & LIMITER</div>
                         <span class="rack-badge">TRUE-PEAK</span>
                     </div>
                     <div class="rack-controls-col">
@@ -1665,8 +1665,8 @@
 
             <!-- FOOTER -->
             <div class="studio-footer">
-                <span class="studio-engine-status">⚡ DSP de Alta Precisão Web Audio • Processamento Linear a 32-bit Ponto Flutuante • 8 Racks Ativos</span>
-                <button class="btn-modal-done" onclick="closeStudioModal()">✓ Salvar & Fechar</button>
+                <span class="studio-engine-status"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> DSP de Alta Precisão Web Audio • Processamento Linear a 32-bit Ponto Flutuante • 8 Racks Ativos</span>
+                <button class="btn-modal-done" onclick="closeStudioModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Salvar & Fechar</button>
             </div>
         </div>
     </div>
@@ -1676,7 +1676,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>📋 Fila de Reprodução (Spotify)</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg> Fila de Reprodução (Spotify)</span>
                         <span class="player-queue-badge" id="modalQueueBadgeCount" style="margin-left: 8px;">0 músicas</span>
                     </div>
                     <div class="eq-modal-sub">
@@ -1692,13 +1692,13 @@
 
                 <!-- Próximas na Fila -->
                 <div class="queue-modal-section-header">
-                    <div class="queue-modal-section-title">⏭️ Próximas na Fila</div>
-                    <button class="btn-clear-queue-modal" onclick="clearAllQueue()" title="Limpar todas as faixas da fila">🗑️ Limpar Fila</button>
+                    <div class="queue-modal-section-title"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg>️ Próximas na Fila</div>
+                    <button class="btn-clear-queue-modal" onclick="clearAllQueue()" title="Limpar todas as faixas da fila"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Limpar Fila</button>
                 </div>
                 <div id="queueModalItems" class="queue-modal-list"></div>
             </div>
             <div class="queue-modal-footer">
-                <button class="btn-modal-done" onclick="closeSpotifyQueueModal()">✓ Concluído</button>
+                <button class="btn-modal-done" onclick="closeSpotifyQueueModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Concluído</button>
             </div>
         </div>
     </div>
@@ -1709,7 +1709,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>⚡ Sincronização de BPM & Beatmatching</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Sincronização de BPM & Beatmatching</span>
                         <span class="badge-bpm-chip" id="bpmSyncStatusBadge" style="margin-left: 8px;">Auto Sync Ativo</span>
                     </div>
                     <div class="eq-modal-sub">
@@ -1738,14 +1738,14 @@
                     <!-- Indicador de Diferença e Compatibilidade -->
                     <div class="bpm-diff-indicator-col">
                         <div class="bpm-diff-badge" id="bpmDiffBadge">0 BPM (0.0%)</div>
-                        <div class="bpm-compat-label" id="bpmCompatLabel">🟢 Compatibilidade Perfeita</div>
-                        <button class="btn-quick-match" onclick="quickMatchBpm()" title="Igualar BPM da próxima faixa imediatamente">⚡ Sincronizar Agora</button>
+                        <div class="bpm-compat-label" id="bpmCompatLabel"><span class="status-indicator-dot dot-green"></span> Compatibilidade Perfeita</div>
+                        <button class="btn-quick-match" onclick="quickMatchBpm()" title="Igualar BPM da próxima faixa imediatamente"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Sincronizar Agora</button>
                     </div>
 
                     <!-- Próximo Deck (A Seguir / Na Fila) -->
                     <div class="bpm-deck-card next">
                         <div class="bpm-deck-header">
-                            <span class="bpm-deck-tag next">⏭️ A SEGUIR</span>
+                            <span class="bpm-deck-tag next"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg>️ A SEGUIR</span>
                             <span class="bpm-val-badge" id="bpmNextVal">130 BPM</span>
                         </div>
                         <div class="bpm-deck-track-title" id="bpmNextTrackTitle">Próxima faixa...</div>
@@ -1760,7 +1760,7 @@
                 <div class="bpm-feature-box">
                     <div class="bpm-toggle-row">
                         <div>
-                            <div class="bpm-feature-title">🔁 Sincronização Automática (Beatmatch Inteligente)</div>
+                            <div class="bpm-feature-title"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg> Sincronização Automática (Beatmatch Inteligente)</div>
                             <div class="bpm-feature-desc">Ajusta gradualmente o andamento da próxima música para igualar a atual durante o crossfade, garantindo mixagem contínua sem quebra de batida.</div>
                         </div>
                         <label class="switch-toggle" title="Ativar/Desativar Beatmatch Automático">
@@ -1773,7 +1773,7 @@
                 <!-- Controle Manual de Pitch / Tempo da Próxima Faixa -->
                 <div class="bpm-pitch-control-section">
                     <div class="bpm-section-header">
-                        <span class="eq-section-title" style="margin-bottom:0;">🎚️ Ajuste Manual de Pitch & Velocidade (±15%)</span>
+                        <span class="eq-section-title" style="margin-bottom:0;"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg> Ajuste Manual de Pitch & Velocidade (±15%)</span>
                         <span class="bpm-pitch-readout" id="bpmPitchReadout">0.0% (Original)</span>
                     </div>
                     
@@ -1789,18 +1789,18 @@
                         <button class="btn-bpm-preset active" id="btnBpmPreset0" onclick="setBpmPitchPreset(0)">0% (Original)</button>
                         <button class="btn-bpm-preset" onclick="setBpmPitchPreset(2)">+2%</button>
                         <button class="btn-bpm-preset" onclick="setBpmPitchPreset(5)">+5%</button>
-                        <button class="btn-bpm-preset match" onclick="quickMatchBpm()">⚡ Match com Atual</button>
+                        <button class="btn-bpm-preset match" onclick="quickMatchBpm()"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Match com Atual</button>
                     </div>
 
                     <div class="bpm-keylock-info">
-                        <span>🔒 <strong>Keylock / Preserves Pitch Ativo:</strong> A velocidade é alterada sem modificar o tom ou afinação da voz dos cantores.</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> <strong>Keylock / Preserves Pitch Ativo:</strong> A velocidade é alterada sem modificar o tom ou afinação da voz dos cantores.</span>
                     </div>
                 </div>
             </div>
 
             <div class="eq-footer">
-                <span class="eq-badge-saved">⚡ Transição suave ativada para todas as categorias e buscas</span>
-                <button class="btn-modal-done" onclick="closeBpmModal()">✓ Concluído</button>
+                <span class="eq-badge-saved"><svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Transição suave ativada para todas as categorias e buscas</span>
+                <button class="btn-modal-done" onclick="closeBpmModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Concluído</button>
             </div>
         </div>
     </div>
@@ -1811,7 +1811,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>📜 Histórico de Reprodução & Descobertas</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Histórico de Reprodução & Descobertas</span>
                         <span class="player-queue-badge" id="modalHistoryBadgeCount" style="margin-left: 8px;">0 faixas</span>
                     </div>
                     <div class="eq-modal-sub">
@@ -1819,7 +1819,7 @@
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button class="btn-clear-queue-modal" onclick="clearPlaybackHistory()" title="Limpar histórico recente">🗑️ Limpar</button>
+                    <button class="btn-clear-queue-modal" onclick="clearPlaybackHistory()" title="Limpar histórico recente"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Limpar</button>
                     <button class="eq-close-btn" onclick="closeHistoryModal()" title="Fechar Histórico" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 </div>
             </div>
@@ -1827,7 +1827,7 @@
                 <div id="historyModalItems" class="history-modal-list"></div>
             </div>
             <div class="queue-modal-footer">
-                <button class="btn-modal-done" onclick="closeHistoryModal()">✓ Fechar</button>
+                <button class="btn-modal-done" onclick="closeHistoryModal()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fechar</button>
             </div>
         </div>
     </div>
@@ -1840,7 +1840,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>🎯 Curadoria de Músicas (IA)</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Curadoria de Músicas (IA)</span>
                     </div>
                     <div class="eq-modal-sub">
                         Baseado no que você mais toca e mais pula de verdade. Quanto mais você usa o player, mais precisa fica.
@@ -1852,19 +1852,19 @@
                 <!-- Descoberta por favorita: roda uma busca "Faixas Parecidas" dedicada pra CADA
                      uma das suas favoritas de verdade (não uma mistura só) e mostra uma lista de
                      novidades separada por favorita, tudo dentro deste mesmo modal. -->
-                <div class="queue-modal-section-title">🧭 Novidades, favorita por favorita</div>
+                <div class="queue-modal-section-title"><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg> Novidades, favorita por favorita</div>
                 <div id="curationDiscoveryIntro" style="font-size: 11.5px; color: var(--text-dim); margin-bottom: 8px;">
                     Pra cada favorita de verdade, busca música nova (fora da sua biblioteca) parecida com ela.
                 </div>
                 <button class="btn-sync-yt" id="btnCurationDiscover" onclick="runCurationDiscovery()" style="width: 100%; margin: 0 0 14px 0; background: linear-gradient(135deg, #1ed760, #00b0ff); color: #000;">
-                    🔍 Buscar Novidades por Favorita
+                    <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> Buscar Novidades por Favorita
                 </button>
                 <div id="curationDiscoveryItems"></div>
 
                 <div id="curationModalItems" class="history-modal-list"></div>
             </div>
             <div class="queue-modal-footer">
-                <button class="btn-modal-done" onclick="closeCurationModal(event)">✓ Fechar</button>
+                <button class="btn-modal-done" onclick="closeCurationModal(event)"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fechar</button>
             </div>
         </div>
     </div>
@@ -1875,7 +1875,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>🎯 Novidades Exclusivas da Faixa</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Novidades Exclusivas da Faixa</span>
                     </div>
                     <div class="eq-modal-sub" id="trackCurationModalSub">
                         3 faixas ideais selecionadas pela IA baseadas no estilo, BPM e ritmo desta música.
@@ -1890,7 +1890,7 @@
                 <div id="trackCurationBaseCard" class="history-track-card" style="background: rgba(0, 242, 254, 0.08); border-color: rgba(0, 242, 254, 0.35); margin-bottom: 14px;"></div>
 
                 <div class="queue-modal-section-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span>✨ 3 Faixas Ideais de Novidades</span>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg> 3 Faixas Ideais de Novidades</span>
                     <button class="btn-refresh-curation" onclick="refreshCurrentTrackCuration()" title="Buscar outras 3 sugestões">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle;"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                         <span>Outras 3</span>
@@ -1900,7 +1900,7 @@
                 <div id="trackCurationModalItems" class="history-modal-list"></div>
             </div>
             <div class="queue-modal-footer">
-                <button class="btn-modal-done" onclick="closeTrackCurationModal(event)">✓ Fechar</button>
+                <button class="btn-modal-done" onclick="closeTrackCurationModal(event)"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Fechar</button>
             </div>
         </div>
     </div>
@@ -1911,7 +1911,7 @@
             <div class="eq-modal-header">
                 <div>
                     <div class="eq-modal-title">
-                        <span>📂 Mover Música de Playlist</span>
+                        <span><svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> Mover Música de Playlist</span>
                     </div>
                     <div class="eq-modal-sub" id="moveModalTrackSub">
                         Selecione para qual playlist da sua biblioteca deseja transferir esta música.
@@ -1922,7 +1922,7 @@
             <div class="move-modal-body">
                 <!-- Preview da Música Selecionada -->
                 <div class="move-track-preview-box">
-                    <div class="move-track-icon-bubble">🎵</div>
+                    <div class="move-track-icon-bubble"><svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></div>
                     <div class="move-track-meta">
                         <strong id="moveModalTrackTitle" class="move-track-title">Nome da Música</strong>
                         <div class="move-track-subline">
@@ -1935,7 +1935,7 @@
                 </div>
 
                 <div class="move-dest-header">
-                    <span>🎯 Selecione a Playlist de Destino:</span>
+                    <span><svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Selecione a Playlist de Destino:</span>
                 </div>
 
                 <!-- Grid de Playlists Disponíveis -->
@@ -1943,7 +1943,7 @@
 
                 <!-- Criar Nova Playlist -->
                 <div class="move-create-playlist-box">
-                    <div class="move-create-label">➕ Ou crie uma nova playlist personalizada:</div>
+                    <div class="move-create-label"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Ou crie uma nova playlist personalizada:</div>
                     <div class="move-create-row">
                         <input type="text" id="inputNewPlaylistName" class="move-new-input" placeholder="Ex: Mega Funk Boliche 2026..." onkeydown="if(event.key==='Enter') createAndMoveToNewPlaylist()">
                         <button type="button" class="btn-create-move-action" onclick="createAndMoveToNewPlaylist()">+ Criar & Mover</button>
@@ -1952,7 +1952,7 @@
             </div>
             <div class="queue-modal-footer move-modal-footer">
                 <button type="button" class="btn-modal-cancel-move" onclick="closeMovePlaylistModal()">Cancelar</button>
-                <button type="button" class="btn-modal-confirm-move" id="btnConfirmMovePlaylist" onclick="executeMovePlaylist()">✓ Mover para Selecionada</button>
+                <button type="button" class="btn-modal-confirm-move" id="btnConfirmMovePlaylist" onclick="executeMovePlaylist()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Mover para Selecionada</button>
             </div>
         </div>
     </div>
@@ -1962,7 +1962,7 @@
         <div class="eq-modal-card remove-modal-card" onclick="event.stopPropagation()">
             <div class="eq-modal-header">
                 <div class="eq-modal-title">
-                    <span style="color: #ff3366;">🗑️ Remover da Biblioteca</span>
+                    <span style="color: #ff3366;"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Remover da Biblioteca</span>
                 </div>
                 <button class="eq-close-btn" onclick="closeConfirmRemoveModal()" title="Fechar" aria-label="Fechar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
@@ -1981,7 +1981,7 @@
             </div>
             <div class="queue-modal-footer remove-modal-footer">
                 <button type="button" class="btn-modal-cancel-remove" onclick="closeConfirmRemoveModal()">Cancelar</button>
-                <button type="button" class="btn-modal-confirm-remove" id="btnConfirmDeleteTrack" onclick="executeRemoveLibraryTrack()">🗑️ Sim, Remover</button>
+                <button type="button" class="btn-modal-confirm-remove" id="btnConfirmDeleteTrack" onclick="executeRemoveLibraryTrack()"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> Sim, Remover</button>
             </div>
         </div>
     </div>
@@ -2013,12 +2013,16 @@
         <!-- Espaço reservado do tamanho da logo, só pra empurrar o texto/barra pra baixo na
              mesma posição de antes - a logo de verdade mora na camada separada abaixo. -->
         <div class="transicao-logo-box" aria-hidden="true"></div>
-        <div class="mode-transition-text">Mudando para <strong id="modeTransitionLabel">Modo</strong></div>
-        <div class="mode-transition-eq" aria-hidden="true">
+        <div class="mode-transition-text" id="modeTransitionText">
+            <span class="mode-transition-text-base">Mudando para <strong id="modeTransitionLabel">Modo</strong></span>
+            <span class="mode-transition-text-paint" id="modeTransitionTextPaint" aria-hidden="true">Mudando para <strong id="modeTransitionLabelPaint">Modo</strong></span>
+        </div>
+        <div class="mode-transition-eq" id="modeTransitionEq" aria-hidden="true">
             <span></span><span></span><span></span><span></span><span></span>
         </div>
-        <div class="mode-transition-bar-track">
+        <div class="mode-transition-bar-track" id="modeTransitionBarTrack">
             <div class="mode-transition-bar-fill" id="modeTransitionBarFill"></div>
+            <div class="mode-transition-bar-paint" id="modeTransitionBarPaint"></div>
         </div>
     </div>
 

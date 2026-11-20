@@ -72,7 +72,7 @@ def run_pipeline(
             continue
 
         track_name = f"{match.title or ''} - {match.artist or ''}".strip(" -") or match.query
-        print(f"  [🎵] Música confirmada ({match.method}): {track_name}")
+        print(f"  [OK] Música confirmada ({match.method}): {track_name}")
         video = search(match.query)
         if video is None:
             print(f"  [x] Não encontrado no YouTube: {match.query}")

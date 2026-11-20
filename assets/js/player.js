@@ -1,3 +1,58 @@
+// VECTOR SVG ICONS REPOSITORY (100% CODE-BASED, REPLACES ALL EMOJIS)
+window.UI_ICONS = {
+    headphones: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>',
+    equalizer: '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>',
+    sliders: '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="10"></line><line x1="4" y1="6" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="14"></line><line x1="12" y1="10" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="18"></line><line x1="20" y1="14" x2="20" y2="3"></line><circle cx="4" cy="8" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="16" r="2"></circle></svg>',
+    zap: '<svg class="ui-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
+    target: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
+    search: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+    sparkles: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3l2 4.5L18.5 9.5 14 11.5 12 16l-2-4.5L5.5 9.5 10 7.5z"></path><path d="M19 16l1 2 2 1-2 1-1 2-1-2-2-1 2-1z"></path></svg>',
+    queue: '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="4" cy="6" r="1.5"></circle><circle cx="4" cy="12" r="1.5"></circle><circle cx="4" cy="18" r="1.5"></circle></svg>',
+    history: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+    fire: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17c1.38 0 2.5-1.12 2.5-2.5 0-1.63-1.5-3-1.5-3s-.5 1-1 1-1-1.5-1-1.5c0 0-1.5 2-1.5 3.5z"></path><path d="M12 2c1 3 4 5 4 9a6 6 0 1 1-12 0c0-4 3-6 4-9 1 2 3 3 4 0z"></path></svg>',
+    refresh: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"></path></svg>',
+    trash: '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>',
+    star: '<svg class="ui-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+    music: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',
+    speaker: '<svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>',
+    "speaker-mute": '<svg class="ui-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>',
+    mic: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>',
+    guitar: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="16" r="5"></circle><line x1="12" y1="11" x2="12" y2="3"></line><line x1="10" y1="3" x2="14" y2="3"></line><circle cx="12" cy="16" r="1.5"></circle></svg>',
+    drum: '<svg class="ui-icon" viewBox="0 0 24 24"><ellipse cx="12" cy="8" rx="8" ry="4"></ellipse><path d="M4 8v8c0 2.2 3.6 4 8 4s8-1.8 8-4V8"></path><line x1="6" y1="4" x2="9" y2="7"></line><line x1="18" y1="4" x2="15" y2="7"></line></svg>',
+    trophy: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path><path d="M4 5h16v6a7 7 0 0 1-14 0V5z"></path><line x1="12" y1="18" x2="12" y2="22"></line><line x1="8" y1="22" x2="16" y2="22"></line></svg>',
+    palm: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 22v-9"></path><path d="M12 13c-3-2-5-6-5-9 3 0 6 2 8 5"></path><path d="M12 13c3-2 5-6 5-9-3 0-6 2-8 5"></path><path d="M12 13c-4 0-8-1-10-4 2-1 6-1 8 2"></path><path d="M12 13c4 0 8-1 10-4-2-1-6-1-8 2"></path></svg>',
+    hat: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 17c1.5 1 4 2 10 2s8.5-1 10-2"></path><path d="M6 16c0-4 1.5-8 6-8s6 4 6 8"></path><path d="M8 8c1-3 2.5-4 4-4s3 1 4 4"></path></svg>',
+    play: '<svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>',
+    pause: '<svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg>',
+    skip: '<svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg>',
+    prev: '<svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"></polygon><rect x="4.5" y="4" width="2.5" height="16" rx="0.5"></rect></svg>',
+    shuffle: '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>',
+    repeat: '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>',
+    "repeat-1": '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path><text x="12" y="15" font-size="8" font-family="sans-serif" font-weight="bold" fill="currentColor" text-anchor="middle">1</text></svg>',
+    check: '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+    close: '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>',
+    alert: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+    chart: '<svg class="ui-icon" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>',
+    stats: '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+    hourglass: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 22h14"></path><path d="M5 2h14"></path><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"></path><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"></path></svg>',
+    "arrow-right": '<svg class="ui-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>',
+    folder: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+    radio: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>',
+    wave: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 12c2.5 4 5 4 7 0s5-4 7 0 5 4 6 0"></path></svg>',
+    diamond: '<svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"></path><path d="M11 3L8 9l4 12 4-12-3-6"></path><path d="M2 9h20"></path></svg>',
+    lock: '<svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
+    scissors: '<svg class="ui-icon" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
+    bot: '<svg class="ui-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"></rect><circle cx="12" cy="5" r="2"></circle><path d="M12 7v4"></path><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="16" y1="16" x2="16.01" y2="16"></line></svg>',
+    film: '<svg class="ui-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>',
+    dot_green: '<span class="status-indicator-dot dot-green"></span>',
+    dot_cyan: '<span class="status-indicator-dot dot-cyan"></span>',
+    dot_yellow: '<span class="status-indicator-dot dot-yellow"></span>',
+    dot_red: '<span class="status-indicator-dot dot-red"></span>'
+};
+window.uiIcon = function(name) {
+    return window.UI_ICONS[name] || '';
+};
+
 const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='16' fill='%23121524'/%3E%3Ccircle cx='60' cy='60' r='42' fill='%230a0c14' stroke='%2300f2fe' stroke-width='2' stroke-opacity='0.4'/%3E%3Ccircle cx='60' cy='60' r='28' fill='%23151928' stroke='%23ff0055' stroke-width='1.5' stroke-opacity='0.4'/%3E%3Ccircle cx='60' cy='60' r='14' fill='%2300f2fe' opacity='0.8'/%3E%3Ccircle cx='60' cy='60' r='4' fill='%23000'/%3E%3C/svg%3E";
         window.DEFAULT_COVER_SVG = DEFAULT_COVER_SVG;
         const DATA = window.DATA || {};
@@ -12,20 +67,20 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 
         // CONFIGURAÇÕES DE EQUALIZADOR PROFISSIONAL (10 BANDAS ISO & 14 PRESETS)
         const EQ_PRESETS = {
-            "padrao": { name: "Padrão (Flat)", icon: "🎵", gains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
-            "grave": { name: "Mega Bass / 808", icon: "💥", gains: [8, 9, 6, 3, 0, -1, 0, 1, 2, 2] },
-            "funk": { name: "Funk & Mandelão", icon: "🔥", gains: [7, 9, 7, 1, -1, 2, 4, 3, 2, 1] },
-            "balada": { name: "Balada / Club", icon: "⚡", gains: [8, 7, 5, 1, -2, 1, 3, 5, 7, 8] },
-            "eletronica": { name: "House & Desande", icon: "🌀", gains: [6, 8, 6, 2, -1, 0, 2, 5, 6, 7] },
-            "cumbia": { name: "Cumbia & Charanga", icon: "🪘", gains: [3, 5, 6, 3, 2, 3, 4, 3, 4, 5] },
-            "gaucho": { name: "Fandango & Vanera", icon: "🪗", gains: [4, 6, 5, 2, 3, 4, 3, 4, 3, 2] },
-            "trap": { name: "Trap & Hip-Hop", icon: "🎤", gains: [9, 10, 6, 0, -2, 1, 3, 4, 6, 7] },
-            "voz": { name: "Mais Voz / Clareza", icon: "🎙️", gains: [-3, -1, 1, 2, 5, 7, 6, 4, 2, 0] },
-            "fone": { name: "Fone de Ouvido Hi-Fi", icon: "🎧", gains: [5, 4, 2, 0, 1, 2, 3, 5, 7, 6] },
-            "sala": { name: "Sala / Espacial", icon: "🏛️", gains: [4, 2, -1, 1, 3, 5, 4, 3, 5, 6] },
-            "rock": { name: "Rock & Metal", icon: "🎸", gains: [6, 5, 3, 0, -2, 2, 4, 6, 5, 6] },
-            "acustico": { name: "Acústico & Voz", icon: "🎻", gains: [-2, 0, 2, 2, 4, 6, 5, 4, 3, 2] },
-            "claridade": { name: "Super Clareza", icon: "✨", gains: [-4, -2, 0, 1, 3, 5, 6, 7, 8, 9] }
+            "padrao": { name: "Padrão (Flat)", icon: window.uiIcon("music"), gains: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] },
+            "grave": { name: "Mega Bass / 808", icon: window.uiIcon("zap"), gains: [8, 9, 6, 3, 0, -1, 0, 1, 2, 2] },
+            "funk": { name: "Funk & Mandelão", icon: window.uiIcon("fire"), gains: [7, 9, 7, 1, -1, 2, 4, 3, 2, 1] },
+            "balada": { name: "Balada / Club", icon: window.uiIcon("zap"), gains: [8, 7, 5, 1, -2, 1, 3, 5, 7, 8] },
+            "eletronica": { name: "House & Desande", icon: window.uiIcon("wave"), gains: [6, 8, 6, 2, -1, 0, 2, 5, 6, 7] },
+            "cumbia": { name: "Cumbia & Charanga", icon: window.uiIcon("guitar"), gains: [3, 5, 6, 3, 2, 3, 4, 3, 4, 5] },
+            "gaucho": { name: "Fandango & Vanera", icon: window.uiIcon("hat"), gains: [4, 6, 5, 2, 3, 4, 3, 4, 3, 2] },
+            "trap": { name: "Trap & Hip-Hop", icon: window.uiIcon("mic"), gains: [9, 10, 6, 0, -2, 1, 3, 4, 6, 7] },
+            "voz": { name: "Mais Voz / Clareza", icon: window.uiIcon("mic"), gains: [-3, -1, 1, 2, 5, 7, 6, 4, 2, 0] },
+            "fone": { name: "Fone de Ouvido Hi-Fi", icon: window.uiIcon("headphones"), gains: [5, 4, 2, 0, 1, 2, 3, 5, 7, 6] },
+            "sala": { name: "Sala / Espacial", icon: window.uiIcon("wave"), gains: [4, 2, -1, 1, 3, 5, 4, 3, 5, 6] },
+            "rock": { name: "Rock & Metal", icon: window.uiIcon("guitar"), gains: [6, 5, 3, 0, -2, 2, 4, 6, 5, 6] },
+            "acustico": { name: "Acústico & Voz", icon: window.uiIcon("guitar"), gains: [-2, 0, 2, 2, 4, 6, 5, 4, 3, 2] },
+            "claridade": { name: "Super Clareza", icon: window.uiIcon("sparkles"), gains: [-4, -2, 0, 1, 3, 5, 6, 7, 8, 9] }
         };
         let eqPreAmpGain = null;
         let eqPreAmpValue = parseFloat(localStorage.getItem("pref_eq_preamp") || "0");
@@ -455,7 +510,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             audioEl.addEventListener("error", (e) => {
                 console.warn(`Deck ${deckName} erro de streaming.`, e);
                 if (deckName === activeDeck && !isTransitioning) {
-                    showToast("⚠️ Faixa indisponível no YouTube. Avançando para a próxima...");
+                    showToast(window.uiIcon("alert") + " Faixa indisponível no YouTube. Avançando para a próxima...");
                     setTimeout(() => {
                         autoAdvanceWithFade();
                     }, 1200);
@@ -490,10 +545,10 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             } catch (e) {}
 
             const labelEl = document.getElementById("barSpeedLabel");
-            if (labelEl) labelEl.textContent = `⚡ ${currentPlaybackSpeed}x`;
+            if (labelEl) labelEl.innerHTML = `${window.uiIcon("zap")} ${currentPlaybackSpeed}x`;
             const djBadge = document.getElementById("djSpeedBadge");
             if (djBadge) {
-                djBadge.textContent = `⚡ ${currentPlaybackSpeed}x`;
+                djBadge.innerHTML = `${window.uiIcon("zap")} ${currentPlaybackSpeed}x`;
                 if (currentPlaybackSpeed !== 1.0) djBadge.classList.add("custom-speed");
                 else djBadge.classList.remove("custom-speed");
             }
@@ -507,7 +562,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             closeSpeedMenu();
             updateTurntablesState();
             updateLiveBpmPanel();
-            showToast(`⚡ Velocidade ajustada para ${currentPlaybackSpeed}x`);
+            showToast(`${window.uiIcon("zap")} Velocidade ajustada para ${currentPlaybackSpeed}x`);
         }
 
         function cyclePlaybackSpeed() {
@@ -639,7 +694,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             const ytOverlay = document.getElementById("ytWaveOverlay");
 
             if (btnBar) {
-                btnBar.innerHTML = mode === "audio" ? "🎵 Áudio HD" : "🎬 Clipe";
+                btnBar.innerHTML = mode === "audio" ? `${window.uiIcon("music")} Áudio HD` : `${window.uiIcon("film")} Clipe`;
                 btnBar.className = `bar-pill-btn ${mode === "audio" ? "active" : ""}`;
             }
             updateVolumeUI();
@@ -660,7 +715,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                         try { playerB.pauseVideo(); playerB.setVolume(0); } catch (e) {}
                     }
                 }
-                showToast("🎵 Áudio HD ativo: Equalizador Spotify, 200% VLC e ZERO bloqueios!");
+                showToast(window.uiIcon("music") + " Áudio HD ativo: Equalizador Spotify, 200% VLC e ZERO bloqueios!");
             } else {
                 if (!isHandoff) {
                     if (visScreen) visScreen.style.display = "none";
@@ -668,7 +723,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                     if (audioDeckA) audioDeckA.pause();
                     if (audioDeckB) audioDeckB.pause();
                 }
-                showToast("🎬 Modo Clipe ativo: Exibindo vídeo oficial com Waveform.");
+                showToast(window.uiIcon("film") + " Modo Clipe ativo: Exibindo vídeo oficial com Waveform.");
             }
 
             if (nowPlayingTrack) {
@@ -1218,7 +1273,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         function adjustDropWindow(deltaSeconds) {
             dropWindowManualBase = Math.max(30, Math.min(180, dropWindowManualBase + deltaSeconds));
             dropTargetSeconds = dropWindowManualBase;
-            showToast(`⏱️ Janela do Refrão ajustada para ${dropWindowManualBase}s`);
+            showToast(`${window.uiIcon("hourglass")} Janela do Refrão ajustada para ${dropWindowManualBase}s`);
             const timerVal = document.getElementById("dropTimerVal");
             if (timerVal) {
                 const elapsed = Math.floor(dropActiveSeconds);
@@ -1302,9 +1357,9 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             const btn = document.getElementById("btnAutoDropToggle");
             if (btn) {
                 btn.classList.toggle("active", isAutoDropEnabled);
-                btn.textContent = isAutoDropEnabled ? "🤖 Auto: ON" : "⏸️ Auto: OFF";
+                btn.innerHTML = isAutoDropEnabled ? `${window.uiIcon("bot")} Auto: ON` : `${window.uiIcon("pause")} Auto: OFF`;
             }
-            showToast(isAutoDropEnabled ? "🤖 Auto DJ LIGADO: Toca o refrão no ápice e corta com efeitos DJ!" : "⏸️ Auto DJ em pausa: Você controla os cortes!");
+            showToast(isAutoDropEnabled ? `${window.uiIcon('bot')} Auto DJ LIGADO: Toca o refrão no ápice e corta com efeitos DJ!` : `${window.uiIcon('pause')} Auto DJ em pausa: Você controla os cortes!`);
         }
 
         function updateDropHunterMetrics() {
@@ -1324,9 +1379,9 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             }
             if (footerText) {
                 if (isLongMix) {
-                    footerText.innerHTML = `🔀 <strong>Mix Longo:</strong> O DJ toca cada canção por 90s e pula suave pro próximo refrão! (${mixSegmentCount + 1}/${maxMixSegmentsBeforeNext + 1})`;
+                    footerText.innerHTML = `${window.uiIcon("shuffle")} <strong>Mix Longo:</strong> O DJ toca cada canção por 90s e pula suave pro próximo refrão! (${mixSegmentCount + 1}/${maxMixSegmentsBeforeNext + 1})`;
                 } else {
-                    footerText.innerHTML = `💡 <strong>Refrão Preditivo:</strong> Ajuste livre (➖/➕), antecipa queda da onda e evita silêncio!`;
+                    footerText.innerHTML = `${window.uiIcon("sparkles")} <strong>Refrão Preditivo:</strong> Ajuste livre (-/+), antecipa queda da onda e evita silêncio!`;
                 }
             }
 
@@ -1363,7 +1418,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 energy = 50; // valor neutro só pro medidor visual, nunca conta como silêncio
             }
 
-            if (energyVal) energyVal.textContent = energy + "% 🔥";
+            if (energyVal) energyVal.innerHTML = `${energy}% ${window.uiIcon("fire")}`;
             if (energyFill) energyFill.style.width = energy + "%";
 
             // Buffer histórico de energia para cálculo preditivo de onda (2 segundos = 20 amostras a cada 100ms)
@@ -1420,7 +1475,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 if (consecutivePredictedDropCount >= 5) { // 0.5s de queda antecipada confirmada
                     if (statusPill) {
                         statusPill.className = "drop-status-pill cutting";
-                        statusPill.innerHTML = "⚡ ANTECIPANDO QUEDA (VIRANDO NO ÁPICE)";
+                        statusPill.innerHTML = `${window.uiIcon("zap")} ANTECIPANDO QUEDA (VIRANDO NO ÁPICE)`;
                     }
                     if (isAutoDropEnabled && !isTransitioning && !isJumpingMix) {
                         smartCutToNextDrop("predictive_fall");
@@ -1442,12 +1497,12 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                     dropTargetSeconds = Math.min(maxAllowed, dropTargetSeconds + 0.1);
                     if (statusPill) {
                         statusPill.className = "drop-status-pill drop-active";
-                        statusPill.innerHTML = "🔥 ÁPICE SUBINDO! (ALTA)";
+                        statusPill.innerHTML = `${window.uiIcon("fire")} ÁPICE SUBINDO! (ALTA)`;
                     }
                 } else {
                     if (statusPill) {
                         statusPill.className = "drop-status-pill drop-active";
-                        statusPill.innerHTML = "💥 DROP ATIVO! (FERVENDO)";
+                        statusPill.innerHTML = `${window.uiIcon("zap")} DROP ATIVO! (FERVENDO)`;
                     }
                 }
             } else if (energy >= 42) {
@@ -1455,7 +1510,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 dropActiveSeconds += 0.08;
                 if (statusPill && !statusPill.classList.contains("cutting")) {
                     statusPill.className = "drop-status-pill buildup";
-                    statusPill.innerHTML = "⚡ Subindo Energia (Buildup)";
+                    statusPill.innerHTML = `${window.uiIcon("zap")} Subindo Energia (Buildup)`;
                 }
             } else {
                 // Energia baixa (Vocal, respiro ou breakdown)
@@ -1470,7 +1525,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 
                 if (statusPill && !statusPill.classList.contains("cutting")) {
                     statusPill.className = "drop-status-pill analyzing";
-                    statusPill.innerHTML = "🔍 Analisando Sinal...";
+                    statusPill.innerHTML = `${window.uiIcon("search")} Analisando Sinal...`;
                 }
             }
 
@@ -1515,7 +1570,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             dropActiveSeconds = 0;
             dropTargetSeconds = isTrackLongMix(nowPlayingTrack) ? 90 : 75;
             consecutiveLowEnergyCount = 0;
-            showToast("⚡ Pulo Inteligente: Saltando intro direto para a parte boa / Drop!");
+            showToast(window.uiIcon("zap") + " Pulo Inteligente: Saltando intro direto para a parte boa / Drop!");
         }
 
         // Salto Suave para o próximo refrão dentro de um mix longo (+80s com Quick-Duck)
@@ -1531,10 +1586,10 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             const statusPill = document.getElementById("dropStatusPill");
             if (statusPill) {
                 statusPill.className = "drop-status-pill mix-jumping";
-                statusPill.innerHTML = `🔀 FADE NO MIX (${mixSegmentCount}/${maxMixSegmentsBeforeNext + 1})`;
+                statusPill.innerHTML = `${window.uiIcon("shuffle")} FADE NO MIX (${mixSegmentCount}/${maxMixSegmentsBeforeNext + 1})`;
             }
 
-            showToast(`🔀 Mix Jumper: Fade suave para o próximo refrão! (${mixSegmentCount + 1}/${maxMixSegmentsBeforeNext + 1})`);
+            showToast(`${window.uiIcon("shuffle")} Mix Jumper: Fade suave para o próximo refrão! (${mixSegmentCount + 1}/${maxMixSegmentsBeforeNext + 1})`);
 
             if (engineMode === "audio") {
                 const curAudio = getActiveAudioDeck();
@@ -1634,19 +1689,19 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             const statusPill = document.getElementById("dropStatusPill");
             if (statusPill) {
                 statusPill.className = "drop-status-pill cutting";
-                statusPill.innerHTML = "✂️ CORTE NO DROP! VIRANDO...";
+                statusPill.innerHTML = `${window.uiIcon("scissors")} CORTE NO DROP! VIRANDO...`;
             }
 
             const nextTrack = getUpcomingTrack();
             const fxInfo = (typeof detectGenreFx === "function") ? detectGenreFx(nowPlayingTrack, nextTrack) : null;
-            const fxLabel = fxInfo ? `${fxInfo.icon} ${fxInfo.name}` : "⚡ Drop FX";
+            const fxLabel = fxInfo ? `${fxInfo.icon || window.uiIcon("zap")} ${fxInfo.name}` : `${window.uiIcon("zap")} Drop FX`;
 
             if (reason === "predictive_fall") {
-                showToast(`⚡ Virada Preditiva: Antecipei a queda da onda! Virando com ${fxLabel}!`);
+                showToast(`${window.uiIcon("zap")} Virada Preditiva: Antecipei a queda da onda! Virando com ${fxLabel}!`);
             } else if (reason === "silence_or_outro") {
-                showToast(`✂️ Silêncio Evitado: Pista segue no topo com ${fxLabel}!`);
+                showToast(`${window.uiIcon("scissors")} Silêncio Evitado: Pista segue no topo com ${fxLabel}!`);
             } else {
-                showToast(`✂️ Corte no Drop: Virando no ápice com ${fxLabel}!`);
+                showToast(`${window.uiIcon("scissors")} Corte no Drop: Virando no ápice com ${fxLabel}!`);
             }
             autoAdvanceWithFade();
         }
@@ -1656,13 +1711,13 @@ function updateUpcomingTrackUI() {
             const barStatusText = document.getElementById("barStatusText");
 
             const modeLabels = {
-                match: "🎯 Match",
-                energy: "⚡ Peak Time",
-                shuffle: "🔀 Shuffle",
-                smooth: "🌊 Smooth",
-                club: "🔥 Balada",
-                studio: "🎛️ Studio",
-                drop: "⚡ Drop Hunter"
+                match: "Match",
+                energy: "Peak Time",
+                shuffle: "Shuffle",
+                smooth: "Smooth",
+                club: "Balada",
+                studio: "Studio",
+                drop: "Drop Hunter"
             };
             const currentModeTag = modeLabels[djPlayMode] || "Modo DJ";
 
@@ -1672,9 +1727,9 @@ function updateUpcomingTrackUI() {
                     const curTitle = nowPlayingTrack ? nowPlayingTrack.title : "Nenhuma";
                     const curArtist = nowPlayingTrack ? (nowPlayingTrack.artist || "") : "";
                     const isQueued = (pendingQueue && pendingQueue.length > 0 && pendingQueue[0].video_id === upcoming.video_id);
-                    let tagLabel = isRepeatSame ? "🔂 Loop" : (isQueued ? "📋 Fila" : currentModeTag);
+                    let tagLabel = isRepeatSame ? "Loop" : (isQueued ? "Fila" : currentModeTag);
                     if (!isQueued && !isRepeatSame && upcoming._isExternalDiscovery) {
-                        tagLabel += " • 🌐 Web";
+                        tagLabel += " • Web";
                     }
 
                     const cleanCur = cleanTrackTitleForBar(curTitle, curArtist);
@@ -1688,7 +1743,7 @@ function updateUpcomingTrackUI() {
                             </div>
                             <div class="bar-status-sep">•</div>
                             <div class="bar-status-col bar-status-next" title="A seguir: ${escapeQuotes(upcoming.title)} [${escapeQuotes(tagLabel)}]">
-                                <span class="status-badge-next" title="Próxima Faixa (${tagLabel})">⏭️ A Seguir:</span>
+                                <span class="status-badge-next" title="Próxima Faixa (${tagLabel})"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg> A Seguir:</span>
                                 <strong class="next-clean">${escapeQuotes(cleanNext)}</strong>
                             </div>
                         </div>`;
@@ -1706,7 +1761,7 @@ function updateUpcomingTrackUI() {
                             </div>
                             <div class="bar-status-sep">•</div>
                             <div class="bar-status-col bar-status-next">
-                                <span class="status-badge-next">⏭️ Pronto para reproduzir</span>
+                                <span class="status-badge-next"><svg class="ui-icon ui-icon-fill" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"></polygon><rect x="17" y="4" width="2.5" height="16" rx="0.5"></rect></svg> Pronto para reproduzir</span>
                             </div>
                         </div>`;
                 }
@@ -1724,7 +1779,7 @@ function updateUpcomingTrackUI() {
                 if (list.length === 0) return;
                 const btn = document.createElement("button");
                 btn.className = `tab-btn ${cat === browseCategory ? "active" : ""}`;
-                btn.innerHTML = `<span>${ICONS[cat] || "🎵"} ${cat}</span><span class="count-badge">${list.length}</span>`;
+                btn.innerHTML = `<span>${ICONS[cat] || window.uiIcon("music")} ${cat}</span><span class="count-badge">${list.length}</span>`;
                 btn.onclick = () => selectCategoryToBrowse(cat);
                 tabsContainer.appendChild(btn);
             });
@@ -1736,7 +1791,7 @@ function updateUpcomingTrackUI() {
                 total += (DATA[cat] || []).length;
             });
             const navText = document.getElementById("navLibraryText");
-            if (navText) navText.textContent = `📚 Minha Biblioteca (${total})`;
+            if (navText) navText.innerHTML = `${window.uiIcon("queue")} Minha Biblioteca (${total})`;
             initTabs();
         }
 
@@ -1858,7 +1913,7 @@ function updateUpcomingTrackUI() {
             CATEGORIES.forEach(cat => {
                 const btn = document.createElement("button");
                 btn.className = `tab-btn ${cat === currentSuggestionCategory ? "active" : ""}`;
-                btn.innerHTML = `<span>${ICONS[cat] || "🎵"} ${cat}</span>`;
+                btn.innerHTML = `<span>${ICONS[cat] || window.uiIcon("music")} ${cat}</span>`;
                 btn.onclick = () => selectSuggestionCategory(cat);
                 container.appendChild(btn);
             });
@@ -1912,7 +1967,7 @@ function updateUpcomingTrackUI() {
 
             radioActiveTrack = track;
             isRadioActive = true;
-            showToast(`📻 Buscando faixas parecidas com "${title}" (${bpm} BPM)...`);
+            showToast(`${window.uiIcon("radio")} Buscando faixas parecidas com "${title}" (${bpm} BPM)...`);
 
             switchView("suggestions");
 
@@ -1921,11 +1976,11 @@ function updateUpcomingTrackUI() {
             const badge = document.getElementById("suggestionCountBadge");
             const btn = document.getElementById("btnRefreshSuggestions");
 
-            if (headerTitle) headerTitle.innerHTML = `📻 Faixas Parecidas: <em>${escapeHtml(title)}</em>`;
+            if (headerTitle) headerTitle.innerHTML = `${window.uiIcon("radio")} Faixas Parecidas: <em>${escapeHtml(title)}</em>`;
             if (headerSub) headerSub.innerHTML = `Músicas no mesmo ritmo e gênero (<strong>${bpm} BPM</strong> • ${escapeHtml(category)}).`;
             if (badge) badge.textContent = "Minerando com IA...";
             if (btn) {
-                btn.innerHTML = `<span>🔄 Buscar Mais no Mesmo Ritmo (${bpm} BPM)</span>`;
+                btn.innerHTML = `<span>${window.uiIcon("refresh")} Buscar Mais no Mesmo Ritmo (${bpm} BPM)</span>`;
                 btn.onclick = () => {
                     const cacheKey = (videoId || title) + "_rhythm";
                     delete radioSuggestionsCache[cacheKey];
@@ -1987,7 +2042,7 @@ function updateUpcomingTrackUI() {
 
             if (isRadioActive) return;
 
-            if (titleEl) titleEl.textContent = `✨ Novidades: ${currentSuggestionCategory}`;
+            if (titleEl) titleEl.innerHTML = `${window.uiIcon("sparkles")} Novidades: ${currentSuggestionCategory}`;
             if (subEl) subEl.innerHTML = `Buscadas em tempo real no YouTube/SoundCloud • <strong>nunca se repetem</strong>`;
             const currentList = suggestionsByGenre[currentSuggestionCategory] || [];
             if (badge) {
@@ -1999,7 +2054,7 @@ function updateUpcomingTrackUI() {
                     badge.textContent = "0 inéditas";
                 }
             }
-            if (btn) btn.innerHTML = `<span>🔄 Buscar Mais Novas (Sem Repetir)</span>`;
+            if (btn) btn.innerHTML = `<span>${window.uiIcon("refresh")} Buscar Mais Novas (Sem Repetir)</span>`;
         }
 
         function showSuggestionsSkeleton() {
@@ -2036,7 +2091,7 @@ function updateUpcomingTrackUI() {
             const btn = document.getElementById("btnRefreshSuggestions");
 
             if (badge) badge.textContent = "Buscando...";
-            if (btn) btn.innerHTML = `<span>⏳ Buscando...</span>`;
+            if (btn) btn.innerHTML = `<span>${window.uiIcon("hourglass")} Buscando...</span>`;
             showSuggestionsSkeleton();
 
             try {
@@ -2065,7 +2120,7 @@ function updateUpcomingTrackUI() {
                 suggestionsFetchingCategories.delete(requestedCategory);
                 if (suggestionsFetchingCategories.size === 0) isFetchingSuggestions = false;
                 if (requestedCategory === currentSuggestionCategory && btn) {
-                    btn.innerHTML = `<span>🔄 Buscar Mais Novas (Sem Repetir)</span>`;
+                    btn.innerHTML = `<span>${window.uiIcon("refresh")} Buscar Mais Novas (Sem Repetir)</span>`;
                 }
             }
         }
@@ -2172,7 +2227,7 @@ function updateUpcomingTrackUI() {
                 const coverStyle = meta.cover_url
                     ? `background-image: url('${meta.cover_url}'); background-size: cover; background-position: center;`
                     : `background: ${getPlaylistCoverGradient(plId)};`;
-                const coverIcon = meta.cover_url ? "" : `<span>${meta.icon || "🟢"}</span>`;
+                const coverIcon = meta.cover_url ? "" : `<span>${meta.icon || window.uiIcon("dot_green")}</span>`;
 
                 const card = document.createElement("div");
                 card.className = `sp-playlist-card${plId === activeSpotifyPlaylist ? " active" : ""}`;
@@ -2627,19 +2682,19 @@ function updateUpcomingTrackUI() {
                 if (badgeEl) {
                     if (djPlayMode === "match") {
                         const score = calculateIdealNextTrackScore(targetTrack, curTrack);
-                        badgeEl.textContent = `🎯 ${score}% Match`;
+                        badgeEl.innerHTML = `${window.uiIcon("target")} ${score}% Match`;
                         badgeEl.className = score >= 93 ? "dj-ideal-match-badge" : "dj-ideal-match-badge match-great";
                     } else if (djPlayMode === "energy") {
                         const curBpm = parseFloat(curTrack.bpm) || 128;
                         const diff = Math.round(candBpm - curBpm);
                         const diffStr = diff >= 0 ? `+${diff}` : `${diff}`;
-                        badgeEl.textContent = `⚡ Peak Time (${diffStr} BPM)`;
+                        badgeEl.innerHTML = `${window.uiIcon("zap")} Peak Time (${diffStr} BPM)`;
                         badgeEl.className = "dj-ideal-match-badge";
                     } else if (djPlayMode === "shuffle") {
-                        badgeEl.textContent = `🔀 Smart Shuffle`;
+                        badgeEl.innerHTML = `${window.uiIcon("shuffle")} Smart Shuffle`;
                         badgeEl.className = "dj-ideal-match-badge match-great";
                     } else if (djPlayMode === "smooth") {
-                        badgeEl.textContent = `🌊 Smooth Flow`;
+                        badgeEl.innerHTML = `${window.uiIcon("wave")} Smooth Flow`;
                         badgeEl.className = "dj-ideal-match-badge";
                     }
                 }
@@ -2655,7 +2710,7 @@ function updateUpcomingTrackUI() {
                 showToast("Nenhuma faixa ideal calculada no momento.");
                 return;
             }
-            showToast(`🎯 Faixa ideal selecionada: ${currentIdealTrack.title.slice(0, 30)}...`);
+            showToast(`${window.uiIcon("target")} Faixa ideal selecionada: ${currentIdealTrack.title.slice(0, 30)}...`);
             const existsIdx = pendingQueue.findIndex(q => q.video_id === currentIdealTrack.video_id);
             if (existsIdx !== -1) {
                 pendingQueue.splice(existsIdx, 1);
@@ -2690,7 +2745,7 @@ function updateUpcomingTrackUI() {
             if (featuredCard) {
                 const iconHtml = meta.cover_url
                     ? `<div class="featured-card-icon has-cover" style="background-image: url('${meta.cover_url}');"></div>`
-                    : `<div class="featured-card-icon">${meta.icon || "🟢"}</div>`;
+                    : `<div class="featured-card-icon">${meta.icon || window.uiIcon("dot_green")}</div>`;
                 featuredCard.innerHTML = `
                     <div class="featured-card-content">
                         <div class="featured-card-left">
@@ -2702,9 +2757,9 @@ function updateUpcomingTrackUI() {
                                 </div>
                                 <div class="featured-card-desc">${escapeHtml(meta.desc || "")}</div>
                                 <div class="featured-card-meta">
-                                    <span class="featured-meta-chip">🔥 ${allTracks.length} Faixas Oficiais</span>
-                                    <span class="featured-meta-chip">⚡ ~${meta.bpm || 130} BPM</span>
-                                    <span class="featured-meta-chip" style="color: #1ed760; border-color: rgba(30,215,96,0.4);">✓ Sincronizado</span>
+                                    <span class="featured-meta-chip">${window.uiIcon("fire")} ${allTracks.length} Faixas Oficiais</span>
+                                    <span class="featured-meta-chip">${window.uiIcon("zap")} ~${meta.bpm || 130} BPM</span>
+                                    <span class="featured-meta-chip" style="color: #1ed760; border-color: rgba(30,215,96,0.4);">${window.uiIcon("check")} Sincronizado</span>
                                 </div>
                             </div>
                         </div>
@@ -2757,17 +2812,17 @@ function updateUpcomingTrackUI() {
 
                 listContainer.innerHTML = `
                     <div style="text-align: center; padding: 35px 20px; color: var(--text-dim); max-width: 520px; margin: 0 auto;">
-                        <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+                        <div style="font-size: 28px; margin-bottom: 8px;">${window.uiIcon("search")}</div>
                         <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">Nenhuma faixa com "<strong>${escapeHtml(spotifySearchQuery)}</strong>" nesta playlist.</div>
                         <div style="font-size: 12px; margin-bottom: 16px;">Esta playlist possui apenas ${allTracks.length} faixas. Você pode buscar nas outras 111 playlists ou na Pesquisa Livre do YouTube!</div>
                         <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
                             ${globalMatches.length > 0 ? `
                                 <button class="btn-sync-yt" onclick="renderGlobalSpotifySearchResults('${escapeQuotes(spotifySearchQuery)}')" style="margin: 0; background: linear-gradient(135deg, #1ed760, #00b0ff); color: #000; font-weight: 700; font-size: 12px; padding: 8px 14px;">
-                                    🟢 Ver ${globalMatches.length} músicas em outras Playlists Spotify
+                                    ${window.uiIcon("dot_green")} Ver ${globalMatches.length} músicas em outras Playlists Spotify
                                 </button>
                             ` : ''}
                             <button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(spotifySearchQuery)}')" style="margin: 0; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); color: var(--accent); font-size: 12px; padding: 8px 14px;">
-                                ⚡ Pesquisa Livre com IA
+                                ${window.uiIcon("zap")} Pesquisa Livre com IA
                             </button>
                         </div>
                     </div>
@@ -2783,7 +2838,7 @@ function updateUpcomingTrackUI() {
                 const meta = getTrackTransitionCardMeta(track, currentVideoId, upcomingVideoId, (!isTransitioning && (track.video_id === lastAddedVideoId || track.addedJustNow)));
                 const queueIdx = (pendingQueue || []).findIndex(q => q.video_id === track.video_id);
                 const isInQueue = queueIdx !== -1;
-                const queuePosText = isInQueue ? (queueIdx === 0 ? "✓ Fila #1 (Próxima)" : `✓ Fila #${queueIdx + 1}`) : "";
+                const queuePosText = isInQueue ? (queueIdx === 0 ? `${window.uiIcon("check")} Fila #1 (Próxima)` : `${window.uiIcon("check")} Fila #${queueIdx + 1}`) : "";
 
                 let cardClasses = "track-card" + meta.cardExtraClass;
                 if (!meta.isOutgoing && !meta.isIncoming) {
@@ -2812,7 +2867,7 @@ function updateUpcomingTrackUI() {
                 } else if (meta.isPlaying) {
                     statusBadge = '<span class="track-status-pill status-playing">▶ TOCANDO AGORA</span>';
                 } else if (meta.isNext) {
-                    statusBadge = '<span class="track-status-pill status-next">⏭️ A SEGUIR</span>';
+                    statusBadge = `<span class="track-status-pill status-next">${window.uiIcon("skip")} A SEGUIR</span>`;
                 }
 
                 const durMin = Math.floor((track.duration || 180) / 60);
@@ -2822,10 +2877,10 @@ function updateUpcomingTrackUI() {
                 if (nowPlayingTrack && track.video_id !== nowPlayingTrack.video_id) {
                     const score = calculateIdealNextTrackScore(track, nowPlayingTrack);
                     if (score >= 93) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">🎯 ${score}% Match</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">${window.uiIcon("target")} ${score}% Match</span>`;
                         cardClasses += " ideal-match-highlight";
                     } else if (score >= 86) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">⚡ ${score}% Mix</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">${window.uiIcon("zap")} ${score}% Mix</span>`;
                     }
                 }
                 card.className = cardClasses;
@@ -2843,9 +2898,9 @@ function updateUpcomingTrackUI() {
                                 ${statusBadge}
                                 ${idealBadgeHtml}
                                 <span class="track-artist">${escapeHtml(track.artist || meta.name)}</span>
-                                <span class="badge-bpm-chip">⚡ ${track.bpm || 130} BPM</span>
-                                <span class="track-duration-pill">⏱️ ${durMin}:${durSec}</span>
-                                <span class="spotify-inline-tag" title="Fonte Oficial: Spotify ${escapeHtml(meta.name)}">🟢 Spotify</span>
+                                <span class="badge-bpm-chip">${window.uiIcon("zap")} ${track.bpm || 130} BPM</span>
+                                <span class="track-duration-pill">${window.uiIcon("hourglass")} ${durMin}:${durSec}</span>
+                                <span class="spotify-inline-tag" title="Fonte Oficial: Spotify ${escapeHtml(meta.name)}">${window.uiIcon("dot_green")} Spotify</span>
                             </div>
                         </div>
                     </div>
@@ -2854,7 +2909,7 @@ function updateUpcomingTrackUI() {
                             ▶ Tocar
                         </button>
                         <button class="btn-card-action btn-card-queue" onclick="queueSpotifyTrackByIndex(${index})" title="Adicionar à fila Spotify">
-                            ${isInQueue ? "✓ Na Fila" : "+ Fila"}
+                            ${isInQueue ? window.uiIcon("check") + " Na Fila" : "+ Fila"}
                         </button>
                     </div>
                 `;
@@ -2909,7 +2964,7 @@ function updateUpcomingTrackUI() {
 
             updateQueueUI();
             playTrack(topTracks[0], `Spotify - ${plName}`);
-            showToast(`🟢 Tocando Top 10 de ${plName} em sequência contínua!`);
+            showToast(`${window.uiIcon("dot_green")} Tocando Top 10 de ${plName} em sequência contínua!`);
             renderSpotifyPlaylist();
         }
 
@@ -2933,7 +2988,7 @@ function updateUpcomingTrackUI() {
 
             updateQueueUI();
             playTrack(tracks[0], `Spotify - ${plName}`);
-            showToast(`🟢 Tocando playlist completa: ${plName} (${tracks.length} músicas)!`);
+            showToast(`${window.uiIcon("dot_green")} Tocando playlist completa: ${plName} (${tracks.length} músicas)!`);
             renderSpotifyPlaylist();
         }
 
@@ -2953,7 +3008,7 @@ function updateUpcomingTrackUI() {
             }
 
             updateQueueUI();
-            showToast(`📋 ${tracks.length} músicas de ${plName} adicionadas à fila!`);
+            showToast(`${window.uiIcon("queue")} ${tracks.length} músicas de ${plName} adicionadas à fila!`);
             renderSpotifyPlaylist();
         }
 
@@ -2982,7 +3037,7 @@ function updateUpcomingTrackUI() {
 
             listContainer.innerHTML = "";
             if (globalMatches.length === 0) {
-                listContainer.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-dim);">Nenhuma música encontrada em nenhuma das 111 playlists para "${escapeHtml(q)}". <br><button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(q)}')" style="margin-top:12px;">⚡ Pesquisa Livre</button></div>`;
+                listContainer.innerHTML = `<div style="text-align:center; padding: 30px; color: var(--text-dim);">Nenhuma música encontrada em nenhuma das 111 playlists para "${escapeHtml(q)}". <br><button class="btn-sync-yt" onclick="goToFreeSearch('${escapeQuotes(q)}')" style="margin-top:12px;">${window.uiIcon("zap")} Pesquisa Livre</button></div>`;
                 return;
             }
 
@@ -3008,8 +3063,8 @@ function updateUpcomingTrackUI() {
                             <div class="track-artist-row">
                                 ${meta.statusBadgeHtml}
                                 <span class="track-artist">${escapeHtml(track.artist || "Spotify")}</span>
-                                <span class="badge-bpm-chip">⚡ ${bpm} BPM</span>
-                                <span class="badge-bpm-chip" style="background: rgba(30,215,96,0.15); border-color: rgba(30,215,96,0.4); color: #1ed760;">🟢 ${escapeHtml(track.playlistName)}</span>
+                                <span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>
+                                <span class="badge-bpm-chip" style="background: rgba(30,215,96,0.15); border-color: rgba(30,215,96,0.4); color: #1ed760;">${window.uiIcon("dot_green")} ${escapeHtml(track.playlistName)}</span>
                             </div>
                         </div>
                     </div>
@@ -3022,7 +3077,9 @@ function updateUpcomingTrackUI() {
         }
         window.renderGlobalSpotifySearchResults = renderGlobalSpotifySearchResults;
 
-        function switchView(view) {
+        let isNavTransitioning = false;
+
+        function executeActualSwitchView(view) {
             browseView = view;
             const navLib = document.getElementById("navLibrary");
             const navSpotify = document.getElementById("navSpotify");
@@ -3055,7 +3112,12 @@ function updateUpcomingTrackUI() {
             if (view === "library") {
                 renderList();
             } else if (view === "spotify") {
-                renderSpotifyPlaylist();
+                updateSpotifyViewModeUI();
+                if (spotifyBrowseMode === "grid") {
+                    renderSpotifyPlaylistGrid();
+                } else {
+                    renderSpotifyPlaylist();
+                }
             } else if (view === "search") {
                 renderSearchResults();
                 setTimeout(() => {
@@ -3085,9 +3147,203 @@ function updateUpcomingTrackUI() {
             }
         }
 
+        function getNavButtonCenter(view) {
+            let btn = null;
+            if (view === "library") btn = document.getElementById("navLibrary");
+            else if (view === "spotify") btn = document.getElementById("navSpotify");
+            else if (view === "search") btn = document.getElementById("navSearch");
+            else if (view === "suggestions") btn = document.getElementById("navSuggestions");
+            else if (view === "queue") btn = document.getElementById("navQueue");
+
+            if (btn) {
+                const r = btn.getBoundingClientRect();
+                return {
+                    x: r.left + r.width / 2,
+                    y: r.top + r.height / 2,
+                    btn
+                };
+            }
+            return {
+                x: window.innerWidth / 2,
+                y: 40,
+                btn: null
+            };
+        }
+
+        function triggerNavOriginWave(x, y) {
+            const existing = document.getElementById("navOriginWave");
+            if (existing) existing.remove();
+
+            const wave = document.createElement("div");
+            wave.id = "navOriginWave";
+            wave.className = "nav-origin-wave-overlay";
+            const maxDim = Math.max(window.innerWidth, window.innerHeight) * 2.2;
+            wave.style.width = `${maxDim}px`;
+            wave.style.height = `${maxDim}px`;
+            wave.style.left = `${x}px`;
+            wave.style.top = `${y}px`;
+            document.body.appendChild(wave);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    wave.classList.add("is-active");
+                });
+            });
+
+            setTimeout(() => {
+                if (wave.parentNode) wave.remove();
+            }, 750);
+        }
+
+        function isElementVisibleInViewport(el) {
+            if (!el || !el.getBoundingClientRect) return false;
+            const r = el.getBoundingClientRect();
+            return r.bottom > 0 && r.top < window.innerHeight && r.height > 0;
+        }
+
+        let isNavPageSwitching = false;
+
+        // TRANSIÇÃO ULTRA SUAVE E ELEGANTE DE NAVEGAÇÃO ENTRE PÁGINAS (FADE + DESMONTAGEM E REMONTAGEM)
+        function switchView(view) {
+            if (view === browseView) return;
+            if (isNavPageSwitching) return;
+
+            isNavPageSwitching = true;
+
+            const paneMap = {
+                library: document.getElementById("paneLibrary"),
+                spotify: document.getElementById("paneSpotify"),
+                search: document.getElementById("paneSearch"),
+                suggestions: document.getElementById("paneSuggestions"),
+                queue: document.getElementById("paneQueue"),
+            };
+
+            const currentPane = paneMap[browseView] || document.querySelector(".pane-view:not([style*='display: none'])");
+            const targetPane = paneMap[view];
+            const { x: originX, y: originY, btn: targetBtn } = getNavButtonCenter(view);
+
+            // Pulso luminoso no botão de destino
+            if (targetBtn) {
+                targetBtn.classList.remove("nav-source-pulse");
+                void targetBtn.offsetWidth;
+                targetBtn.classList.add("nav-source-pulse");
+                setTimeout(() => targetBtn.classList.remove("nav-source-pulse"), 650);
+            }
+
+            // Onda suave expandindo radialmente a partir do botão
+            triggerNavOriginWave(originX, originY);
+
+            // 1. DESMONTAGEM E FADE OUT DA PÁGINA ATUAL:
+            const oldCards = currentPane
+                ? Array.from(currentPane.querySelectorAll(".track-card, .sp-playlist-card, .search-result-card, .queue-item")).filter(isElementVisibleInViewport).slice(0, 24)
+                : [];
+
+            if (oldCards.length > 0) {
+                let maxOldDist = 1;
+                const oldInfos = oldCards.map(c => {
+                    const r = c.getBoundingClientRect();
+                    const dist = Math.hypot(r.left + r.width / 2 - originX, r.top + r.height / 2 - originY);
+                    if (dist > maxOldDist) maxOldDist = dist;
+                    return { c, dist, r };
+                });
+
+                oldInfos.forEach(({ c, dist, r }) => {
+                    const delay = Math.round((dist / maxOldDist) * 120);
+                    const pushX = Math.round(((r.left + r.width / 2 - originX) / Math.max(1, dist)) * 10);
+                    c.style.setProperty("--card-delay", `${delay}ms`);
+                    c.style.setProperty("--card-dx", `${pushX}px`);
+                    c.classList.add("nav-card-item", "nav-card-exit");
+                });
+            }
+
+            // Fade out no container da página inteira
+            if (currentPane) {
+                currentPane.classList.remove("page-transition-enter-start", "page-transition-enter-active");
+                currentPane.classList.add("page-transition-exit");
+            }
+
+            // Duração do Fade Out e Desmontagem: ~280ms
+            setTimeout(() => {
+                // Limpeza no painel antigo
+                if (currentPane) {
+                    currentPane.classList.remove("page-transition-exit");
+                    oldCards.forEach(c => {
+                        c.classList.remove("nav-card-item", "nav-card-exit");
+                        c.style.removeProperty("--card-delay");
+                        c.style.removeProperty("--card-dx");
+                    });
+                }
+
+                // 2. TROCA DE TELA NO DOM
+                executeActualSwitchView(view);
+
+                // 3. FADE IN E REMONTAGEM NA NOVA PÁGINA
+                if (targetPane) {
+                    targetPane.classList.remove("page-transition-exit", "page-transition-enter-active");
+                    targetPane.classList.add("page-transition-enter-start");
+                    void targetPane.offsetWidth; // força reflow
+
+                    const newCards = Array.from(targetPane.querySelectorAll(".track-card, .sp-playlist-card, .search-result-card, .queue-item")).filter(isElementVisibleInViewport).slice(0, 24);
+
+                    if (newCards.length > 0) {
+                        let maxNewDist = 1;
+                        const newInfos = newCards.map(c => {
+                            const r = c.getBoundingClientRect();
+                            const dist = Math.hypot(r.left + r.width / 2 - originX, r.top + r.height / 2 - originY);
+                            if (dist > maxNewDist) maxNewDist = dist;
+                            return { c, dist, r };
+                        });
+
+                        const ENTER_CASCADE_TOTAL_MS = 220;
+                        newInfos.forEach(({ c, dist, r }) => {
+                            const delay = Math.round((dist / maxNewDist) * ENTER_CASCADE_TOTAL_MS);
+                            const enterX = Math.round(((originX - (r.left + r.width / 2)) / Math.max(1, dist)) * 14);
+                            c.style.setProperty("--card-delay", `${delay}ms`);
+                            c.style.setProperty("--card-dx", `${enterX}px`);
+                            c.classList.add("nav-card-item", "nav-card-enter-start");
+                        });
+
+                        void targetPane.offsetWidth; // força reflow
+
+                        requestAnimationFrame(() => {
+                            targetPane.classList.remove("page-transition-enter-start");
+                            targetPane.classList.add("page-transition-enter-active");
+
+                            newCards.forEach(c => {
+                                c.classList.remove("nav-card-enter-start");
+                                c.classList.add("nav-card-enter-active");
+                            });
+
+                            setTimeout(() => {
+                                targetPane.classList.remove("page-transition-enter-active");
+                                newCards.forEach(c => {
+                                    c.classList.remove("nav-card-item", "nav-card-enter-active");
+                                    c.style.removeProperty("--card-delay");
+                                    c.style.removeProperty("--card-dx");
+                                });
+                                isNavPageSwitching = false;
+                            }, ENTER_CASCADE_TOTAL_MS + 550);
+                        });
+                    } else {
+                        // Se a página não tiver cards no momento (ex.: Fila vazia ou Busca inicial)
+                        requestAnimationFrame(() => {
+                            targetPane.classList.remove("page-transition-enter-start");
+                            targetPane.classList.add("page-transition-enter-active");
+                            setTimeout(() => {
+                                targetPane.classList.remove("page-transition-enter-active");
+                                isNavPageSwitching = false;
+                            }, 500);
+                        });
+                    }
+                } else {
+                    isNavPageSwitching = false;
+                }
+            }, 280);
+        }
+
         // Renderiza a lista de músicas exibindo:
         // 1. Status 'TOCANDO AGORA' com animação na música atual
-        // 2. Status '✨ ADICIONADA AGORA' na última música que foi favoritada
+        // 2. Status ADICIONADA AGORA na última música que foi favoritada
         // 3. Status 'A SEGUIR (PRÓXIMA)' na próxima música a ser tocada
         function renderList(filteredTracks = null) {
             currentFilteredLibraryTracks = filteredTracks;
@@ -3120,16 +3376,16 @@ function updateUpcomingTrackUI() {
                 let statusBadgeHtml = meta.statusBadgeHtml;
 
                 const bpmVal = t.bpm || detectBpmJs(t.title, t.category);
-                const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>`;
+                const bpmBadgeHtml = `<span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpmVal} BPM</span>`;
 
                 let idealBadgeHtml = "";
                 if (nowPlayingTrack && t.video_id !== nowPlayingTrack.video_id) {
                     const score = calculateIdealNextTrackScore(t, nowPlayingTrack);
                     if (score >= 93) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">🎯 ${score}% Match</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">${window.uiIcon("target")} ${score}% Match</span>`;
                         cardClasses += " ideal-match-highlight";
                     } else if (score >= 86) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">⚡ ${score}% Mix</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">${window.uiIcon("zap")} ${score}% Mix</span>`;
                     }
                 }
                 card.className = cardClasses;
@@ -3156,18 +3412,18 @@ function updateUpcomingTrackUI() {
                     </div>
                     <div class="card-actions">
                         <button class="btn-similar-card" onclick="findSimilarToLibraryTrack('${browseCategory}', ${index})" title="Buscar músicas semelhantes no mesmo ritmo e BPM com IA">
-                            📻 Parecidas
+                            ${window.uiIcon("radio")} Parecidas
                         </button>
                         <button class="btn-move-card" onclick="openMovePlaylistModal('${browseCategory}', ${index}, '${t.video_id}')" title="Mover para outra playlist / gênero">
-                            📂 Mover
+                            ${window.uiIcon("folder")} Mover
                         </button>
                         <button class="btn-remove-lib-card" onclick="removeLibraryTrackPrompt('${browseCategory}', ${index}, '${t.video_id}')" title="Remover da biblioteca">
-                            🗑️
+                            ${window.uiIcon("trash")}
                         </button>
                         ${(() => {
                             const qIdx = pendingQueue.findIndex(q => q.video_id === t.video_id);
                             if (qIdx !== -1) {
-                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${t.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">✓ Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
+                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${t.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">${window.uiIcon("check")} Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
                             } else {
                                 return `<button class="btn-add-queue" onclick="addLibraryTrackToQueue('${browseCategory}', ${index})">+ Fila</button>`;
                             }
@@ -3241,14 +3497,14 @@ function updateUpcomingTrackUI() {
                     btnFav.style.borderColor = "rgba(0, 230, 118, 0.4)";
                     btnFav.style.color = "#00e676";
                     btnFav.title = `Salva na sua biblioteca (Aba: ${targetCategory})`;
-                    btnFav.innerHTML = "❤️ Na Playlist";
+                    btnFav.innerHTML = `${window.uiIcon("star")} Na Playlist`;
                 }
                 const badgeSource = cardElement.querySelector(".badge-source");
                 if (badgeSource) {
                     badgeSource.style.background = "rgba(0, 230, 118, 0.15)";
                     badgeSource.style.color = "#00e676";
                     badgeSource.style.border = "1px solid rgba(0, 230, 118, 0.3)";
-                    badgeSource.textContent = "✓ Na Biblioteca";
+                    badgeSource.innerHTML = `${window.uiIcon("check")} Na Biblioteca`;
                 }
             }
 
@@ -3324,7 +3580,7 @@ function updateUpcomingTrackUI() {
                     renderSearchResults();
                 }
 
-                showToast(`⭐ "${track.title}" salva na sua biblioteca! Acesse na aba "${targetCategory}".`, 5000);
+                showToast(`${window.uiIcon("star")} "${track.title}" salva na sua biblioteca! Acesse na aba "${targetCategory}".`, 5000);
             } catch (err) {
                 console.error("Erro ao adicionar faixa à biblioteca:", err);
                 showToast("Erro ao adicionar faixa. Tente novamente.");
@@ -3393,7 +3649,7 @@ function updateUpcomingTrackUI() {
             const fromCat = resolved.category || sourceCategory;
 
             if (!track) {
-                showToast("⚠️ Música não encontrada para mover.");
+                showToast(window.uiIcon("alert") + " Música não encontrada para mover.");
                 return;
             }
 
@@ -3417,7 +3673,7 @@ function updateUpcomingTrackUI() {
                 grid.innerHTML = "";
                 CATEGORIES.forEach(cat => {
                     const count = (DATA[cat] || []).length;
-                    const icon = ICONS[cat] || "🎵";
+                    const icon = ICONS[cat] || window.uiIcon("music");
                     const isCurrent = (cat === currentSourceCategory);
 
                     const optCard = document.createElement("div");
@@ -3471,7 +3727,7 @@ function updateUpcomingTrackUI() {
 
         async function executeMovePlaylist() {
             if (!currentTrackToMove || !selectedDestinationCategory) {
-                showToast("⚠️ Selecione uma playlist de destino primeiro!");
+                showToast(window.uiIcon("alert") + " Selecione uma playlist de destino primeiro!");
                 return;
             }
             if (selectedDestinationCategory === currentSourceCategory) {
@@ -3508,7 +3764,7 @@ function updateUpcomingTrackUI() {
             updateLibraryCounters();
             renderList();
             renderAllActiveLists();
-            showToast(`📂 "${track.title.slice(0, 30)}..." movida com sucesso para "${newCat}"!`, 4500);
+            showToast(`${window.uiIcon("folder")} "${track.title.slice(0, 30)}..." movida com sucesso para "${newCat}"!`, 4500);
 
             // 4. Persistência no backend (complete_library.json e rebuild de player.html)
             try {
@@ -3531,7 +3787,7 @@ function updateUpcomingTrackUI() {
             const input = document.getElementById("inputNewPlaylistName");
             const newName = (input ? input.value : "").trim();
             if (!newName) {
-                showToast("⚠️ Digite um nome para a nova playlist.");
+                showToast(window.uiIcon("alert") + " Digite um nome para a nova playlist.");
                 return;
             }
             selectedDestinationCategory = newName;
@@ -3545,7 +3801,7 @@ function updateUpcomingTrackUI() {
             const track = resolved.track;
 
             if (!track && !resolved.videoId) {
-                showToast("⚠️ Música não localizada para remoção.");
+                showToast(window.uiIcon("alert") + " Música não localizada para remoção.");
                 return;
             }
 
@@ -3620,7 +3876,7 @@ function updateUpcomingTrackUI() {
             updateLibraryCounters();
             renderList();
             renderAllActiveLists();
-            showToast(`🗑️ "${title.slice(0, 32)}..." removida da biblioteca em tempo real!`, 4000);
+            showToast(`${window.uiIcon("trash")} "${title.slice(0, 32)}..." removida da biblioteca em tempo real!`, 4000);
 
             // 4. Persistência no backend (complete_library.json e rebuild de player.html)
             try {
@@ -3645,14 +3901,14 @@ function updateUpcomingTrackUI() {
 
             if (btn) btn.classList.add("syncing");
             if (btnText) btnText.textContent = "Sincronizando...";
-            showToast("🔄 Sincronizando com sua playlist no YouTube...");
+            showToast(window.uiIcon("refresh") + " Sincronizando com sua playlist no YouTube...");
 
             try {
                 const res = await fetch("/api/sync-youtube", { method: "POST" });
                 const data = await res.json();
                 
                 if (data.success || data.playlist_url) {
-                    showToast("✅ Playlist sincronizada com o YouTube com sucesso!", 3500);
+                    showToast(window.uiIcon("check") + " Playlist sincronizada com o YouTube com sucesso!", 3500);
                 } else {
                     showToast("Erro na sincronização: " + (data.message || "Tente novamente."));
                 }
@@ -3889,7 +4145,7 @@ function updateUpcomingTrackUI() {
                         });
                     }).catch(err => {
                         console.warn("Falha ao carregar a fonte de áudio:", err);
-                        showToast("⚠️ Não foi possível tocar esta faixa. Pulando para a próxima...");
+                        showToast(window.uiIcon("alert") + " Não foi possível tocar esta faixa. Pulando para a próxima...");
                         setTimeout(() => {
                             if (typeof autoAdvanceWithFade === "function") autoAdvanceWithFade();
                         }, 900);
@@ -4006,7 +4262,7 @@ function updateUpcomingTrackUI() {
                 transitionRole = "outgoing";
                 statusBadgeHtml = `
                     <div class="badge-outgoing-track" data-track-badge="outgoing">
-                        <span>📤 SAINDO (${pctOut}%)</span>
+                        <span>${window.uiIcon("arrow-right")} SAINDO (${pctOut}%)</span>
                     </div>
                 `;
             } else if (isIncoming) {
@@ -4014,7 +4270,7 @@ function updateUpcomingTrackUI() {
                 transitionRole = "incoming";
                 statusBadgeHtml = `
                     <div class="badge-incoming-track" data-track-badge="incoming">
-                        <span>📥 ENTRANDO (${pctIn}%)</span>
+                        <span>ENTRANDO (${pctIn}%)</span>
                     </div>
                 `;
             } else if (isPlaying) {
@@ -4029,14 +4285,14 @@ function updateUpcomingTrackUI() {
                 cardExtraClass = " next-up";
                 statusBadgeHtml = `
                     <div class="badge-added-now">
-                        <span>✨ ADICIONADA AGORA</span>
+                        <span>${window.uiIcon("sparkles")} ADICIONADA AGORA</span>
                     </div>
                 `;
             } else if (isNext) {
                 cardExtraClass = " next-up";
                 statusBadgeHtml = `
                     <div class="badge-next-up">
-                        <span>⏭️ A SEGUIR (PRÓXIMA)</span>
+                        <span>${window.uiIcon("skip")} A SEGUIR (PRÓXIMA)</span>
                     </div>
                 `;
             }
@@ -4125,7 +4381,7 @@ function updateUpcomingTrackUI() {
             const pctA = Math.round((activeDeck === "A" ? fromVol : toVol) * 100);
             const pctB = Math.round((activeDeck === "A" ? toVol : fromVol) * 100);
             if (balanceText) {
-                balanceText.textContent = `Deck A ${pctA}% ➔ ${pctB}% Deck B`;
+                balanceText.textContent = `Deck A ${pctA}% -> ${pctB}% Deck B`;
             }
 
             if (meterA && meterB) {
@@ -4135,16 +4391,16 @@ function updateUpcomingTrackUI() {
 
             // Indicador flutuante elegante sobre o vídeo
             if (crossfadeInd) {
-                crossfadeInd.innerHTML = `🎚️ <span style="color:#ff5500; font-weight:800;">Saindo:</span> ${escapeHtml(outTitle.slice(0, 24))} ➔ <span style="color:#00f2fe; font-weight:800;">Entrando:</span> ${escapeHtml(inTitle.slice(0, 24))} <strong style="color:#00f2fe; margin-left:4px;">${pct}%</strong>`;
+                crossfadeInd.innerHTML = `${window.uiIcon("sliders")} <span style="color:#ff5500; font-weight:800;">Saindo:</span> ${escapeHtml(outTitle.slice(0, 24))} -> <span style="color:#00f2fe; font-weight:800;">Entrando:</span> ${escapeHtml(inTitle.slice(0, 24))} <strong style="color:#00f2fe; margin-left:4px;">${pct}%</strong>`;
             }
 
             if (nowPlayingPill) {
                 nowPlayingPill.classList.add("in-transition");
-                nowPlayingPill.innerHTML = `🎚️ Transição <strong style="color:#00f2fe; margin-left:3px;">${pct}%</strong>`;
+                nowPlayingPill.innerHTML = `${window.uiIcon("sliders")} Transição <strong style="color:#00f2fe; margin-left:3px;">${pct}%</strong>`;
             }
 
             if (barStatus) {
-                barStatus.innerHTML = `🎚️ <span style="color:#ffaa00; font-weight:700;">Saindo:</span> ${escapeHtml(outTitle)} • <span style="color:#00f2fe; font-weight:700;">Entrando:</span> ${escapeHtml(inTitle)} (${pct}%)`;
+                barStatus.innerHTML = `${window.uiIcon("sliders")} <span style="color:#ffaa00; font-weight:700;">Saindo:</span> ${escapeHtml(outTitle)} • <span style="color:#00f2fe; font-weight:700;">Entrando:</span> ${escapeHtml(inTitle)} (${pct}%)`;
             }
 
             // Atualização dos banners de transição (Pesquisa e Spotify)
@@ -4157,8 +4413,8 @@ function updateUpcomingTrackUI() {
                     const inEl = document.getElementById("searchIncomingTrackInfo");
                     const fillEl = document.getElementById("searchTransitionFill");
                     if (pctEl) pctEl.textContent = `${pctIn}%`;
-                    if (outEl) outEl.textContent = `📤 SAINDO: ${outTitle} (${pctOut}%)`;
-                    if (inEl) inEl.textContent = `📥 ENTRANDO: ${inTitle} (${pctIn}%)`;
+                    if (outEl) outEl.textContent = `SAINDO: ${outTitle} (${pctOut}%)`;
+                    if (inEl) inEl.textContent = `ENTRANDO: ${inTitle} (${pctIn}%)`;
                     if (fillEl) fillEl.style.width = `${pctIn}%`;
                 } else {
                     searchBanner.style.display = "none";
@@ -4174,8 +4430,8 @@ function updateUpcomingTrackUI() {
                     const inEl = document.getElementById("spotifyIncomingTrackInfo");
                     const fillEl = document.getElementById("spotifyTransitionFill");
                     if (pctEl) pctEl.textContent = `${pctIn}%`;
-                    if (outEl) outEl.textContent = `📤 SAINDO: ${outTitle} (${pctOut}%)`;
-                    if (inEl) inEl.textContent = `📥 ENTRANDO: ${inTitle} (${pctIn}%)`;
+                    if (outEl) outEl.textContent = `SAINDO: ${outTitle} (${pctOut}%)`;
+                    if (inEl) inEl.textContent = `ENTRANDO: ${inTitle} (${pctIn}%)`;
                     if (fillEl) fillEl.style.width = `${pctIn}%`;
                 } else {
                     spotifyBanner.style.display = "none";
@@ -4193,15 +4449,15 @@ function updateUpcomingTrackUI() {
             // Tags de status suaves com animação visual
             if (tagOutgoing) {
                 tagOutgoing.className = "deck-tag outgoing";
-                tagOutgoing.textContent = `${activeDeck === "A" ? "DECK A" : "DECK B"} 📤 ${pctOut}%`;
+                tagOutgoing.textContent = `${activeDeck === "A" ? "DECK A" : "DECK B"} [OUT] ${pctOut}%`;
             }
             if (tagIncoming) {
                 tagIncoming.className = "deck-tag incoming";
-                tagIncoming.textContent = `${activeDeck === "A" ? "DECK B" : "DECK A"} 📥 ${pctIn}%`;
+                tagIncoming.textContent = `${activeDeck === "A" ? "DECK B" : "DECK A"} [IN] ${pctIn}%`;
             }
 
-            if (artistOutgoing) artistOutgoing.innerHTML = `<span style="color:#ff8800; font-weight:700;">📤 Saindo da música atual...</span>`;
-            if (artistIncoming) artistIncoming.innerHTML = `<span style="color:#00e676; font-weight:700;">📥 Entrando na próxima música...</span>`;
+            if (artistOutgoing) artistOutgoing.innerHTML = `<span style="color:#ff8800; font-weight:700;">${window.uiIcon("arrow-right")} Saindo da música atual...</span>`;
+            if (artistIncoming) artistIncoming.innerHTML = `<span style="color:#00e676; font-weight:700;">${window.uiIcon("arrow-right")} Entrando na próxima música...</span>`;
 
             // CONTORNO SUAVE DOS CARDS CONFORME A BARRA VAI SAINDO E ENTRANDO
             if (cardOutgoing) {
@@ -4244,7 +4500,7 @@ function updateUpcomingTrackUI() {
                                 const b = document.createElement("div");
                                 b.className = "badge-outgoing-track";
                                 b.setAttribute("data-track-badge", "outgoing");
-                                b.innerHTML = `<span>📤 SAINDO (${pctOut}%)</span>`;
+                                b.innerHTML = `<span>${window.uiIcon("arrow-right")} SAINDO (${pctOut}%)</span>`;
                                 subrow.insertBefore(b, subrow.firstChild);
                             }
                         }
@@ -4266,7 +4522,7 @@ function updateUpcomingTrackUI() {
                                 const b = document.createElement("div");
                                 b.className = "badge-incoming-track";
                                 b.setAttribute("data-track-badge", "incoming");
-                                b.innerHTML = `<span>📥 ENTRANDO (${pctIn}%)</span>`;
+                                b.innerHTML = `<span>ENTRANDO (${pctIn}%)</span>`;
                                 subrow.insertBefore(b, subrow.firstChild);
                             }
                         }
@@ -4285,7 +4541,7 @@ function updateUpcomingTrackUI() {
                 c.style.boxShadow = `0 0 ${outGlowSize}px rgba(255, 85, 0, ${outGlowAlpha})`;
                 c.style.background = `linear-gradient(135deg, rgba(255, 85, 0, ${outBgAlpha}), rgba(0, 0, 0, 0.4))`;
                 const badgeSpan = c.querySelector('[data-track-badge="outgoing"] span');
-                if (badgeSpan) badgeSpan.textContent = `📤 SAINDO (${pctOut}%)`;
+                if (badgeSpan) badgeSpan.textContent = `SAINDO (${pctOut}%)`;
             });
 
             const listInCards = document.querySelectorAll('.track-card.transition-incoming, [data-transition-role="incoming"]');
@@ -4298,7 +4554,7 @@ function updateUpcomingTrackUI() {
                 c.style.boxShadow = `0 0 ${inGlowSize}px rgba(0, 242, 254, ${inGlowAlpha})`;
                 c.style.background = `linear-gradient(135deg, rgba(0, 242, 254, ${inBgAlpha}), rgba(0, 0, 0, 0.4))`;
                 const badgeSpan = c.querySelector('[data-track-badge="incoming"] span');
-                if (badgeSpan) badgeSpan.textContent = `📥 ENTRANDO (${pctIn}%)`;
+                if (badgeSpan) badgeSpan.textContent = `ENTRANDO (${pctIn}%)`;
             });
         }
 
@@ -4360,7 +4616,7 @@ function triggerCrossfade(nextTrack) {
 
             const curBpm = (outgoingTrack && outgoingTrack.bpm) ? outgoingTrack.bpm : 135;
             const incBpm = (incomingTrack && incomingTrack.bpm) ? incomingTrack.bpm : curBpm;
-            if (syncBadge) syncBadge.textContent = `⚡ Mixando: ~${incBpm} BPM`;
+            if (syncBadge) syncBadge.innerHTML = `${window.uiIcon("zap")} Mixando: ~${incBpm} BPM`;
 
             if (activeDeck === "A") {
                 if (deckATitle) deckATitle.textContent = outgoingTrack ? outgoingTrack.title : "Deck A";
@@ -4449,7 +4705,7 @@ function triggerCrossfade(nextTrack) {
                         console.warn("Falha ao carregar a próxima faixa no crossfade:", err);
                         cancelTransition();
                         hasFadedCurrentTrack = false;
-                        showToast("⚠️ Não foi possível tocar a próxima faixa. Pulando...");
+                        showToast(window.uiIcon("alert") + " Não foi possível tocar a próxima faixa. Pulando...");
                         setTimeout(() => {
                             if (typeof autoAdvanceWithFade === "function") autoAdvanceWithFade();
                         }, 900);
@@ -4842,12 +5098,12 @@ function triggerCrossfade(nextTrack) {
             }
 
             if (syncBadge && !isTransitioning) {
-                syncBadge.textContent = `⚡ Sincronia: ~${curBpm} BPM`;
+                syncBadge.innerHTML = `${window.uiIcon("zap")} Sync: ~${curBpm} BPM`;
             }
             const stemsTitle = document.getElementById("stemsTrackNowTitle");
             const stemsBpm = document.getElementById("stemsTrackNowBpm");
             if (stemsTitle && nowPlayingTrack) stemsTitle.textContent = nowPlayingTrack.title;
-            if (stemsBpm) stemsBpm.textContent = `⚡ ${curBpm} BPM`;
+            if (stemsBpm) stemsBpm.innerHTML = `${window.uiIcon("zap")} ${curBpm} BPM`;
 
             updateTurntablesState();
         }
@@ -5009,13 +5265,13 @@ function triggerCrossfade(nextTrack) {
             if (targetTime <= dropStartSec || targetTime < 12) {
                 dropActiveSeconds = 0;
                 dropTargetSeconds = (typeof dropWindowManualBase === "number") ? dropWindowManualBase : 75;
-                showToast("🔄 Repetindo/Início: Contexto do Drop e análise reiniciados!");
+                showToast(window.uiIcon("refresh") + " Repetindo/Início: Contexto do Drop e análise reiniciados!");
             } else {
                 // Recalcula o tempo já decorrido do drop relativo à nova posição da barra
                 dropActiveSeconds = Math.max(0, targetTime - dropStartSec);
                 const base = (typeof dropWindowManualBase === "number") ? dropWindowManualBase : 75;
                 dropTargetSeconds = Math.max(dropActiveSeconds + 35, base);
-                showToast(`📍 Contexto sincronizado na posição ${formatTime(targetTime)}!`);
+                showToast(`${window.uiIcon("target")} Contexto sincronizado na posição ${formatTime(targetTime)}!`);
             }
 
             if (typeof updateDropHunterMetrics === "function") {
@@ -5196,21 +5452,21 @@ function triggerCrossfade(nextTrack) {
             let volLabel = `${masterVolume}%`;
             let volColor = "var(--text-dim)";
             if (masterVolume > 140) {
-                volLabel = `🔥 ${masterVolume}%`;
+                volLabel = `${masterVolume}%`;
                 volColor = "#ff0055";
             } else if (masterVolume > 100) {
-                volLabel = `⚡ ${masterVolume}%`;
+                volLabel = `${masterVolume}%`;
                 volColor = "#ffaa00";
             }
 
-            const icon = (isMuted || masterVolume === 0) ? "🔇" : (masterVolume < 50 ? "🔉" : (masterVolume <= 100 ? "🔊" : "📢"));
+            const icon = (isMuted || masterVolume === 0) ? window.uiIcon("speaker-mute") : (masterVolume <= 100 ? window.uiIcon("speaker") : window.uiIcon("speaker"));
 
             if (slider) slider.value = masterVolume;
             if (text) {
                 text.textContent = volLabel;
                 text.style.color = volColor;
             }
-            if (barMute) barMute.textContent = icon;
+            if (barMute) barMute.innerHTML = icon;
 
             if (eqSlider) eqSlider.value = masterVolume;
             if (eqText) {
@@ -5222,7 +5478,7 @@ function triggerCrossfade(nextTrack) {
             const visTag = document.getElementById("visTagText");
             if (visTag) {
                 if (isMuted || masterVolume === 0) {
-                    visTag.textContent = engineMode === "audio" ? "ÁUDIO HD • 🔇 MUDO" : "CLIPE YT • 🔇 MUDO";
+                    visTag.textContent = engineMode === "audio" ? "ÁUDIO HD • MUDO" : "CLIPE YT • MUDO";
                 } else {
                     const modePrefix = engineMode === "audio" ? "ÁUDIO HD" : "CLIPE YT";
                     const vlcExtra = masterVolume > 100 ? " VLC" : "";
@@ -5893,7 +6149,7 @@ function triggerCrossfade(nextTrack) {
 
             const badge = document.getElementById("stemsProfileActiveBadge");
             if (badge) {
-                const prefix = (key === "auto") ? "⚡ AUTO: " : "🎯 ";
+                const prefix = (key === "auto") ? "AUTO: " : "";
                 badge.textContent = `${prefix}${profile.name.toUpperCase()} (CALIBRADO)`;
             }
 
@@ -5917,7 +6173,7 @@ function triggerCrossfade(nextTrack) {
                 applyProfileFiltersToDsp(profile);
                 const badge = document.getElementById("stemsProfileActiveBadge");
                 if (badge) {
-                    badge.textContent = `⚡ AUTO: ${profile.name.toUpperCase()} (CALIBRADO)`;
+                    badge.innerHTML = `${window.uiIcon("zap")} AUTO: ${profile.name.toUpperCase()} (CALIBRADO)`;
                 }
             }
         }
@@ -6089,10 +6345,10 @@ function triggerCrossfade(nextTrack) {
                     pill.classList.remove("active-engaged");
                 } else if (stemsState.solo) {
                     const stemNames = { vocal: "VOCAL SOLO", drums: "BATIDA SOLO", bass: "GRAVE SOLO", inst: "MELODIA SOLO" };
-                    pill.textContent = `⚡ ${stemNames[stemsState.solo] || "SOLO ATIVO"}`;
+                    pill.innerHTML = `${window.uiIcon("zap")} ${stemNames[stemsState.solo] || "SOLO ATIVO"}`;
                     pill.classList.add("active-engaged");
                 } else {
-                    pill.textContent = "⚡ STEMS DSP ATIVO (ISOLADO)";
+                    pill.innerHTML = `${window.uiIcon("zap")} STEMS DSP ATIVO (ISOLADO)`;
                     pill.classList.add("active-engaged");
                 }
             }
@@ -6284,13 +6540,45 @@ function triggerCrossfade(nextTrack) {
             const inMid = (incomingDeck === "B") ? deckGainMidB : deckGainMidA;
             const inHigh = (incomingDeck === "B") ? deckGainHighB : deckGainHighA;
 
-            if (outLow && outLow.gain) outLow.gain.value = fromBass * effBass;
-            if (outMid && outMid.gain) outMid.gain.value = fromMid * effVocal;
-            if (outHigh && outHigh.gain) outHigh.gain.value = fromHigh * effInst;
+            // Suavização Contínua do Bypass nos Decks (Elimina qualquer salto de áudio na entrada e saída da transição):
+            const inBypassGainNode = (incomingDeck === "B") ? deckGainBypassB : deckGainBypassA;
+            const outBypassGainNode = (outgoingDeck === "A") ? deckGainBypassA : deckGainBypassB;
 
-            if (inLow && inLow.gain) inLow.gain.value = toBass * effBass;
-            if (inMid && inMid.gain) inMid.gain.value = toMid * effVocal;
-            if (inHigh && inHigh.gain) inHigh.gain.value = toHigh * effInst;
+            // Na deck de saída: transita suavemente do bypass para os filtros nos primeiros 35%
+            let outBypass = 0.0001;
+            let outFilterMul = 1.0;
+            if (p < 0.35) {
+                const outBlend = p / 0.35;
+                const outEase = 0.5 - 0.5 * Math.cos(outBlend * Math.PI);
+                outBypass = Math.max(0.0001, 1.0 - outEase);
+                outFilterMul = outEase;
+            } else {
+                outBypass = 0.0001;
+                outFilterMul = 1.0;
+            }
+            if (outBypassGainNode && outBypassGainNode.gain) outBypassGainNode.gain.value = outBypass;
+
+            // Na deck de entrada: transita suavemente dos filtros para o bypass limpo nos últimos 45% (p = 0.55 até 1.0)
+            let inBypass = 0.0001;
+            let inFilterMul = 1.0;
+            if (p > 0.55) {
+                const inBlend = (p - 0.55) / 0.45;
+                const inEase = 0.5 - 0.5 * Math.cos(inBlend * Math.PI);
+                inBypass = Math.max(0.0001, inEase);
+                inFilterMul = Math.max(0.0, 1.0 - inEase);
+            } else {
+                inBypass = 0.0001;
+                inFilterMul = 1.0;
+            }
+            if (inBypassGainNode && inBypassGainNode.gain) inBypassGainNode.gain.value = inBypass;
+
+            if (outLow && outLow.gain) outLow.gain.value = fromBass * effBass * outFilterMul;
+            if (outMid && outMid.gain) outMid.gain.value = fromMid * effVocal * outFilterMul;
+            if (outHigh && outHigh.gain) outHigh.gain.value = fromHigh * effInst * outFilterMul;
+
+            if (inLow && inLow.gain) inLow.gain.value = toBass * effBass * inFilterMul;
+            if (inMid && inMid.gain) inMid.gain.value = toMid * effVocal * inFilterMul;
+            if (inHigh && inHigh.gain) inHigh.gain.value = toHigh * effInst * inFilterMul;
         }
 
         // ==========================================================
@@ -6308,11 +6596,11 @@ function triggerCrossfade(nextTrack) {
             if (fxBadge && fxName && fxInfo) {
                 fxName.textContent = fxInfo.name || "Transição DJ Club";
                 const iconSpan = fxBadge.querySelector(".fx-icon");
-                if (iconSpan) iconSpan.textContent = fxInfo.icon || "⚡";
+                if (iconSpan) iconSpan.innerHTML = fxInfo.icon || window.uiIcon("zap");
             }
 
             const dropStatus = document.getElementById("djHudDropIndicator");
-            if (dropStatus) dropStatus.textContent = "💥 PREPARANDO DROP...";
+            if (dropStatus) dropStatus.innerHTML = `${window.uiIcon("zap")} PREPARANDO DROP...`;
 
             const barBassA = document.getElementById("djBarBassA");
             const barBassB = document.getElementById("djBarBassB");
@@ -6362,9 +6650,9 @@ function triggerCrossfade(nextTrack) {
 
             const dropStatus = document.getElementById("djHudDropIndicator");
             if (dropStatus) {
-                if (p < 0.45) dropStatus.textContent = "💥 PREPARANDO DROP...";
-                else if (p < 0.85) dropStatus.textContent = "🔥 DROP ATIVADO! (BASS SWAP)";
-                else dropStatus.textContent = "✨ DROP CONFIRMADO";
+                if (p < 0.45) dropStatus.innerHTML = `${window.uiIcon("zap")} PREPARANDO DROP...`;
+                else if (p < 0.85) dropStatus.innerHTML = `${window.uiIcon("fire")} DROP ATIVADO! (BASS SWAP)`;
+                else dropStatus.innerHTML = `${window.uiIcon("sparkles")} DROP CONFIRMADO`;
             }
         }
 
@@ -6383,49 +6671,49 @@ function triggerCrossfade(nextTrack) {
         // ==========================================================
         const DJ_GENRE_EFFECTS_CATALOG = {
             funk: [
-                { id: "airhorn_impact", name: "FX: Baile Airhorn & Sub 808", type: "airhorn", icon: "📢", tag: "FUNK / MANDELÃO" },
-                { id: "spinback_drop", name: "FX: Vinyl Spinback & 808", type: "spinback", icon: "🔄", tag: "FUNK / MANDELÃO" },
-                { id: "sub_drop", name: "FX: 808 Sub Drop Explosivo", type: "sub_drop", icon: "💥", tag: "FUNK / MANDELÃO" },
-                { id: "stutter_gate", name: "FX: Stutter Gate & Sub Drop", type: "stutter_gate", icon: "⚡", tag: "FUNK / MANDELÃO" },
-                { id: "siren_riser", name: "FX: Dub Siren & Mandelão Drop", type: "siren_riser", icon: "🚨", tag: "FUNK / MANDELÃO" }
+                { id: "airhorn_impact", name: "FX: Baile Airhorn & Sub 808", type: "airhorn", icon: window.uiIcon("speaker"), tag: "FUNK / MANDELÃO" },
+                { id: "spinback_drop", name: "FX: Vinyl Spinback & 808", type: "spinback", icon: window.uiIcon("refresh"), tag: "FUNK / MANDELÃO" },
+                { id: "sub_drop", name: "FX: 808 Sub Drop Explosivo", type: "sub_drop", icon: window.uiIcon("zap"), tag: "FUNK / MANDELÃO" },
+                { id: "stutter_gate", name: "FX: Stutter Gate & Sub Drop", type: "stutter_gate", icon: window.uiIcon("zap"), tag: "FUNK / MANDELÃO" },
+                { id: "siren_riser", name: "FX: Dub Siren & Mandelão Drop", type: "siren_riser", icon: window.uiIcon("alert"), tag: "FUNK / MANDELÃO" }
             ],
             house: [
-                { id: "jet_flanger", name: "FX: Jet Flanger & Club Drop", type: "jet_flanger", icon: "✈️", tag: "ELETRÔNICA / EDM" },
-                { id: "riser_drop", name: "FX: HPF Noise Sweep & Drop", type: "riser_drop", icon: "📈", tag: "ELETRÔNICA / EDM" },
-                { id: "snare_buildup", name: "FX: Snare Buildup & Impact", type: "snare_buildup", icon: "🥁", tag: "ELETRÔNICA / EDM" },
-                { id: "uplifter", name: "FX: Rave Uplifter & Drop", type: "uplifter", icon: "🚀", tag: "ELETRÔNICA / EDM" },
-                { id: "pitch_dive", name: "FX: Pitch Dive & Drop", type: "pitch_dive", icon: "📉", tag: "ELETRÔNICA / EDM" }
+                { id: "jet_flanger", name: "FX: Jet Flanger & Club Drop", type: "jet_flanger", icon: window.uiIcon("zap"), tag: "ELETRÔNICA / EDM" },
+                { id: "riser_drop", name: "FX: HPF Noise Sweep & Drop", type: "riser_drop", icon: window.uiIcon("chart"), tag: "ELETRÔNICA / EDM" },
+                { id: "snare_buildup", name: "FX: Snare Buildup & Impact", type: "snare_buildup", icon: window.uiIcon("drum"), tag: "ELETRÔNICA / EDM" },
+                { id: "uplifter", name: "FX: Rave Uplifter & Drop", type: "uplifter", icon: window.uiIcon("zap"), tag: "ELETRÔNICA / EDM" },
+                { id: "pitch_dive", name: "FX: Pitch Dive & Drop", type: "pitch_dive", icon: window.uiIcon("chart"), tag: "ELETRÔNICA / EDM" }
             ],
             cumbia: [
-                { id: "dub_echo", name: "FX: Dub Echo Delay & Roll", type: "dub_echo", icon: "🎛️", tag: "CUMBIA / CHARANGA" },
-                { id: "guiro_flange", name: "FX: Güiro Flanger & Drop", type: "jet_flanger", icon: "🪇", tag: "CUMBIA / CHARANGA" },
-                { id: "tape_stop", name: "FX: Cumbia Tape Stop & Spin", type: "spinback", icon: "📼", tag: "CUMBIA / CHARANGA" },
-                { id: "space_siren", name: "FX: Sonidero Space Siren", type: "siren_riser", icon: "🚨", tag: "CUMBIA / CHARANGA" },
-                { id: "sub_cumbia", name: "FX: Villera Sub Impact", type: "sub_drop", icon: "💥", tag: "CUMBIA / CHARANGA" }
+                { id: "dub_echo", name: "FX: Dub Echo Delay & Roll", type: "dub_echo", icon: window.uiIcon("equalizer"), tag: "CUMBIA / CHARANGA" },
+                { id: "guiro_flange", name: "FX: Güiro Flanger & Drop", type: "jet_flanger", icon: window.uiIcon("guitar"), tag: "CUMBIA / CHARANGA" },
+                { id: "tape_stop", name: "FX: Cumbia Tape Stop & Spin", type: "spinback", icon: window.uiIcon("radio"), tag: "CUMBIA / CHARANGA" },
+                { id: "space_siren", name: "FX: Sonidero Space Siren", type: "siren_riser", icon: window.uiIcon("alert"), tag: "CUMBIA / CHARANGA" },
+                { id: "sub_cumbia", name: "FX: Villera Sub Impact", type: "sub_drop", icon: window.uiIcon("zap"), tag: "CUMBIA / CHARANGA" }
             ],
             gaucho: [
-                { id: "tape_stop", name: "FX: Tape Stop & Fandango Sub", type: "spinback", icon: "🤠", tag: "GAÚCHO / FRONTEIRA" },
-                { id: "salao_reverb", name: "FX: Salão de Baile Echo", type: "dub_echo", icon: "🏛️", tag: "GAÚCHO / FRONTEIRA" },
-                { id: "sanfona_air", name: "FX: Gaita Airhorn & Sub", type: "airhorn", icon: "🪗", tag: "GAÚCHO / FRONTEIRA" },
-                { id: "sub_drop", name: "FX: Vanera Sub Drop", type: "sub_drop", icon: "💥", tag: "GAÚCHO / FRONTEIRA" }
+                { id: "tape_stop", name: "FX: Tape Stop & Fandango Sub", type: "spinback", icon: window.uiIcon("hat"), tag: "GAÚCHO / FRONTEIRA" },
+                { id: "salao_reverb", name: "FX: Salão de Baile Echo", type: "dub_echo", icon: window.uiIcon("wave"), tag: "GAÚCHO / FRONTEIRA" },
+                { id: "sanfona_air", name: "FX: Gaita Airhorn & Sub", type: "airhorn", icon: window.uiIcon("speaker"), tag: "GAÚCHO / FRONTEIRA" },
+                { id: "sub_drop", name: "FX: Vanera Sub Drop", type: "sub_drop", icon: window.uiIcon("zap"), tag: "GAÚCHO / FRONTEIRA" }
             ],
             trap: [
-                { id: "vinyl_scratch", name: "FX: Hip-Hop Vinyl Scratch", type: "vinyl_scratch", icon: "🎚️", tag: "TRAP / RAP" },
-                { id: "gunshot", name: "FX: Gunshot Slide & 808 Boom", type: "gunshot", icon: "🔫", tag: "TRAP / RAP" },
-                { id: "sub_drop", name: "FX: 808 Boom Profundo", type: "sub_drop", icon: "💥", tag: "TRAP / RAP" },
-                { id: "reverse_crash", name: "FX: Reverse Crash & 808", type: "reverse_crash", icon: "🌪️", tag: "TRAP / RAP" }
+                { id: "vinyl_scratch", name: "FX: Hip-Hop Vinyl Scratch", type: "vinyl_scratch", icon: window.uiIcon("sliders"), tag: "TRAP / RAP" },
+                { id: "gunshot", name: "FX: Gunshot Slide & 808 Boom", type: "gunshot", icon: window.uiIcon("zap"), tag: "TRAP / RAP" },
+                { id: "sub_drop", name: "FX: 808 Boom Profundo", type: "sub_drop", icon: window.uiIcon("zap"), tag: "TRAP / RAP" },
+                { id: "reverse_crash", name: "FX: Reverse Crash & 808", type: "reverse_crash", icon: window.uiIcon("wave"), tag: "TRAP / RAP" }
             ],
             sertanejo: [
-                { id: "sub_drop", name: "FX: Sub Drop de Arena", type: "sub_drop", icon: "🎸", tag: "SERTANEJO" },
-                { id: "dub_echo", name: "FX: Modão Acoustic Delay", type: "dub_echo", icon: "🎙️", tag: "SERTANEJO" },
-                { id: "airhorn", name: "FX: Rodeio Airhorn Impact", type: "airhorn", icon: "📢", tag: "SERTANEJO" },
-                { id: "reverse_crash", name: "FX: Reverse Swell & Drop", type: "reverse_crash", icon: "✨", tag: "SERTANEJO" }
+                { id: "sub_drop", name: "FX: Sub Drop de Arena", type: "sub_drop", icon: window.uiIcon("guitar"), tag: "SERTANEJO" },
+                { id: "dub_echo", name: "FX: Modão Acoustic Delay", type: "dub_echo", icon: window.uiIcon("mic"), tag: "SERTANEJO" },
+                { id: "airhorn", name: "FX: Rodeio Airhorn Impact", type: "airhorn", icon: window.uiIcon("speaker"), tag: "SERTANEJO" },
+                { id: "reverse_crash", name: "FX: Reverse Swell & Drop", type: "reverse_crash", icon: window.uiIcon("sparkles"), tag: "SERTANEJO" }
             ],
             pop: [
-                { id: "sub_drop", name: "FX: Filter Sweep & Sub Drop", type: "sub_drop", icon: "🎛️", tag: "POP / GERAL" },
-                { id: "jet_flanger", name: "FX: Space Flanger & Drop", type: "jet_flanger", icon: "🛸", tag: "POP / GERAL" },
-                { id: "reverse_crash", name: "FX: Reverse Crash Swell", type: "reverse_crash", icon: "🌪️", tag: "POP / GERAL" },
-                { id: "uplifter", name: "FX: Pop Uplifter Riser", type: "uplifter", icon: "🚀", tag: "POP / GERAL" }
+                { id: "sub_drop", name: "FX: Filter Sweep & Sub Drop", type: "sub_drop", icon: window.uiIcon("equalizer"), tag: "POP / GERAL" },
+                { id: "jet_flanger", name: "FX: Space Flanger & Drop", type: "jet_flanger", icon: window.uiIcon("zap"), tag: "POP / GERAL" },
+                { id: "reverse_crash", name: "FX: Reverse Crash Swell", type: "reverse_crash", icon: window.uiIcon("wave"), tag: "POP / GERAL" },
+                { id: "uplifter", name: "FX: Pop Uplifter Riser", type: "uplifter", icon: window.uiIcon("zap"), tag: "POP / GERAL" }
             ]
         };
 
@@ -6494,6 +6782,11 @@ function triggerCrossfade(nextTrack) {
         }
 
         function triggerMusicDucking(durationSec = 2.0) {
+            // Se estiver em transição (crossfade ativo), o crossfade já equaliza suavemente os decks.
+            // O DJ FX possui barramento próprio com limiter dinâmico (djFxLimiterNode).
+            // Aplicar linearRampToValueAtTime em activeGain.gain enquanto a transição automatiza os ganhos
+            // causa salto de volume e estalo ao término do FX.
+            if (isTransitioning) return;
             const ctx = audioCtx;
             if (ctx && engineMode === "audio") {
                 const activeGain = (activeDeck === "A") ? deckGainA : deckGainB;
@@ -6502,7 +6795,7 @@ function triggerCrossfade(nextTrack) {
                         const now = ctx.currentTime;
                         activeGain.gain.cancelScheduledValues(now);
                         activeGain.gain.setValueAtTime(activeGain.gain.value, now);
-                        activeGain.gain.linearRampToValueAtTime(0.55, now + 0.05);
+                        activeGain.gain.linearRampToValueAtTime(0.65, now + 0.05);
                         activeGain.gain.linearRampToValueAtTime(1.0, now + durationSec);
                     } catch (e) {}
                 }
@@ -7073,7 +7366,7 @@ function triggerCrossfade(nextTrack) {
             initWebAudio();
             if (!audioCtx) return;
             if (audioCtx.state === "suspended") audioCtx.resume();
-            playDjClubFx({ type: type, name: `Teste ${type}`, icon: "⚡" }, 128, 3000, null, null);
+            playDjClubFx({ type: type, name: `Teste ${type}`, icon: window.uiIcon("zap") }, 128, 3000, null, null);
         }
 
         function togglePlayPause() {
@@ -7157,7 +7450,7 @@ function triggerCrossfade(nextTrack) {
                     } else {
                         nowPlayingQueue.push(nextTrack);
                         nowPlayingIndex = nowPlayingQueue.length - 1;
-                        showToast(`🌐 Descoberta Fora da Lista: ${nextTrack.title.slice(0, 26)}...`);
+                        showToast(`${window.uiIcon("radio")} Descoberta Fora da Lista: ${nextTrack.title.slice(0, 26)}...`);
                     }
                 }
             }
@@ -7206,7 +7499,7 @@ function triggerCrossfade(nextTrack) {
                         } else {
                             nowPlayingQueue.push(nextTrack);
                             nowPlayingIndex = nowPlayingQueue.length - 1;
-                            showToast(`🌐 Descoberta Fora da Lista: ${nextTrack.title.slice(0, 26)}...`);
+                            showToast(`${window.uiIcon("radio")} Descoberta Fora da Lista: ${nextTrack.title.slice(0, 26)}...`);
                         }
                     }
                 }
@@ -7286,13 +7579,13 @@ function triggerCrossfade(nextTrack) {
             if (smartSilenceMode === "auto") {
                 smartSilenceMode = "fixed";
                 introSkipFixedSeconds = 2.0;
-                showToast("⚡ Silêncio: Fixo (2.0s cortados em todas as faixas)");
+                showToast(window.uiIcon("zap") + " Silêncio: Fixo (2.0s cortados em todas as faixas)");
             } else if (smartSilenceMode === "fixed") {
                 smartSilenceMode = "off";
-                showToast("⚡ Silêncio: Desativado (Início padrão em 0.0s)");
+                showToast(window.uiIcon("zap") + " Silêncio: Desativado (Início padrão em 0.0s)");
             } else {
                 smartSilenceMode = "auto";
-                showToast("⚡ Silêncio: Inteligente (Catalogado & Auto-detecção)");
+                showToast(window.uiIcon("zap") + " Silêncio: Inteligente (Catalogado & Auto-detecção)");
             }
 
             localStorage.setItem("pref_smartSilenceMode", smartSilenceMode);
@@ -7319,13 +7612,13 @@ function triggerCrossfade(nextTrack) {
         function toggleRepeatMode() {
             if (repeatMode === "off") {
                 repeatMode = "one";
-                showToast("🔂 Modo Repetir: A MESMA MÚSICA em loop contínuo!");
+                showToast(window.uiIcon("repeat-1") + " Modo Repetir: A MESMA MÚSICA em loop contínuo!");
             } else if (repeatMode === "one") {
                 repeatMode = "all";
-                showToast("🔁 Modo Repetir: TODA A PLAYLIST em loop contínuo!");
+                showToast(window.uiIcon("repeat") + " Modo Repetir: TODA A PLAYLIST em loop contínuo!");
             } else {
                 repeatMode = "off";
-                showToast("➡️ Modo Repetir: DESATIVADO (Avanço normal)");
+                showToast(window.uiIcon("arrow-right") + " Modo Repetir: DESATIVADO (Avanço normal)");
             }
             localStorage.setItem("pref_repeat_mode", repeatMode);
             updateSettingsUI();
@@ -7337,15 +7630,15 @@ function triggerCrossfade(nextTrack) {
             if (!btn) return;
             if (repeatMode === "one") {
                 btn.className = "bar-pill-btn active";
-                btn.innerHTML = "🔂 Repetir: 1";
+                btn.innerHTML = `${window.uiIcon("repeat-1")} Repetir: 1`;
                 btn.title = "Modo Ativo: Repetindo a MESMA música em loop contínuo (Clique para alternar: Todas / Desativar)";
             } else if (repeatMode === "all") {
                 btn.className = "bar-pill-btn active";
-                btn.innerHTML = "🔁 Repetir: Todas";
+                btn.innerHTML = `${window.uiIcon("repeat")} Repetir: Todas`;
                 btn.title = "Modo Ativo: Repetindo a PLAYLIST inteira (Clique para alternar: Desativar)";
             } else {
                 btn.className = "bar-pill-btn";
-                btn.innerHTML = "🔂 Repetir";
+                btn.innerHTML = `${window.uiIcon("repeat-1")} Repetir`;
                 btn.title = "Modo de Repetição Desativado (Clique para repetir a mesma música em loop)";
             }
         }
@@ -7353,22 +7646,22 @@ function triggerCrossfade(nextTrack) {
         function updateSettingsUI() {
             const btnCross = document.getElementById("barCrossfadeBtn");
             if (btnCross) {
-                btnCross.innerHTML = `🎚️ Fade: ${crossfadeSeconds}s`;
+                btnCross.innerHTML = `${window.uiIcon("sliders")} Fade: ${crossfadeSeconds}s`;
                 btnCross.className = `bar-pill-btn ${crossfadeSeconds > 0 ? "fade-active" : ""}`;
             }
 
             const btnIntro = document.getElementById("barIntroSkipBtn");
             if (btnIntro) {
                 if (smartSilenceMode === "auto") {
-                    btnIntro.innerHTML = `⚡ Silêncio: Auto`;
+                    btnIntro.innerHTML = `${window.uiIcon("zap")} Silêncio: Auto`;
                     btnIntro.className = "bar-pill-btn active";
                     btnIntro.title = "Silêncio Inteligente: Cataloga e detecta faixas sem silêncio (0s) e com silêncio";
                 } else if (smartSilenceMode === "fixed") {
-                    btnIntro.innerHTML = `⚡ Silêncio: Fixo 2s`;
+                    btnIntro.innerHTML = `${window.uiIcon("zap")} Silêncio: Fixo 2s`;
                     btnIntro.className = "bar-pill-btn active";
                     btnIntro.title = "Silêncio Fixo: Corta 2 segundos no início de todas as faixas";
                 } else {
-                    btnIntro.innerHTML = `⚡ Silêncio: 0s`;
+                    btnIntro.innerHTML = `${window.uiIcon("zap")} Silêncio: 0s`;
                     btnIntro.className = "bar-pill-btn";
                     btnIntro.title = "Silêncio Desativado: Inicia no segundo 0.0";
                 }
@@ -7386,7 +7679,7 @@ function triggerCrossfade(nextTrack) {
 
             const btnMode = document.getElementById("barEngineModeBtn");
             if (btnMode) {
-                btnMode.innerHTML = engineMode === "audio" ? "🎵 Áudio HD" : "🎬 Clipe";
+                btnMode.innerHTML = engineMode === "audio" ? `${window.uiIcon("music")} Áudio HD` : `${window.uiIcon("film")} Clipe`;
                 btnMode.className = `bar-pill-btn ${engineMode === "audio" ? "active" : ""}`;
             }
 
@@ -7407,28 +7700,28 @@ function triggerCrossfade(nextTrack) {
 
             const thumbUrl = (track && track.video_id) ? getTrackThumbnailUrl(track) : DEFAULT_COVER_SVG;
 
-            if (tTitle) tTitle.textContent = track.title || "Central de Músicas";
+            if (tTitle) tTitle.textContent = track.title || "DropHunter Studio";
             if (tArtist) tArtist.textContent = track.artist || track.category || "";
             if (tSource) {
                 const rawSource = (track.source || nowPlayingCategoryName || "Fila Ativa").trim();
                 let displaySource = rawSource;
                 if (rawSource.toLowerCase().includes("instagram")) {
-                    displaySource = "📷 Instagram";
+                    displaySource = "Instagram";
                     tSource.style.borderColor = "rgba(255, 0, 128, 0.4)";
                     tSource.style.background = "rgba(255, 0, 128, 0.12)";
                     tSource.style.color = "#ff4081";
                 } else if (rawSource.toLowerCase().includes("spotify")) {
-                    displaySource = "🟢 Spotify";
+                    displaySource = "Spotify";
                     tSource.style.borderColor = "rgba(30, 215, 96, 0.4)";
                     tSource.style.background = "rgba(30, 215, 96, 0.12)";
                     tSource.style.color = "#1ed760";
                 } else if (rawSource.toLowerCase().includes("youtube")) {
-                    displaySource = "🔴 YouTube";
+                    displaySource = "YouTube";
                     tSource.style.borderColor = "rgba(255, 68, 68, 0.4)";
                     tSource.style.background = "rgba(255, 68, 68, 0.12)";
                     tSource.style.color = "#ff5252";
                 } else {
-                    displaySource = `⚡ ${rawSource}`;
+                    displaySource = rawSource;
                     tSource.style.borderColor = "rgba(0, 242, 254, 0.35)";
                     tSource.style.background = "rgba(0, 242, 254, 0.12)";
                     tSource.style.color = "var(--accent)";
@@ -7436,7 +7729,7 @@ function triggerCrossfade(nextTrack) {
                 tSource.textContent = displaySource;
                 tSource.title = `Origem: ${rawSource}`;
             }
-            if (bTitle) bTitle.textContent = track.title || "Central de Músicas";
+            if (bTitle) bTitle.textContent = track.title || "DropHunter Studio";
             if (bArtist) bArtist.textContent = track.artist || track.category || "";
             if (bThumb) {
                 bThumb.onerror = function() { this.onerror = null; this.src = DEFAULT_COVER_SVG; };
@@ -7467,7 +7760,7 @@ function triggerCrossfade(nextTrack) {
         function showToast(msg) {
             const t = document.getElementById("toastNotify");
             if (!t) return;
-            t.textContent = msg;
+            t.innerHTML = msg;
             t.style.display = "block";
             setTimeout(() => {
                 t.style.display = "none";
@@ -7610,7 +7903,7 @@ function triggerCrossfade(nextTrack) {
             } else {
                 listContainer.innerHTML = `
                     <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 12px; padding: 30px 20px; text-align: center; margin-top: 15px;">
-                        <div style="font-size: 32px; margin-bottom: 10px;">🔍</div>
+                        <div style="font-size: 28px; margin-bottom: 10px;">${window.uiIcon("search")}</div>
                         <div style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px;">
                             Nenhuma música com "<em>${escapeHtml(rawQ)}</em>" na sua biblioteca
                         </div>
@@ -7618,7 +7911,7 @@ function triggerCrossfade(nextTrack) {
                             Quer que a IA busque novas músicas com esse nome, ritmo ou artista no YouTube e SoundCloud?
                         </div>
                         <button class="btn-sync-yt" onclick="searchExternalYouTube('${escapeQuotes(rawQ)}')" style="display: inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #ff0055, #ff5500); padding: 10px 22px; font-size: 13px; font-weight: 800; border-radius: 24px; box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4); margin: 0 auto;">
-                            <span>✨ Buscar "${escapeHtml(rawQ)}" com IA</span>
+                            <span>${window.uiIcon("sparkles")} Buscar "${escapeHtml(rawQ)}" com IA</span>
                         </button>
                     </div>
                 `;
@@ -7641,7 +7934,7 @@ function triggerCrossfade(nextTrack) {
             const subEl = document.getElementById("suggestionSubtext");
 
             if (badge) badge.textContent = "Buscando com IA...";
-            if (titleEl) titleEl.innerHTML = `🔍 Busca com IA: <em>${escapeHtml(q)}</em>`;
+            if (titleEl) titleEl.innerHTML = `${window.uiIcon("search")} Busca com IA: <em>${escapeHtml(q)}</em>`;
             if (subEl) subEl.innerHTML = `Buscando novidades no YouTube e SoundCloud baseadas no ritmo, BPM e estilo de <strong>${escapeHtml(q)}</strong>.`;
             showSuggestionsSkeleton();
 
@@ -7750,7 +8043,7 @@ function triggerCrossfade(nextTrack) {
                         <span class="eq-anim-bars"><span></span><span></span><span></span></span>
                         <div class="queue-item-meta">
                             <div class="queue-item-title">${escapeHtml(nowPlayingTrack.title)}</div>
-                            <div class="queue-item-sub">${escapeHtml(nowPlayingTrack.artist || nowPlayingTrack.category || '')} • ⚡ ${nowPlayingTrack.bpm || 135} BPM</div>
+                            <div class="queue-item-sub">${escapeHtml(nowPlayingTrack.artist || nowPlayingTrack.category || '')} • ${window.uiIcon("zap")} ${nowPlayingTrack.bpm || 135} BPM</div>
                         </div>
                     </div>
                     <span class="badge-source" style="background: rgba(0,230,118,0.15); color: #00e676; border: 1px solid rgba(0,230,118,0.3);">▶ Tocando Agora</span>
@@ -7779,12 +8072,12 @@ function triggerCrossfade(nextTrack) {
                         <span class="queue-item-pos">#${idx + 1}${idx === 0 ? " (Próxima)" : ""}</span>
                         <div class="queue-item-meta">
                             <div class="queue-item-title">${idx + 1}. ${escapeHtml(item.title)}</div>
-                            <div class="queue-item-sub">${escapeHtml(item.artist || item.category || '')} • ⚡ ${item.bpm || 135} BPM</div>
+                            <div class="queue-item-sub">${escapeHtml(item.artist || item.category || '')} • ${window.uiIcon("zap")} ${item.bpm || 135} BPM</div>
                         </div>
                     </div>
                     <div class="queue-item-actions">
                         <button class="btn-play-queue-item" onclick="playQueuedItemInstantly(${idx})" title="Tocar esta música agora com fade">▶ Tocar</button>
-                        <button class="btn-remove-queue-item" onclick="removeFromQueue('${item.video_id}')" title="Remover da fila">🗑️</button>
+                        <button class="btn-remove-queue-item" onclick="removeFromQueue('${item.video_id}')" title="Remover da fila"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                     </div>
                 `;
                 itemsContainer.appendChild(row);
@@ -7877,8 +8170,8 @@ function triggerCrossfade(nextTrack) {
                 let statusBadgeHtml = meta.statusBadgeHtml;
 
                 const bpm = item.bpm || detectBpmJs(item.title, item.category);
-                const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>`;
-                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">🏷️ ${item.category}</span>` : "";
+                const bpmBadgeHtml = `<span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>`;
+                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">${escapeHtml(item.category)}</span>` : "";
 
                 const card = document.createElement("div");
                 card.id = `queueCard_${item.video_id}`;
@@ -7900,11 +8193,11 @@ function triggerCrossfade(nextTrack) {
                     </div>
                     <div class="card-actions">
                         <button class="btn-similar-card" onclick="findSimilarToQueueTrack(${idx})" title="Buscar músicas semelhantes no mesmo ritmo e BPM com IA">
-                            📻 Parecidas
+                            ${window.uiIcon("radio")} Parecidas
                         </button>
                         ${inLibrary 
-                            ? `<button class="btn-add-playlist in-library" style="background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676;" title="Esta música já está salva na sua biblioteca">❤️ Na Playlist</button>`
-                            : `<button class="btn-add-playlist" onclick="addQueueTrackToPlaylist(${idx})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ Favoritar</button>`
+                            ? `<button class="btn-add-playlist in-library" style="background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676;" title="Esta música já está salva na sua biblioteca">${window.uiIcon("star")} Na Playlist</button>`
+                            : `<button class="btn-add-playlist" onclick="addQueueTrackToPlaylist(${idx})" title="Salvar permanentemente na sua Playlist/Biblioteca">${window.uiIcon("star")} Favoritar</button>`
                         }
                         <button class="btn-add-queue" onclick="removeFromQueue('${item.video_id}')" title="Remover da fila">Remover</button>
                     </div>
@@ -8029,11 +8322,11 @@ function triggerCrossfade(nextTrack) {
             if (!tracks || tracks.length === 0) {
                 container.innerHTML = `
                     <div style="color: var(--text-dim); text-align: center; padding: 40px 20px;">
-                        <div style="font-size: 28px; margin-bottom: 8px;">✨</div>
+                        <div style="font-size: 24px; margin-bottom: 8px;">${window.uiIcon("sparkles")}</div>
                         <div style="font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 6px;">Nenhuma sugestão carregada no momento para este gênero.</div>
                         <div style="font-size: 12px; margin-bottom: 14px;">Clique no botão abaixo para buscar músicas inéditas em tempo real no YouTube e SoundCloud!</div>
                         <button class="btn-sync-yt" onclick="fetchFreshSuggestionsForCurrentGenre()" style="margin: 0 auto; display: inline-flex; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; font-weight: 700; font-size: 12px; padding: 8px 16px;">
-                            🔄 Buscar Novidades com IA Agora
+                            ${window.uiIcon("refresh")} Buscar Novidades com IA Agora
                         </button>
                     </div>
                 `;
@@ -8053,18 +8346,18 @@ function triggerCrossfade(nextTrack) {
                 let statusBadgeHtml = meta.statusBadgeHtml;
 
                 const bpm = item.bpm || detectBpmJs(item.title, item.category);
-                const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>`;
-                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">🏷️ ${item.category}</span>` : "";
+                const bpmBadgeHtml = `<span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>`;
+                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">${escapeHtml(item.category)}</span>` : "";
                 const sourceBadgeHtml = getTrackSourceBadgeHtml(item);
 
                 let idealBadgeHtml = "";
                 if (nowPlayingTrack && item.video_id !== nowPlayingTrack.video_id) {
                     const score = calculateIdealNextTrackScore(item, nowPlayingTrack);
                     if (score >= 93) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">🎯 ${score}% Match</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">${window.uiIcon("target")} ${score}% Match</span>`;
                         cardClasses += " ideal-match-highlight";
                     } else if (score >= 86) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">⚡ ${score}% Mix</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">${window.uiIcon("zap")} ${score}% Mix</span>`;
                     }
                 }
 
@@ -8089,15 +8382,15 @@ function triggerCrossfade(nextTrack) {
                     </div>
                     <div class="card-actions">
                         <button class="btn-similar-card" onclick="findSimilarToSuggestionTrack(${idx})" title="Buscar músicas semelhantes no mesmo ritmo e BPM com IA">
-                            📻 Parecidas
+                            ${window.uiIcon("radio")} Parecidas
                         </button>
                         <button class="btn-add-playlist" onclick="addSuggestionTrackToPlaylist(${idx})" title="Salvar permanentemente na sua Playlist/Biblioteca">
-                            ⭐ + Playlist
+                            ${window.uiIcon("star")} + Playlist
                         </button>
                         ${(() => {
                             const qIdx = pendingQueue.findIndex(q => q.video_id === item.video_id);
                             if (qIdx !== -1) {
-                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${item.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">✓ Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
+                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${item.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">${window.uiIcon("check")} Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
                             } else {
                                 return `<button class="btn-add-queue" onclick="addSuggestionTrackToQueue(${idx})">+ Fila</button>`;
                             }
@@ -8206,7 +8499,7 @@ function triggerCrossfade(nextTrack) {
             if (container) {
                 container.innerHTML = `
                     <div class="search-empty-state">
-                        <div class="search-empty-icon" style="animation: pulseDot 1s infinite;">🔍</div>
+                        <div class="search-empty-icon" style="animation: pulseDot 1s infinite;">${window.uiIcon("search")}</div>
                         <div class="search-empty-title">Pesquisando "${query}"...</div>
                         <div class="search-empty-desc">Procurando na biblioteca e minerando novidades no YouTube e SoundCloud com IA...</div>
                     </div>
@@ -8231,7 +8524,7 @@ function triggerCrossfade(nextTrack) {
                 if (container) {
                     container.innerHTML = `
                         <div class="search-empty-state">
-                            <div class="search-empty-icon" style="color: #ff5555;">⚠️</div>
+                            <div class="search-empty-icon" style="color: #ff5555;">${window.uiIcon("alert")}</div>
                             <div class="search-empty-title">Erro ao buscar músicas</div>
                             <div class="search-empty-desc">Verifique a conexão com o servidor local e tente novamente.</div>
                         </div>
@@ -8333,7 +8626,7 @@ function triggerCrossfade(nextTrack) {
                 const hasSearched = (document.getElementById("freeSearchInput") && document.getElementById("freeSearchInput").value);
                 container.innerHTML = `
                     <div class="search-empty-state">
-                        <div class="search-empty-icon">${hasSearched ? "🔎" : "🔍"}</div>
+                        <div class="search-empty-icon">${window.uiIcon("search")}</div>
                         <div class="search-empty-title">${hasSearched ? "Nenhuma música encontrada" : "Pesquisa Livre & Descobertas"}</div>
                         <div class="search-empty-desc">${hasSearched ? "Tente buscar por outro termo, nome de DJ, ritmo ou BPM." : "Digite qualquer música, ritmo ou BPM acima para buscar com IA e ouvir com Crossfade!"}</div>
                     </div>
@@ -8362,20 +8655,20 @@ function triggerCrossfade(nextTrack) {
                 let statusBadgeHtml = meta.statusBadgeHtml;
 
                 const bpm = item.bpm || detectBpmJs(item.title, item.category);
-                const bpmBadgeHtml = `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>`;
-                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">🏷️ ${item.category}</span>` : "";
+                const bpmBadgeHtml = `<span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>`;
+                const catBadgeHtml = item.category ? `<span class="badge-bpm-chip" style="background: rgba(0,242,254,0.1); border-color: rgba(0,242,254,0.3); color: var(--accent);">${escapeHtml(item.category)}</span>` : "";
                 const sourceBadge = inLibrary
-                    ? `<span class="badge-source" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);">✓ Na Biblioteca</span>`
-                    : `<span class="badge-source" style="background: rgba(0, 242, 254, 0.15); color: var(--accent);">✨ Novidade</span> ${getTrackSourceBadgeHtml(item)}`;
+                    ? `<span class="badge-source" style="background: rgba(0, 230, 118, 0.15); color: #00e676; border: 1px solid rgba(0, 230, 118, 0.3);">${window.uiIcon("check")} Na Biblioteca</span>`
+                    : `<span class="badge-source" style="background: rgba(0, 242, 254, 0.15); color: var(--accent);">${window.uiIcon("sparkles")} Novidade</span> ${getTrackSourceBadgeHtml(item)}`;
 
                 let idealBadgeHtml = "";
                 if (nowPlayingTrack && item.video_id !== nowPlayingTrack.video_id) {
                     const score = calculateIdealNextTrackScore(item, nowPlayingTrack);
                     if (score >= 93) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">🎯 ${score}% Match</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-perfect" title="Harmonia e BPM ideais para mixagem">${window.uiIcon("target")} ${score}% Match</span>`;
                         cardClasses += " ideal-match-highlight";
                     } else if (score >= 86) {
-                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">⚡ ${score}% Mix</span>`;
+                        idealBadgeHtml = `<span class="badge-ideal-track match-great" title="Excelente sincronia de mix">${window.uiIcon("zap")} ${score}% Mix</span>`;
                     }
                 }
 
@@ -8400,16 +8693,16 @@ function triggerCrossfade(nextTrack) {
                     </div>
                     <div class="card-actions">
                         <button class="btn-similar-card" onclick="findSimilarToSearchTrack(${idx})" title="Buscar músicas semelhantes no mesmo ritmo e BPM com IA">
-                            📻 Parecidas
+                            ${window.uiIcon("radio")} Parecidas
                         </button>
                         ${inLibrary 
-                            ? `<button class="btn-add-playlist" style="background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676;" title="Esta música já está salva na sua biblioteca">❤️ Na Playlist</button>`
-                            : `<button class="btn-add-playlist" onclick="addSearchTrackToPlaylist(${idx})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ Favoritar</button>`
+                            ? `<button class="btn-add-playlist" style="background: rgba(0, 230, 118, 0.15); border-color: rgba(0, 230, 118, 0.4); color: #00e676;" title="Esta música já está salva na sua biblioteca">${window.uiIcon("star")} Na Playlist</button>`
+                            : `<button class="btn-add-playlist" onclick="addSearchTrackToPlaylist(${idx})" title="Salvar permanentemente na sua Playlist/Biblioteca">${window.uiIcon("star")} Favoritar</button>`
                         }
                         ${(() => {
                             const qIdx = pendingQueue.findIndex(q => q.video_id === item.video_id);
                             if (qIdx !== -1) {
-                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${item.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">✓ Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
+                                return `<button class="btn-add-queue added" onclick="removeFromQueue('${item.video_id}')" title="Clique para remover da fila (#${qIdx + 1})">${window.uiIcon("check")} Fila #${qIdx + 1}${qIdx === 0 ? " (Próxima)" : ""}</button>`;
                             } else {
                                 return `<button class="btn-add-queue" onclick="addSearchTrackToQueue(${idx})">+ Fila</button>`;
                             }
@@ -8548,12 +8841,12 @@ function triggerCrossfade(nextTrack) {
             console.warn("YouTube Player event error code:", code);
             
             if (code === 100 || code === 2) {
-                showToast("⚠️ Vídeo não disponível no YouTube. Avançando para a próxima música...");
+                showToast(window.uiIcon("alert") + " Vídeo não disponível no YouTube. Avançando para a próxima música...");
                 setTimeout(() => {
                     autoAdvanceWithFade();
                 }, 1200);
             } else if (code === 150 || code === 101 || code === 5) {
-                showToast("🎵 Vídeo bloqueado no YouTube por direitos autorais. Ativando Áudio HD sem restrições!");
+                showToast(window.uiIcon("music") + " Vídeo bloqueado no YouTube por direitos autorais. Ativando Áudio HD sem restrições!");
                 setEngineMode("audio");
             }
         }
@@ -8616,13 +8909,13 @@ function triggerCrossfade(nextTrack) {
 
             if (compatLabel) {
                 if (Math.abs(parseFloat(diffPct)) <= 6) {
-                    compatLabel.textContent = "🟢 Compatibilidade Perfeita (Mixagem 100% Harmônica)";
+                    compatLabel.innerHTML = `${window.uiIcon("dot_green")} Compatibilidade Perfeita (Mixagem 100% Harmônica)`;
                     compatLabel.style.color = "#00e676";
                 } else if (Math.abs(parseFloat(diffPct)) <= 12) {
-                    compatLabel.textContent = "🟡 Boa Compatibilidade (Ajuste Suave no Crossfade)";
+                    compatLabel.innerHTML = `${window.uiIcon("dot_yellow")} Boa Compatibilidade (Ajuste Suave no Crossfade)`;
                     compatLabel.style.color = "#ffaa00";
                 } else {
-                    compatLabel.textContent = "🔴 Variação de Ritmo Maior (Keylock Automático Ativo)";
+                    compatLabel.innerHTML = `${window.uiIcon("dot_red")} Variação de Ritmo Maior (Keylock Automático Ativo)`;
                     compatLabel.style.color = "#ff7777";
                 }
             }
@@ -8652,7 +8945,7 @@ function triggerCrossfade(nextTrack) {
                 statusBadge.textContent = isAutoBeatmatchEnabled ? "Auto Sync Ativo" : "Auto Sync Desativado";
                 statusBadge.style.color = isAutoBeatmatchEnabled ? "var(--accent)" : "var(--text-dim)";
             }
-            showToast(isAutoBeatmatchEnabled ? "⚡ Beatmatch Automático ATIVADO no Crossfade" : "Beatmatch Automático desativado");
+            showToast(isAutoBeatmatchEnabled ? `${window.uiIcon("zap")} Beatmatch Automático ATIVADO no Crossfade` : "Beatmatch Automático desativado");
         }
 
         function handleBpmPitchSlider(val) {
@@ -8690,7 +8983,7 @@ function triggerCrossfade(nextTrack) {
             const curTrack = nowPlayingTrack;
             const nextTrack = getUpcomingTrack();
             if (!curTrack || !nextTrack) {
-                showToast("⚡ Selecione uma faixa tocando para sincronizar!");
+                showToast(window.uiIcon("zap") + " Selecione uma faixa tocando para sincronizar!");
                 return;
             }
             const curBpm = curTrack.bpm || 130;
@@ -8699,7 +8992,7 @@ function triggerCrossfade(nextTrack) {
             const neededPct = ((curBpm - nextBpm) / nextBpm) * 100;
             const clamped = Math.max(-15, Math.min(15, neededPct));
             setBpmPitchPreset(parseFloat(clamped.toFixed(1)));
-            showToast(`⚡ Próxima faixa sincronizada para ${curBpm} BPM!`);
+            showToast(`${window.uiIcon("zap")} Próxima faixa sincronizada para ${curBpm} BPM!`);
         }
 
         function applyPitchAdjustmentToAudio() {
@@ -8764,9 +9057,9 @@ function triggerCrossfade(nextTrack) {
                 elStatus.classList.toggle("shifted", isShifted && !isRamping);
                 elStatus.classList.toggle("ramping", isRamping);
                 if (isRamping) {
-                    elStatus.textContent = "🔄 Fade Gradual";
+                    elStatus.innerHTML = `${window.uiIcon("refresh")} Fade Gradual`;
                 } else if (isShifted) {
-                    elStatus.textContent = `⚡ Sincronizado (${diffPct >= 0 ? "+" : ""}${diffPct.toFixed(1)}%)`;
+                    elStatus.innerHTML = `${window.uiIcon("zap")} Sincronizado (${diffPct >= 0 ? "+" : ""}${diffPct.toFixed(1)}%)`;
                 } else {
                     elStatus.textContent = "Original (1.0x)";
                 }
@@ -8794,7 +9087,7 @@ function triggerCrossfade(nextTrack) {
             let step = 0;
 
             const startBpm = Math.round(originalBpm * startRate);
-            if (liveNum) liveNum.textContent = `${startBpm} ➔ ${originalBpm} BPM`;
+            if (liveNum) liveNum.textContent = `${startBpm} -> ${originalBpm} BPM`;
 
             updateLiveBpmPanel(originalBpm, startBpm, ((startRate - 1.0) * 100), true);
 
@@ -8815,7 +9108,7 @@ function triggerCrossfade(nextTrack) {
                 const remainingPct = Math.max(0, 100 - (frac * 100));
 
                 if (progressBar) progressBar.style.width = `${remainingPct}%`;
-                if (liveNum) liveNum.textContent = `${curBpm} ➔ ${originalBpm} BPM`;
+                if (liveNum) liveNum.textContent = `${curBpm} -> ${originalBpm} BPM`;
 
                 // Atualiza o painel visual no player EM TEMPO REAL!
                 updateLiveBpmPanel(originalBpm, curBpm, curPct, true);
@@ -8834,7 +9127,7 @@ function triggerCrossfade(nextTrack) {
                     updateBpmPitchUI();
 
                     if (progressBar) progressBar.style.width = "0%";
-                    if (caption) caption.textContent = "✓ Ritmo original 100% restaurado!";
+                    if (caption) caption.innerHTML = `${window.uiIcon("check")} Ritmo original 100% restaurado!`;
 
                     setTimeout(() => {
                         if (!liveBpmRampTimer && progressWrap) {
@@ -8977,12 +9270,12 @@ function triggerCrossfade(nextTrack) {
         function getVisibleTrackCards() {
             const activePane = Array.from(document.querySelectorAll(".pane-view")).find(p => p.style.display !== "none" && p.offsetParent !== null);
             const container = activePane || document;
-            const allCards = Array.from(container.querySelectorAll(".track-card"));
+            const allCards = Array.from(container.querySelectorAll(".track-card, .sp-playlist-card, .search-result-card, .queue-item"));
             const viewportH = window.innerHeight;
             return allCards.filter(c => {
                 const r = c.getBoundingClientRect();
                 return r.bottom > 0 && r.top < viewportH && r.height > 0;
-            }).slice(0, 14);
+            }).slice(0, 28);
         }
         function disassembleTrackCards(reduceMotion) {
             const cards = getVisibleTrackCards();
@@ -9123,6 +9416,7 @@ function triggerCrossfade(nextTrack) {
         function flipModeLogoFromCenter(targetEl, targetRect, modeColor, onDone) {
             const logoLayer = document.getElementById("modeTransitionLogoLayer");
             const logoBox = document.getElementById("modeTransitionLogoBox");
+            const transitionText = document.getElementById("modeTransitionText");
             const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             function limpar() {
                 if (logoLayer) logoLayer.classList.remove("is-flying");
@@ -9131,6 +9425,11 @@ function triggerCrossfade(nextTrack) {
                     logoBox.style.opacity = "";
                     logoBox.classList.remove("is-rebuilding");
                     logoBox.style.removeProperty("--logo-current-rgb");
+                }
+                if (transitionText) {
+                    transitionText.classList.remove("is-rebuilding");
+                    transitionText.style.removeProperty("--logo-current-rgb");
+                    transitionText.style.removeProperty("--logo-target-rgb");
                 }
                 if (targetEl && targetEl.classList) targetEl.classList.remove("is-mode-flying");
             }
@@ -9171,6 +9470,20 @@ function triggerCrossfade(nextTrack) {
             };
         }
 
+        // Atualiza dinamicamente o ícone (favicon) da aba do navegador para refletir a cor do modo de atuação
+        function updateSiteFavicon(modeColor) {
+            if (!modeColor || !modeColor.hex) return;
+            let link = document.getElementById("siteFavicon") || document.querySelector("link[rel*='icon']");
+            if (!link) {
+                link = document.createElement("link");
+                link.id = "siteFavicon";
+                link.rel = "icon";
+                document.head.appendChild(link);
+            }
+            const encodedColor = encodeURIComponent(modeColor.hex);
+            link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22${encodedColor}%22 stroke-width=%222.2%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><path d=%22M3 18v-6a9 9 0 0 1 18 0v6%22/><path d=%22M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z%22/></svg>`;
+        }
+
         // Troca --mode-accent-rgb/--accent/--accent-glow (usadas no site inteiro - botões,
         // bordas, cards, badges) - chamada direto quando não tem transição (restaurando o
         // modo salvo), ou adiada até o handoff final quando tem (showModeTransitionOverlay),
@@ -9179,6 +9492,7 @@ function triggerCrossfade(nextTrack) {
             document.documentElement.style.setProperty("--mode-accent-rgb", modeColor.rgb);
             document.documentElement.style.setProperty("--accent", modeColor.hex);
             document.documentElement.style.setProperty("--accent-glow", `rgba(${modeColor.rgb}, 0.4)`);
+            updateSiteFavicon(modeColor);
         }
 
         // Handoff final: troca a cópia que ficou parada no lugar de pouso pela logo real do
@@ -9188,6 +9502,12 @@ function triggerCrossfade(nextTrack) {
         function commitLogoHandoff(targetEl, modeColor) {
             const logoLayer = document.getElementById("modeTransitionLogoLayer");
             const logoBox = document.getElementById("modeTransitionLogoBox");
+            const transitionText = document.getElementById("modeTransitionText");
+            const eqEl = document.getElementById("modeTransitionEq");
+            const barTrack = document.getElementById("modeTransitionBarTrack");
+            const barFill = document.getElementById("modeTransitionBarFill");
+            const barPaint = document.getElementById("modeTransitionBarPaint");
+
             if (logoLayer) logoLayer.classList.remove("is-flying");
             if (logoBox) {
                 logoBox.style.transform = "";
@@ -9198,6 +9518,28 @@ function triggerCrossfade(nextTrack) {
                 logoBox.classList.remove("is-rebuilding");
                 logoBox.style.removeProperty("--logo-current-rgb");
                 logoBox.style.removeProperty("--logo-target-rgb");
+            }
+            if (transitionText) {
+                transitionText.classList.remove("is-rebuilding");
+                transitionText.style.removeProperty("--logo-current-rgb");
+                transitionText.style.removeProperty("--logo-target-rgb");
+            }
+            if (eqEl) {
+                eqEl.classList.remove("is-rebuilding");
+                eqEl.style.removeProperty("--logo-current-rgb");
+                eqEl.style.removeProperty("--logo-target-rgb");
+            }
+            if (barTrack) {
+                barTrack.style.removeProperty("--logo-current-rgb");
+                barTrack.style.removeProperty("--logo-target-rgb");
+            }
+            if (barFill) {
+                barFill.style.transitionDuration = "0ms";
+                barFill.style.width = "0%";
+            }
+            if (barPaint) {
+                barPaint.style.transitionDuration = "0ms";
+                barPaint.style.width = "0%";
             }
             if (targetEl && targetEl.classList) targetEl.classList.remove("is-mode-flying");
             // Pulso de pouso suave no cabeçalho - fecha o ciclo.
@@ -9220,27 +9562,40 @@ function triggerCrossfade(nextTrack) {
             const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
             if (reduceMotion) return;
             const logoBox = document.getElementById("modeTransitionLogoBox");
-            if (!logoBox) return;
-            logoBox.classList.remove("is-rebuilding");
-            void logoBox.offsetWidth;
-            logoBox.classList.add("is-rebuilding");
+            if (logoBox) {
+                logoBox.classList.remove("is-rebuilding");
+                void logoBox.offsetWidth;
+                logoBox.classList.add("is-rebuilding");
+            }
+            const transitionText = document.getElementById("modeTransitionText");
+            if (transitionText) {
+                transitionText.classList.remove("is-rebuilding");
+                void transitionText.offsetWidth;
+                transitionText.classList.add("is-rebuilding");
+            }
+            const eqEl = document.getElementById("modeTransitionEq");
+            if (eqEl) {
+                eqEl.classList.remove("is-rebuilding");
+                void eqEl.offsetWidth;
+                eqEl.classList.add("is-rebuilding");
+            }
         }
 
         function showModeTransitionOverlay(mode, label, previousModeColor) {
             const overlay = document.getElementById("modeTransitionOverlay");
             if (!overlay) return;
             const labelEl = document.getElementById("modeTransitionLabel");
+            const labelPaintEl = document.getElementById("modeTransitionLabelPaint");
+            const transitionText = document.getElementById("modeTransitionText");
+            const eqEl = document.getElementById("modeTransitionEq");
+            const barTrack = document.getElementById("modeTransitionBarTrack");
             const barFill = document.getElementById("modeTransitionBarFill");
+            const barPaint = document.getElementById("modeTransitionBarPaint");
             const headerLogo = document.getElementById("headerMainLogo");
             const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
 
-            // A logo "chega" no carregamento ainda na cor do modo ANTERIOR, e só na hora do
-            // efeito de remontagem (playLogoRebuildEffect) é que troca de verdade pra cor do
-            // modo NOVO - --logo-current-rgb e --logo-target-rgb são locais (setadas só neste
-            // elemento), porque --mode-accent-rgb (a global, usada no site inteiro) só é
-            // atualizada bem no final de tudo (applyModeAccentColors, no handoff) - não dá
-            // pra essa logo depender da global pra saber a cor nova, já que a global ainda
-            // não mudou nesse ponto.
+            // A logo e o texto "chegam" no carregamento ainda na cor do modo ANTERIOR, e só na hora do
+            // efeito de remontagem (playLogoRebuildEffect) é que trocam de verdade pra cor do modo NOVO
             const logoBoxEl = document.getElementById("modeTransitionLogoBox");
             if (logoBoxEl) {
                 logoBoxEl.style.setProperty("--logo-target-rgb", modeColor.rgb);
@@ -9250,11 +9605,34 @@ function triggerCrossfade(nextTrack) {
                     logoBoxEl.style.removeProperty("--logo-current-rgb");
                 }
             }
+            if (transitionText) {
+                transitionText.style.setProperty("--logo-target-rgb", modeColor.rgb);
+                if (previousModeColor && previousModeColor.rgb !== modeColor.rgb) {
+                    transitionText.style.setProperty("--logo-current-rgb", previousModeColor.rgb);
+                } else {
+                    transitionText.style.removeProperty("--logo-current-rgb");
+                }
+            }
+            if (eqEl) {
+                eqEl.style.setProperty("--logo-target-rgb", modeColor.rgb);
+                if (previousModeColor && previousModeColor.rgb !== modeColor.rgb) {
+                    eqEl.style.setProperty("--logo-current-rgb", previousModeColor.rgb);
+                } else {
+                    eqEl.style.removeProperty("--logo-current-rgb");
+                }
+            }
+            if (barTrack) {
+                barTrack.style.setProperty("--logo-target-rgb", modeColor.rgb);
+                if (previousModeColor && previousModeColor.rgb !== modeColor.rgb) {
+                    barTrack.style.setProperty("--logo-current-rgb", previousModeColor.rgb);
+                } else {
+                    barTrack.style.removeProperty("--logo-current-rgb");
+                }
+            }
 
-            // O emoji do modo (ex: ⚡) vai junto do nome agora, não mais como selo em cima da
-            // logo - ficava sobreposto bem no centro do fone de ouvido, brigando com o desenho
-            // dele (reportado como ícone "desproporcional e grosseiro").
+            // O ícone e o nome do modo pintam tanto na camada base quanto na camada de pintura superior
             if (labelEl) labelEl.textContent = label || mode;
+            if (labelPaintEl) labelPaintEl.textContent = label || mode;
 
             const isAggressive = mode === "drop";
             overlay.classList.toggle("is-aggressive", isAggressive);
@@ -9300,12 +9678,27 @@ function triggerCrossfade(nextTrack) {
                         barFill.style.width = "0%";
                         barFill.style.transitionDuration = "0ms";
                     }
+                    if (barPaint) {
+                        barPaint.style.width = "0%";
+                        barPaint.style.transitionDuration = "0ms";
+                    }
                     overlay.classList.add("is-active");
                     void overlay.offsetWidth;
                     playLogoRebuildEffect();
                     if (barFill) {
                         barFill.style.transitionDuration = `${HOLD_MS}ms`;
                         requestAnimationFrame(() => { barFill.style.width = "100%"; });
+                    }
+                    // Quando a barra de carregamento estiver perto da metade (~44% de progresso),
+                    // a cor do novo modo de atuação vem do início (0%) e varre a barra em velocidade acelerada,
+                    // "pintando" a barra antes dela completar o loading final (100%).
+                    if (barPaint) {
+                        const paintStartDelayMs = Math.round(HOLD_MS * 0.44);
+                        const paintDurationMs = Math.round(HOLD_MS * 0.48);
+                        schedule(() => {
+                            barPaint.style.transitionDuration = `${paintDurationMs}ms`;
+                            requestAnimationFrame(() => { barPaint.style.width = "100%"; });
+                        }, paintStartDelayMs);
                     }
 
                     schedule(() => {
@@ -9342,18 +9735,28 @@ function triggerCrossfade(nextTrack) {
             const previousModeColor = DJ_MODE_COLORS[djPlayMode] || DJ_MODE_COLORS.match;
             djPlayMode = mode;
             const shortLabels = {
-                match: "🎯 Match Perfeito",
-                energy: "⚡ Peak Time",
-                shuffle: "🔀 Smart Shuffle",
-                smooth: "🌊 Smooth Flow",
-                club: "🔥 Balada & Club DJ",
-                studio: "🎛️ Estúdio Pro & Mastering",
-                drop: "⚡ Drop Hunter (Corte no Drop)"
+                match: "Match Perfeito",
+                energy: "Peak Time",
+                shuffle: "Smart Shuffle",
+                smooth: "Smooth Flow",
+                club: "Balada & Club DJ",
+                studio: "Estúdio Pro & Mastering",
+                drop: "Drop Hunter"
             };
-            const activeLabel = document.getElementById("djActModeActiveLabel");
-            if (activeLabel) activeLabel.textContent = shortLabels[mode] || mode;
-
+            const DJ_MODE_ICONS = {
+                match: window.uiIcon("target"),
+                energy: window.uiIcon("zap"),
+                shuffle: window.uiIcon("shuffle"),
+                smooth: window.uiIcon("wave"),
+                club: window.uiIcon("fire"),
+                studio: window.uiIcon("equalizer"),
+                drop: window.uiIcon("zap")
+            };
             const modeColor = DJ_MODE_COLORS[mode] || DJ_MODE_COLORS.match;
+            const activeLabel = document.getElementById("djActModeActiveLabel");
+            if (activeLabel) {
+                activeLabel.innerHTML = `<span class="dj-act-active-icon" style="color: ${modeColor.hex};">${DJ_MODE_ICONS[mode] || window.uiIcon("target")}</span> ${shortLabels[mode] || mode}`;
+            }
             // Troca a cor de destaque do modo no site inteiro via CSS var - --accent já é
             // usada em botões, bordas e destaques por quase toda a interface. Quando tem
             // transição rolando (isUserSelection), essa troca é ADIADA pra acontecer só no
@@ -9423,7 +9826,7 @@ function triggerCrossfade(nextTrack) {
                 initWebAudio();
                 if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
                 if (typeof selectStudioPreset === "function") selectStudioPreset("mastering");
-                showToast("🎛️ MODO ESTÚDIO PRO ATIVO: Console de Mastering, Reverb & Compressor Habilitados");
+                showToast(window.uiIcon("equalizer") + " MODO ESTÚDIO PRO ATIVO: Console de Mastering, Reverb & Compressor Habilitados");
             }
 
             document.querySelectorAll(".dj-act-menu-opt").forEach(opt => {
@@ -9433,11 +9836,11 @@ function triggerCrossfade(nextTrack) {
             if (selOpt) selOpt.classList.add("active");
 
             const modeLabels = {
-                match: "🎯 Match Perfeito (Harmonia máxima, BPM ideal e descoberta inteligente)",
-                energy: "⚡ Peak Time (Acelera BPM e eleva a energia da pista)",
-                shuffle: "🔀 Smart Shuffle (Aleatório harmônico no mesmo gênero)",
-                smooth: "🌊 Smooth Flow (Crossfade longo de 8s e transições ultra suaves)",
-                club: "🔥 Balada & Club DJ (Drops explosivos, Bass Swap e FX sincronizados)"
+                match: "Match Perfeito (Harmonia máxima, BPM ideal e descoberta inteligente)",
+                energy: "Peak Time (Acelera BPM e eleva a energia da pista)",
+                shuffle: "Smart Shuffle (Aleatório harmônico no mesmo gênero)",
+                smooth: "Smooth Flow (Crossfade longo de 8s e transições ultra suaves)",
+                club: "Balada & Club DJ (Drops explosivos, Bass Swap e FX sincronizados)"
             };
 
             // Ajusta o tempo de crossfade conforme o modo de atuação
@@ -9506,7 +9909,7 @@ function triggerCrossfade(nextTrack) {
         // Conta plays/skips por faixa pra alimentar /api/curation/suggestions - "play" é
         // registrado toda vez que uma faixa começa a tocar de verdade (mesmo ponto que já
         // disparava recordTrackInHistory); "skip" é registrado só quando o usuário pula
-        // manualmente (botão ⏭) e a faixa anterior mal tinha começado - ver manualTransition.
+        // manualmente (botão Próxima) e a faixa anterior mal tinha começado - ver manualTransition.
         function recordPlayStat(videoId) {
             if (!videoId) return;
             fetch("/api/stats/play", {
@@ -9893,15 +10296,15 @@ function triggerCrossfade(nextTrack) {
             if (section === "promote") {
                 statHtml = `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${track.plays}x tocada${track.skips ? ` • pulada ${track.skips}x` : ""}</span>`;
             } else if (section === "remove") {
-                statHtml = `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">⏭ Pulada em ${pct}% das vezes (${track.skips}/${track.plays})</span>`;
+                statHtml = `<span class="history-mode-chip" style="background: rgba(255,0,85,0.15); border-color: rgba(255,0,85,0.4); color: #ff6b88;">${window.uiIcon("skip")} Pulada em ${pct}% das vezes (${track.skips}/${track.plays})</span>`;
             } else {
-                statHtml = `<span class="history-mode-chip" style="background: rgba(0,242,254,0.15); border-color: rgba(0,242,254,0.4); color: #00f2fe;">⏳ ${track.plays}/3 plays para virar favorita${track.skips ? ` • ${track.skips} pulo` : ""}</span>`;
+                statHtml = `<span class="history-mode-chip" style="background: rgba(0,242,254,0.15); border-color: rgba(0,242,254,0.4); color: #00f2fe;">${window.uiIcon("hourglass")} ${track.plays}/3 plays para virar favorita${track.skips ? ` • ${track.skips} pulo` : ""}</span>`;
             }
 
             const actionsHtml = section === "remove"
                 ? `<button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
-                   <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">🗑️ Remover</button>`
-                : `<button class="btn-add-playlist" onclick="openTrackCurationModal('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', ${bpmVal}, ${track.plays || 0}, event)" title="Ver 3 novidades ideais selecionadas pela IA para esta música" style="background: rgba(0,242,254,0.12); border-color: rgba(0,242,254,0.4); color: #00f2fe; font-weight: 600; padding: 4px 8px; font-size: 11px;">✨ 3 Novidades</button>
+                   <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">${window.uiIcon("trash")} Remover</button>`
+                : `<button class="btn-add-playlist" onclick="openTrackCurationModal('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', ${bpmVal}, ${track.plays || 0}, event)" title="Ver 3 novidades ideais selecionadas pela IA para esta música" style="background: rgba(0,242,254,0.12); border-color: rgba(0,242,254,0.4); color: #00f2fe; font-weight: 600; padding: 4px 8px; font-size: 11px;">${window.uiIcon("sparkles")} 3 Novidades</button>
                    <button class="btn-history-play" onclick="playCurationTrack(${idx}, '${section}')" title="Tocar esta faixa agora">▶</button>
                    <button class="btn-add-queue" onclick="queueCurationTrack(${idx}, '${section}')">+ Fila</button>`;
 
@@ -9915,7 +10318,7 @@ function triggerCrossfade(nextTrack) {
                             <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
                             <div class="history-sub">
                                 <span class="history-artist-text">${escapeQuotes(track.artist || track.category || "")}</span>
-                                <span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>
+                                <span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpmVal} BPM</span>
                                 ${statHtml}
                             </div>
                         </div>
@@ -9939,11 +10342,11 @@ function triggerCrossfade(nextTrack) {
                 // Estatísticas da curadoria em tempo real
                 html += `
                     <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; font-size: 11px; color: var(--text-dim); background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                        <span>📊 <strong>${data.total_plays || 0}</strong> reproduções monitoradas</span>
+                        <span>${window.uiIcon("stats")} <strong>${data.total_plays || 0}</strong> reproduções monitoradas</span>
                         <span>•</span>
-                        <span>🎵 <strong>${data.tracked_count || 0}</strong> faixas no radar</span>
+                        <span>${window.uiIcon("music")} <strong>${data.tracked_count || 0}</strong> faixas no radar</span>
                         <span>•</span>
-                        <span>⏭ <strong>${data.total_skips || 0}</strong> pulos</span>
+                        <span>${window.uiIcon("skip")} <strong>${data.total_skips || 0}</strong> pulos</span>
                     </div>
                 `;
 
@@ -9957,15 +10360,15 @@ function triggerCrossfade(nextTrack) {
                 }
 
                 if (data.promote && data.promote.length > 0) {
-                    html += `<div class="queue-modal-section-title">🔥 Suas favoritas de verdade (toca muito, quase nunca pula)</div>`;
+                    html += `<div class="queue-modal-section-title">${window.uiIcon("fire")} Suas favoritas de verdade (toca muito, quase nunca pula)</div>`;
                     html += data.promote.map((t, i) => curationTrackCardHtml(t, i, "promote")).join("");
                 }
                 if (data.remove_candidates && data.remove_candidates.length > 0) {
-                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">⚠️ Candidatas a sair da rotação (você pula na maioria das vezes)</div>`;
+                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">${window.uiIcon("alert")} Candidatas a sair da rotação (você pula na maioria das vezes)</div>`;
                     html += data.remove_candidates.map((t, i) => curationTrackCardHtml(t, i, "remove")).join("");
                 }
                 if (data.in_observation && data.in_observation.length > 0) {
-                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">📈 Em Observação (a caminho de virar favoritas)</div>`;
+                    html += `<div class="queue-modal-section-title" style="margin-top: 14px;">${window.uiIcon("chart")} Em Observação (a caminho de virar favoritas)</div>`;
                     html += data.in_observation.slice(0, 8).map((t, i) => curationTrackCardHtml(t, i, "in_observation")).join("");
                 }
                 container.innerHTML = html;
@@ -10005,7 +10408,7 @@ function triggerCrossfade(nextTrack) {
 
             const baseCardEl = document.getElementById("trackCurationBaseCard");
             if (baseCardEl) {
-                const bpmBadge = bpm ? `<span class="badge-bpm-chip">⚡ ${bpm} BPM</span>` : "";
+                const bpmBadge = bpm ? `<span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>` : "";
                 const playsBadge = plays > 0 ? `<span class="history-mode-chip" style="background: rgba(0,230,118,0.15); border-color: rgba(0,230,118,0.4); color: #00e676;">▶ ${plays}x tocada</span>` : "";
                 baseCardEl.innerHTML = `
                     <div class="history-card-left">
@@ -10013,7 +10416,7 @@ function triggerCrossfade(nextTrack) {
                             <img src="${getTrackThumbnailUrl({video_id: videoId})}" class="history-thumb" alt="Capa" onerror="this.src=window.DEFAULT_COVER_SVG">
                         </div>
                         <div class="history-info">
-                            <div class="history-title" style="color: #00f2fe; font-weight: 700;">🎯 Faixa Base: ${escapeQuotes(title)}</div>
+                            <div class="history-title" style="color: #00f2fe; font-weight: 700;">${window.uiIcon("target")} Faixa Base: ${escapeQuotes(title)}</div>
                             <div class="history-sub">
                                 <span class="history-artist-text">${escapeQuotes(artist || category || "")}</span>
                                 ${bpmBadge}
@@ -10053,7 +10456,7 @@ function triggerCrossfade(nextTrack) {
 
             container.innerHTML = `
                 <div style="text-align: center; padding: 25px; color: var(--text-dim);">
-                    <div style="font-size: 24px; margin-bottom: 8px;">⏳</div>
+                    <div style="font-size: 24px; margin-bottom: 8px;">${window.uiIcon("hourglass")}</div>
                     Analisando padrão sonoro e minerando as 3 melhores novidades no YouTube e SoundCloud...
                 </div>
             `;
@@ -10069,7 +10472,7 @@ function triggerCrossfade(nextTrack) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 25px; color: var(--text-dim);">
                             Nenhuma faixa parecida nova encontrada no momento fora da sua biblioteca.<br>
-                            <span style="font-size: 11px;">Tente clicar em '🔄 Outras 3' ou continue ouvindo para atualizar os filtros.</span>
+                            <span style="font-size: 11px;">Tente clicar em 'Outras 3' ou continue ouvindo para atualizar os filtros.</span>
                         </div>
                     `;
                     return;
@@ -10088,14 +10491,14 @@ function triggerCrossfade(nextTrack) {
                                     <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
                                     <div class="history-sub">
                                         <span class="history-artist-text">${escapeQuotes(track.artist || track.category || "")}</span>
-                                        <span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>
+                                        <span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpmVal} BPM</span>
                                         ${getTrackSourceBadgeHtml(track)}
                                     </div>
                                 </div>
                             </div>
                             <div class="history-actions">
                                 <button class="btn-history-play" onclick="playCustomTrack('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', 'Novidade Curadoria', ${bpmVal})" title="Tocar esta faixa agora">▶</button>
-                                <button class="btn-add-playlist" onclick="saveTrackNovidadeToLibrary(${idx})" title="Salvar na sua biblioteca">⭐ + Playlist</button>
+                                <button class="btn-add-playlist" onclick="saveTrackNovidadeToLibrary(${idx})" title="Salvar na sua biblioteca">${window.uiIcon("star")} + Playlist</button>
                                 <button class="btn-add-queue" onclick="addCustomTrackToQueue('${track.video_id}', '${escapeQuotes(track.title)}', '${escapeQuotes(track.artist || '')}', '${escapeQuotes(track.category || '')}', 'Novidade Curadoria', ${bpmVal})">+ Fila</button>
                             </div>
                         </div>
@@ -10132,7 +10535,7 @@ function triggerCrossfade(nextTrack) {
             if (res) {
                 const btn = document.querySelector(`#trackNovidadeCard_${idx} .btn-add-playlist`);
                 if (btn) {
-                    btn.textContent = "✓ Salvo";
+                    btn.innerHTML = `${window.uiIcon("check")} Salvo`;
                     btn.disabled = true;
                     btn.style.background = "rgba(0, 230, 118, 0.2)";
                     btn.style.color = "#00e676";
@@ -10171,14 +10574,14 @@ function triggerCrossfade(nextTrack) {
                             <div class="history-title" title="${escapeQuotes(t.title)}">${escapeQuotes(t.title)}</div>
                             <div class="history-sub">
                                 <span class="history-artist-text">${escapeQuotes(t.artist || t.category || "")}</span>
-                                <span class="badge-bpm-chip">⚡ ${bpm} BPM</span>
+                                <span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpm} BPM</span>
                                 ${getTrackSourceBadgeHtml(t)}
                             </div>
                         </div>
                     </div>
                     <div class="history-actions">
                         <button class="btn-history-play" onclick="playCurationDiscoveryTrack(${favIdx}, ${trackIdx})" title="Tocar esta faixa agora">▶</button>
-                        <button class="btn-add-playlist" onclick="saveCurationDiscoveryTrack(${favIdx}, ${trackIdx})" title="Salvar permanentemente na sua Playlist/Biblioteca">⭐ + Playlist</button>
+                        <button class="btn-add-playlist" onclick="saveCurationDiscoveryTrack(${favIdx}, ${trackIdx})" title="Salvar permanentemente na sua Playlist/Biblioteca">${window.uiIcon("star")} + Playlist</button>
                         <button class="btn-add-queue" onclick="queueCurationDiscoveryTrack(${favIdx}, ${trackIdx})">+ Fila</button>
                     </div>
                 </div>
@@ -10189,7 +10592,7 @@ function triggerCrossfade(nextTrack) {
             const btn = document.getElementById("btnCurationDiscover");
             const container = document.getElementById("curationDiscoveryItems");
             if (!container) return;
-            if (btn) { btn.disabled = true; btn.innerHTML = "⏳ Buscando..."; }
+            if (btn) { btn.disabled = true; btn.innerHTML = `${window.uiIcon("hourglass")} Buscando...`; }
             container.innerHTML = `<div style="text-align: center; padding: 16px; color: var(--text-dim);">Analisando suas favoritas e minerando novidades, uma a uma, no YouTube/SoundCloud...</div>`;
 
             try {
@@ -10209,7 +10612,7 @@ function triggerCrossfade(nextTrack) {
                     html += `
                         <div class="curation-discovery-group">
                             <div class="curation-discovery-group-title">
-                                <span title="${escapeQuotes(fav.title)}">🎯 Curadoria pra "${escapeHtml((fav.title || "").slice(0, 46))}${(fav.title || "").length > 46 ? "…" : ""}"</span>
+                                <span title="${escapeQuotes(fav.title)}">${window.uiIcon("target")} Curadoria pra "${escapeHtml((fav.title || "").slice(0, 46))}${(fav.title || "").length > 46 ? "…" : ""}"</span>
                                 <span class="count-badge">${fav.tracks.length} ${fav.tracks.length === 1 ? "novidade" : "novidades"}</span>
                             </div>
                     `;
@@ -10224,7 +10627,7 @@ function triggerCrossfade(nextTrack) {
             } catch (e) {
                 container.innerHTML = `<div style="text-align: center; padding: 16px; color: #ff5555;">Erro ao buscar novidades. Tente de novo.</div>`;
             } finally {
-                if (btn) { btn.disabled = false; btn.innerHTML = "🔍 Buscar Novidades por Favorita"; }
+                if (btn) { btn.disabled = false; btn.innerHTML = `${window.uiIcon("search")} Buscar Novidades por Favorita`; }
             }
         }
 
@@ -10316,9 +10719,9 @@ function triggerCrossfade(nextTrack) {
                 const inLib = isTrackInLibrary(track.video_id);
                 const bpmVal = track.bpm || 128;
                 const timeVal = track.played_at || "";
-                const modeBadge = track.mode === "match" ? "🎯 Match" :
-                                  track.mode === "energy" ? "⚡ Peak Time" :
-                                  track.mode === "shuffle" ? "🔀 Smart" : "🌊 Smooth";
+                const modeBadge = track.mode === "match" ? `${window.uiIcon("target")} Match` :
+                                  track.mode === "energy" ? `${window.uiIcon("zap")} Peak Time` :
+                                  track.mode === "shuffle" ? `${window.uiIcon("shuffle")} Smart` : `${window.uiIcon("wave")} Smooth`;
 
                 html += `
                     <div class="history-track-card" id="historyCard_${track.video_id}">
@@ -10330,7 +10733,7 @@ function triggerCrossfade(nextTrack) {
                                 <div class="history-title" title="${escapeQuotes(track.title)}">${escapeQuotes(track.title)}</div>
                                 <div class="history-sub">
                                     <span class="history-artist-text">${escapeQuotes(track.artist || track.category || "DJ Set")}</span>
-                                    <span class="badge-bpm-chip">⚡ ${bpmVal} BPM</span>
+                                    <span class="badge-bpm-chip">${window.uiIcon("zap")} ${bpmVal} BPM</span>
                                     <span class="history-mode-chip">${modeBadge}</span>
                                     ${timeVal ? `<span class="history-time">${timeVal}</span>` : ""}
                                 </div>
@@ -10340,16 +10743,16 @@ function triggerCrossfade(nextTrack) {
                             <button class="btn-history-play" onclick="playHistoryTrackByIndex(${idx})" title="Tocar esta faixa agora">▶</button>
                             ${inLib ? `
                                 <div style="display: flex; gap: 5px; align-items: center;">
-                                    <span class="history-saved-badge" title="Esta música já está na sua biblioteca">✓ Na Biblioteca</span>
-                                    <button class="btn-move-card" onclick="openMovePlaylistModalByVideoId('${track.video_id}', '${escapeQuotes(track.title)}')" title="Mover para outra playlist">📂 Mover</button>
-                                    <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca">🗑️</button>
+                                    <span class="history-saved-badge" title="Esta música já está na sua biblioteca"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Na Biblioteca</span>
+                                    <button class="btn-move-card" onclick="openMovePlaylistModalByVideoId('${track.video_id}', '${escapeQuotes(track.title)}')" title="Mover para outra playlist">${window.uiIcon("folder")} Mover</button>
+                                    <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${track.video_id}')" title="Remover da biblioteca"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                                 </div>
                             ` : `
                                 <button class="btn-history-save" id="btnSaveHist_${track.video_id}" onclick="saveHistoryTrackByIndex(${idx})" title="Salvar permanentemente na sua Biblioteca">
-                                    ⭐ Salvar na Biblioteca
+                                    ${window.uiIcon("star")} Salvar na Biblioteca
                                 </button>
                             `}
-                            <button class="btn-remove-lib-card" onclick="removeHistoryTrack('${track.video_id}')" title="Remover só este item do histórico (não afeta a biblioteca)">✕</button>
+                            <button class="btn-remove-lib-card" onclick="removeHistoryTrack('${track.video_id}')" title="Remover só este item do histórico (não afeta a biblioteca)"><svg class="ui-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                         </div>
                     </div>
                 `;
@@ -10413,32 +10816,32 @@ function triggerCrossfade(nextTrack) {
                     renderList();
                     renderAllActiveLists();
 
-                    showToast(`⭐ "${title.slice(0, 32)}..." salva na sua biblioteca! Acesse na aba "${cat}".`, 5000);
+                    showToast(`${window.uiIcon("star")} "${title.slice(0, 32)}..." salva na sua biblioteca! Acesse na aba "${cat}".`, 5000);
                     const actionsBox = document.getElementById(`histActions_${videoId}`);
                     if (actionsBox) {
                         actionsBox.innerHTML = `
                             <button class="btn-history-play" onclick="playHistoryTrackByIndex(0)" title="Tocar esta faixa agora">▶</button>
                             <div style="display: flex; gap: 5px; align-items: center;">
-                                <span class="history-saved-badge" title="Esta música já está na sua biblioteca">✓ Na Biblioteca</span>
-                                <button class="btn-move-card" onclick="openMovePlaylistModalByVideoId('${videoId}', '${escapeQuotes(title)}')" title="Mover para outra playlist">📂 Mover</button>
-                                <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${videoId}')" title="Remover da biblioteca">🗑️</button>
+                                <span class="history-saved-badge" title="Esta música já está na sua biblioteca"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Na Biblioteca</span>
+                                <button class="btn-move-card" onclick="openMovePlaylistModalByVideoId('${videoId}', '${escapeQuotes(title)}')" title="Mover para outra playlist">${window.uiIcon("folder")} Mover</button>
+                                <button class="btn-remove-lib-card" onclick="openConfirmRemoveModal(null, null, '${videoId}')" title="Remover da biblioteca"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button>
                             </div>
                         `;
                     } else if (btn) {
-                        btn.outerHTML = `<span class="history-saved-badge">✓ Na Biblioteca</span>`;
+                        btn.outerHTML = `<span class="history-saved-badge"><svg class="ui-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> Na Biblioteca</span>`;
                     }
                 } else {
                     showToast("Erro ao salvar música na biblioteca.");
                     if (btn) {
                         btn.disabled = false;
-                        btn.textContent = "⭐ Salvar na Biblioteca";
+                        btn.innerHTML = `${window.uiIcon('star')} Salvar na Biblioteca`;
                     }
                 }
             } catch (e) {
                 showToast("Erro de rede ao salvar faixa.");
                 if (btn) {
                     btn.disabled = false;
-                    btn.textContent = "⭐ Salvar na Biblioteca";
+                    btn.innerHTML = `${window.uiIcon('star')} Salvar na Biblioteca`;
                 }
             }
         }
@@ -10462,7 +10865,7 @@ function triggerCrossfade(nextTrack) {
             updateHistoryBadge(playbackHistory.length);
             renderHistoryModalList();
             const label = removedTrack ? removedTrack.title : "Música";
-            showToast(`🗑️ "${label.slice(0, 40)}" removida do histórico!`);
+            showToast(`${window.uiIcon("trash")} "${label.slice(0, 40)}" removida do histórico!`);
             try {
                 await fetch("/api/history/remove", {
                     method: "POST",

@@ -1,6 +1,6 @@
-# 🎧 Web Player com Processamento de Áudio & DJ Mixer Pro
+# 🎧 DropHunter Studio - Web Player com Processamento de Áudio & DJ Mixer Pro
 
-Um Web Player de alta fidelidade e sistema de discotecagem profissional executado diretamente no navegador via **Web Audio API** e **Web Animations API**, integrando catálogo híbrido (**YouTube**, **SoundCloud** e **Spotify**), processamento de sinal em tempo real (DSP), isolamento de stems zero-bleed, sincronização harmônica de BPM, curadoria de repertório assistida por IA e animações tridimensionais FLIP.
+O **DropHunter Studio** é um Web Player de alta fidelidade e sistema de discotecagem profissional executado diretamente no navegador via **Web Audio API** e **Web Animations API**, integrando catálogo híbrido (**YouTube**, **SoundCloud** e **Spotify**), processamento de sinal em tempo real (DSP), isolamento de stems zero-bleed, sincronização harmônica de BPM, curadoria de repertório assistida por IA, favicon reativo em tempo real e animações tridimensionais FLIP com transições suaves de página.
 
 ---
 
@@ -32,10 +32,17 @@ Um Web Player de alta fidelidade e sistema de discotecagem profissional executad
   - ⚠️ **Candidatas a Sair da Rotação**: Faixas puladas com frequência.
 - **3 Novidades Ideais por Faixa**: Mineração inteligente e contextual de faixas inéditas similares em ritmo, estilo e BPM fora da biblioteca do usuário.
 
-### 5. ✨ Efeitos Visuais & Transições Morph FLIP (AutoPost)
+### 5. ✨ Efeitos Visuais, Favicon Dinâmico & Transições Suaves de Página
+- **Branding DropHunter Studio**: Identidade visual unificada com logotipo neon, anéis de refração e iluminação reativa no cabeçalho.
+- **Favicon Dinâmico em SVG Inline**: O ícone da aba do navegador muda de cor em tempo real conforme o Modo de Atuação do DJ Mixer (Match Perfeito: Cyan `#00f2fe`, Drop Hunter: Vermelho `#ff3b3b`, Mixagem Automática: Âmbar `#ffaa00`, etc.).
+- **Pintura Dinâmica Sincronizada (1.05s)**: A animação de desenho do fone neon está sincronizada no mesmo ritmo com o texto de transição ("Mudando para o modo..."), as 5 barrinhas do equalizador e a varredura acelerada da barra de loading dupla aos 44%.
+- **Transição Suave de Páginas (Fade + Desmontagem e Remontagem)**:
+  - Onda suave de expansão radial que nasce nas coordenadas exatas do botão clicado no menu superior (`originX`, `originY`).
+  - Fade out suave com elevação de 16px no container da página anterior (`.page-transition-exit`).
+  - Desmontagem dos cards anteriores em cascata orientada pela distância do botão.
+  - Fade in com encaixe na nova página (`.page-transition-enter-active`) e remontagem em onda dos novos cards da grade (`cubic-bezier(0.16, 1, 0.3, 1)`).
+- **Padronização 100% Vetorial (Zero Emojis)**: Substituição integral de todos os emojis da interface por ícones SVG ultranítidos e responsivos (`window.uiIcon(...)`), assegurando fidelidade visual multiplataforma idêntica.
 - **Morph FLIP Universal**: Todos os botões do player (Stems DJ, Equalizador, Estúdio Pro, BPM Sync, Fila, Histórico, Curadoria) decolam e expandem a partir do botão clicado e, ao fechar, desmontam suavemente e contraem de volta para o botão original com um pulso neon ciano.
-- **Fone de Ouvido Neon Animado**: Âncora central e logotipo com pulso de luz e anéis de refração no cabeçalho.
-- **Transição de Modos de Atuação**: Animações de desmontagem e remontagem sequenciada com profundidade 3D, partículas ascendentes e fitas de aurora boreal na tela de carregamento.
 
 ### 6. 🌐 Catálogo Híbrido & Descoberta Multi-Fonte
 - Suporte a reprodução de streaming do **YouTube** (modo Áudio HD e modo Clipe com persistência de posição de seek).
@@ -134,6 +141,15 @@ Abaixo está o registro cronológico de cada evolução, implementação e corre
   - Remoção de regras CSS conflitantes (`animation: scaleIn`), eliminando o flash/pop visual e garantindo 60 FPS limpos.
   - Correção definitiva do travamento e piscamento na Curadoria: o card base (`#trackCurationBaseCard`) permanece estável e visível, enquanto as 3 novidades entram suavemente em cascata.
   - Ao fechar, desmontagem reversa com contração de volta ao botão que originou o clique e disparo de pulso neon.
+- **20:26 a 20:41** — **Favicon Dinâmico Reativo**: Criação do gerador inline de SVG para o ícone do navegador (`#siteFavicon`), sincronizado instantaneamente com as cores do Modo de Atuação ativo do DJ Mixer (Cyan, Vermelho, Âmbar, etc.).
+- **20:45 a 21:05** — **Sincronização de Pintura em 1.05s**: Sincronização milimétrica do ritmo de desenho do fone neon com o texto ("Mudando para o modo..."), as barrinhas do equalizador e o efeito de preenchimento duplo da barra de progresso aos 44% do carregamento.
+- **21:08 a 21:28** — **Padronização 100% Vetorial (Eliminação de Emojis)**: Substituição de todos os emojis unicode por SVGs inline otimizados em botões, badges, modais e tooltips via `window.uiIcon`, garantindo renderização idêntica em Windows, Linux e macOS.
+- **21:30 a 21:38** — **Transição de Páginas com Fade e Remontagem em Cascata**:
+  - Eliminação de cápsulas flutuantes e giros 3D caóticos.
+  - Implementação da física de onda radial partindo do botão clicado (`originX`, `originY`).
+  - Transição de Fade Out + Fade In bidirecional em nível de página (`.pane-view`) combinada com a desmontagem e remontagem fluida de todos os cards da grade (`cubic-bezier(0.16, 1, 0.3, 1)`).
+  - Remoção de qualquer bloqueio por `prefers-reduced-motion` no switch de abas para garantir que o efeito ocorra suavemente em qualquer navegador.
+- **21:45** — **Lançamento Oficial da Marca DropHunter Studio**: Renomeação definitiva do projeto para **DropHunter Studio**, atualizando o cabeçalho `<h1>`, a aba do navegador (`<title>`) e todos os metadados e fallbacks da aplicação.
 
 ---
 

@@ -371,11 +371,12 @@
             width: 4px;
             height: 100%;
             border-radius: 2px;
-            background: rgb(var(--mode-accent-rgb));
-            box-shadow: 0 0 8px rgba(var(--mode-accent-rgb), 0.7);
+            background: rgb(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+            box-shadow: 0 0 8px rgba(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.6);
             transform: scaleY(0.22);
             transform-origin: bottom;
             animation: modeTransitionEq 0.68s ease-in-out infinite;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
         }
         .mode-transition-eq span:nth-child(1) { animation-duration: 0.62s; animation-delay: -0.52s; }
         .mode-transition-eq span:nth-child(2) { animation-duration: 0.77s; animation-delay: -0.18s; }
@@ -386,16 +387,77 @@
             0%, 100% { transform: scaleY(0.22); }
             50% { transform: scaleY(1); }
         }
+        /* Pintura das barrinhas de equalizador no mesmo ritmo (1.05s) do fone e das letras */
+        #modeTransitionEq.is-rebuilding span {
+            animation: modeTransitionEq 0.68s ease-in-out infinite, eqBarPaintColor 0.55s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+        #modeTransitionEq.is-rebuilding span:nth-child(1) { animation-delay: -0.52s, 0.00s; }
+        #modeTransitionEq.is-rebuilding span:nth-child(2) { animation-delay: -0.18s, 0.12s; }
+        #modeTransitionEq.is-rebuilding span:nth-child(3) { animation-delay: -0.35s, 0.24s; }
+        #modeTransitionEq.is-rebuilding span:nth-child(4) { animation-delay: -0.09s, 0.36s; }
+        #modeTransitionEq.is-rebuilding span:nth-child(5) { animation-delay: -0.41s, 0.48s; }
+        @keyframes eqBarPaintColor {
+            0% {
+                background: rgb(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+                box-shadow: 0 0 8px rgba(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.6);
+            }
+            100% {
+                background: rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+                box-shadow: 0 0 12px rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.9);
+            }
+        }
         .mode-transition-text {
             position: relative;
             font-size: 15px;
             font-weight: 700;
             color: #fff;
             letter-spacing: 0.3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
-        .mode-transition-text strong {
-            color: rgb(var(--mode-accent-rgb));
-            text-shadow: 0 0 12px rgba(var(--mode-accent-rgb), 0.7);
+        .mode-transition-text-base {
+            position: relative;
+            display: inline-block;
+            color: rgb(var(--logo-current-rgb, 255, 255, 255));
+            transition: color 0.4s ease;
+        }
+        .mode-transition-text-base strong {
+            color: rgb(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+            text-shadow: 0 0 10px rgba(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.6);
+        }
+        .mode-transition-text-paint {
+            position: absolute;
+            inset: 0;
+            display: inline-block;
+            white-space: nowrap;
+            color: rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+            filter: drop-shadow(0 0 14px rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.85));
+            clip-path: inset(0 100% 0 0);
+            pointer-events: none;
+        }
+        .mode-transition-text-paint strong {
+            color: rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)));
+            text-shadow: 0 0 16px rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.9);
+        }
+        /* Efeito de Pintura das Letras: Pinta no mesmo ritmo e regras do fone */
+        #modeTransitionText.is-rebuilding .mode-transition-text-paint {
+            animation: textGlyphRebuildDraw 1.05s cubic-bezier(.65, 0, .35, 1) both;
+        }
+        #modeTransitionText.is-rebuilding .mode-transition-text-base {
+            animation: textGlyphRebuildColor 1.05s cubic-bezier(0.23, 1, 0.32, 1) both;
+        }
+        @keyframes textGlyphRebuildDraw {
+            0% { clip-path: inset(0 100% 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+        @keyframes textGlyphRebuildColor {
+            0% {
+                color: rgb(var(--logo-current-rgb, 255, 255, 255));
+            }
+            100% {
+                color: rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.85);
+            }
         }
         .mode-transition-bar-track {
             position: relative;
@@ -406,14 +468,35 @@
             overflow: hidden;
         }
         .mode-transition-bar-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
             width: 0%;
             border-radius: 3px;
-            background: linear-gradient(90deg, rgba(var(--mode-accent-rgb), 0.5), rgb(var(--mode-accent-rgb)));
-            box-shadow: 0 0 10px rgb(var(--mode-accent-rgb));
-            /* Progresso de carregamento = movimento constante, por isso linear (não uma
-               curva de ease) - a duração exata é setada via JS (style.transitionDuration). */
+            background: linear-gradient(90deg, 
+                rgba(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.45), 
+                rgb(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)))
+            );
+            box-shadow: 0 0 10px rgba(var(--logo-current-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.7);
             transition: width 1s linear;
+            z-index: 1;
+        }
+        /* Segunda barra de carregamento que vem do início perto da metade, pintando com a cor nova antes de terminar */
+        .mode-transition-bar-paint {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, 
+                rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.6), 
+                rgb(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)))
+            );
+            box-shadow: 0 0 14px rgba(var(--logo-target-rgb, var(--mode-accent-rgb, 0, 242, 254)), 0.95);
+            transition: width 0.7s cubic-bezier(0.2, 0.9, 0.4, 1);
+            z-index: 2;
         }
         /* Modo Drop Hunter (agressivo/"sport mode"): o mesmo fade, só que mais rápido e
            com um segundo pulso extra - como o alerta de um painel esportivo de carro. */
@@ -481,19 +564,102 @@
            TIRAR essa classe pra remontar fazia o card cair de volta na transição genérica
            da base (".track-card { transition: all 0.2s ease }", sem --card-delay nenhum),
            e a remontagem toda "estourava" de uma vez em vez de cascatear igual a desmontagem. */
-        .track-card.is-mode-transitioning {
+        .track-card.is-mode-transitioning,
+        .sp-playlist-card.is-mode-transitioning {
             transition:
                 transform 0.56s var(--card-delay, 0ms) var(--ease-out-strong),
                 opacity 0.56s var(--card-delay, 0ms) ease,
                 filter 0.56s var(--card-delay, 0ms) ease !important;
         }
-        .track-card.is-disassembling {
+        .track-card.is-disassembling,
+        .sp-playlist-card.is-disassembling {
             transform: perspective(900px)
                 translate3d(var(--card-fly-x, 50px), var(--card-fly-y, 10px), var(--card-fly-z, -220px))
                 rotateX(var(--card-fly-rx, 12deg))
-                rotateY(var(--card-fly-ry, 18deg));
+                rotateY(var(--card-fly-ry, 18deg)) !important;
+            opacity: 0 !important;
+            filter: drop-shadow(0 0 14px rgb(var(--mode-accent-rgb, 0, 242, 254)));
+        }
+
+        /* TRANSIÇÃO ULTRA SUAVE E ELEGANTE DE NAVEGAÇÃO ENTRE ABAS ("SAI DO BOTÃO E SE REMONTA COM FADE") */
+        .list-pane {
+            position: relative;
+        }
+
+        .pane-view {
+            will-change: opacity, transform;
+        }
+
+        /* 1. Transição de Fade e Deslocamento na Página Inteira */
+        .pane-view.page-transition-exit {
+            opacity: 0 !important;
+            transform: translateY(-16px) scale(0.985) !important;
+            transition: opacity 0.28s ease, transform 0.30s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            pointer-events: none;
+        }
+        .pane-view.page-transition-enter-start {
+            opacity: 0 !important;
+            transform: translateY(22px) scale(0.985) !important;
+            transition: none !important;
+            pointer-events: none;
+        }
+        .pane-view.page-transition-enter-active {
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+            transition: opacity 0.44s ease, transform 0.48s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        /* 2. Onda suave expandindo a partir do botão */
+        .nav-origin-wave-overlay {
+            position: fixed;
+            pointer-events: none;
+            z-index: 998;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--mode-accent-rgb, 0, 242, 254), 0.24) 0%, rgba(var(--mode-accent-rgb, 0, 242, 254), 0.07) 50%, transparent 75%);
+            transform: translate(-50%, -50%) scale(0.01);
+            opacity: 1;
+            transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.68s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform, opacity;
+        }
+        .nav-origin-wave-overlay.is-active {
+            transform: translate(-50%, -50%) scale(1);
             opacity: 0;
-            filter: drop-shadow(0 0 14px rgb(var(--mode-accent-rgb)));
+        }
+
+        .nav-btn.nav-source-pulse {
+            animation: navBtnPulseGlow 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes navBtnPulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(var(--mode-accent-rgb, 0, 242, 254), 0.8); transform: scale(1.06); }
+            50% { box-shadow: 0 0 20px 6px rgba(var(--mode-accent-rgb, 0, 242, 254), 0.45); }
+            100% { box-shadow: none; transform: scale(1); }
+        }
+
+        /* 3. Desmontagem e Remontagem dos Cards em Cascata */
+        .track-card.nav-card-item,
+        .sp-playlist-card.nav-card-item,
+        .search-result-card.nav-card-item,
+        .queue-item.nav-card-item {
+            will-change: transform, opacity;
+        }
+        .nav-card-item.nav-card-exit {
+            opacity: 0 !important;
+            transform: translate(var(--card-dx, 0px), var(--card-dy, -18px)) scale(0.95) !important;
+            transition:
+                opacity 0.28s var(--card-delay, 0ms) ease,
+                transform 0.30s var(--card-delay, 0ms) cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+        .nav-card-item.nav-card-enter-start {
+            opacity: 0 !important;
+            transform: translate(var(--card-dx, 0px), var(--card-dy, 28px)) scale(0.92) !important;
+            transition: none !important;
+        }
+        .nav-card-item.nav-card-enter-active {
+            opacity: 1 !important;
+            transform: translate(0, 0) scale(1) !important;
+            transition:
+                opacity 0.48s var(--card-delay, 0ms) ease,
+                transform 0.52s var(--card-delay, 0ms) cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -507,10 +673,12 @@
                 transform: none;
                 opacity: 0;
             }
-            .track-card.is-mode-transitioning {
+            .track-card.is-mode-transitioning,
+            .sp-playlist-card.is-mode-transitioning {
                 transition: opacity 0.2s var(--card-delay, 0ms) ease !important;
             }
-            .track-card.is-disassembling {
+            .track-card.is-disassembling,
+            .sp-playlist-card.is-disassembling {
                 transform: none;
                 opacity: 0;
             }
@@ -2628,6 +2796,84 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* ==========================================================
+           ÍCONES VETORIAIS SVG POR CÓDIGO (SUBSTITUIÇÃO TOTAL DE EMOJIS)
+           ========================================================== */
+        .ui-icon {
+            display: inline-block;
+            width: 1.15em;
+            height: 1.15em;
+            vertical-align: -0.18em;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+            transition: transform 0.2s ease, filter 0.2s ease, color 0.2s ease;
+        }
+        .ui-icon-fill {
+            fill: currentColor;
+            stroke: none;
+        }
+        .ui-icon-sm {
+            width: 0.88em;
+            height: 0.88em;
+            vertical-align: -0.12em;
+        }
+        .ui-icon-lg {
+            width: 1.35em;
+            height: 1.35em;
+            vertical-align: -0.22em;
+        }
+        .ui-icon-xl {
+            width: 1.8em;
+            height: 1.8em;
+        }
+        .ui-icon-spin {
+            animation: spinSync 1.4s linear infinite;
+        }
+        .ui-icon-neon-cyan {
+            filter: drop-shadow(0 0 5px rgba(0, 242, 254, 0.7));
+            color: #00f2fe;
+        }
+        .ui-icon-neon-green {
+            filter: drop-shadow(0 0 5px rgba(0, 230, 118, 0.7));
+            color: #00e676;
+        }
+        .ui-icon-neon-orange {
+            filter: drop-shadow(0 0 5px rgba(255, 170, 0, 0.7));
+            color: #ffaa00;
+        }
+        .ui-icon-neon-pink {
+            filter: drop-shadow(0 0 5px rgba(255, 0, 85, 0.7));
+            color: #ff0055;
+        }
+        .status-indicator-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: 0.08em;
+        }
+        .status-indicator-dot.dot-green {
+            background: #00e676;
+            box-shadow: 0 0 8px #00e676;
+        }
+        .status-indicator-dot.dot-yellow {
+            background: #ffaa00;
+            box-shadow: 0 0 8px #ffaa00;
+        }
+        .status-indicator-dot.dot-red {
+            background: #ff0055;
+            box-shadow: 0 0 8px #ff0055;
+        }
+        .status-indicator-dot.dot-cyan {
+            background: #00f2fe;
+            box-shadow: 0 0 8px #00f2fe;
+        }
+
         /* MODAL EQUALIZADOR SPOTIFY */
         .eq-modal-overlay {
             position: fixed;
@@ -3705,16 +3951,21 @@
             align-items: center;
             width: 100%;
             min-width: 0;
+            gap: 6px;
         }
         .dj-title {
-            font-size: 11px;
+            font-size: 10.5px;
             font-weight: 800;
             color: var(--accent);
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             white-space: nowrap;
+            flex-shrink: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .dj-pulse-dot {
             width: 6px;
@@ -3730,11 +3981,11 @@
             50% { opacity: 0.4; transform: scale(0.7); }
         }
         .dj-bpm-sync {
-            font-size: 9.5px;
+            font-size: 9px;
             font-weight: 700;
             color: #ffaa00;
             background: rgba(255, 170, 0, 0.12);
-            padding: 2px 7px;
+            padding: 2px 6px;
             border-radius: 4px;
             border: 1px solid rgba(255, 170, 0, 0.3);
             white-space: nowrap;
@@ -4383,8 +4634,13 @@
             color: #ff8a4c;
         }
         .badge-track-source--sc::before {
-            content: "☁";
-            font-size: 9px;
+            content: "";
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: currentColor;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z'/%3E%3C/svg%3E") no-repeat center / contain;
         }
 
 
@@ -5668,11 +5924,24 @@ input:checked + .slider-toggle:before {
     cursor: pointer;
     transition: all 0.2s ease;
     box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 28px;
 }
 .btn-dj-act-trigger:hover {
     background: linear-gradient(135deg, rgba(var(--mode-accent-rgb), 0.25), rgba(var(--mode-accent-rgb), 0.18));
     border-color: rgb(var(--mode-accent-rgb));
     box-shadow: 0 0 10px rgba(var(--mode-accent-rgb), 0.35);
+}
+#djActModeActiveLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex: 1;
 }
 .dj-dropdown-caret {
     font-size: 10px;
@@ -5734,6 +6003,36 @@ input:checked + .slider-toggle:before {
 .dj-act-menu-opt .opt-icon {
     font-size: 15px;
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.dj-act-menu-opt .opt-icon svg {
+    width: 15px;
+    height: 15px;
+    display: block;
+}
+
+/* Cores específicas de cada modo na lista de atuação */
+#actOpt_match .opt-icon, #actOpt_match .opt-icon svg { color: #00f2fe !important; }
+#actOpt_energy .opt-icon, #actOpt_energy .opt-icon svg { color: #ffaa00 !important; }
+#actOpt_shuffle .opt-icon, #actOpt_shuffle .opt-icon svg { color: #a855f7 !important; }
+#actOpt_smooth .opt-icon, #actOpt_smooth .opt-icon svg { color: #4facfe !important; }
+#actOpt_studio .opt-icon, #actOpt_studio .opt-icon svg { color: #ffd700 !important; }
+#actOpt_drop .opt-icon, #actOpt_drop .opt-icon svg { color: #ff3b3b !important; }
+#actOpt_club .opt-icon, #actOpt_club .opt-icon svg { color: #ff0055 !important; }
+
+/* Ícone ativo do Modo de Atuação no botão gatilho */
+.dj-act-active-icon {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+.dj-act-active-icon svg {
+    width: 14px;
+    height: 14px;
+    display: block;
 }
 .dj-act-menu-opt .opt-text {
     display: flex;

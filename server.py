@@ -767,7 +767,7 @@ def build_curation_discovery(limit: int = 15) -> dict:
 def build_curation_discovery_per_favorite(limit_per_favorite: int = 8, max_favorites: int = 3) -> dict:
     """Mesma ideia de build_curation_discovery, mas em vez de misturar o sinal de todas as
     favoritas numa busca só, roda uma busca "Faixas Parecidas" dedicada pra CADA favorita
-    (reaproveitando discover_related_tracks, a mesma função do botão 📻 Parecidas) - pra
+    (reaproveitando discover_related_tracks, a mesma função do botão Parecidas) - pra
     mostrar, dentro do próprio modal de Curadoria, uma lista de novidades por favorita."""
     suggestions = build_curation_suggestions()
     favorites = suggestions.get("promote", [])[:max_favorites]
