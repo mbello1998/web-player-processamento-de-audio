@@ -241,7 +241,7 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         // 1ms, transientes rápidos (kick/808) ainda furam o teto antes dele reagir. Esta
         // é a rede de segurança final: nenhuma amostra sai estourada, e abaixo do joelho
         // o áudio normal passa inalterado (sem coloração perceptível).
-        function makeSafetyClipCurve(threshold = 0.9) {
+        function makeSafetyClipCurve(threshold = 0.98) {
             const n = 2048;
             const curve = new Float32Array(n);
             for (let i = 0; i < n; i++) {
@@ -433,15 +433,15 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 masterGainNode.gain.value = initVol;
                 eqFilters[eqFilters.length - 1].connect(masterGainNode);
 
-                // Compressor & Brickwall Peak Limiter (Protege caixas de som e fones contra distorção mesmo a 200% VLC)
+                // Compressor & Peak Limiter Audiófilo (Estabilidade dinâmica cristalina, sem pumping e sem distorção)
                 compressorNode = audioCtx.createDynamicsCompressor();
-                compressorNode.threshold.value = -0.5; // Limita rigorosamente em -0.5 dBFS
-                compressorNode.knee.value = 4.0;
-                compressorNode.ratio.value = 20.0; // Brickwall Limiter
-                compressorNode.attack.value = 0.001; // Resposta ultrarrápida (1ms) evita qualquer estouro de transiente
-                compressorNode.release.value = 0.08;
+                compressorNode.threshold.value = -1.5; // Limite transparente de masterização
+                compressorNode.knee.value = 12.0; // Joelho suave e musical que evita variações abruptas
+                compressorNode.ratio.value = 3.5; // Compressão suave transparente (elimina 100% do pumping)
+                compressorNode.attack.value = 0.010; // 10ms: preserva o punch e o ataque natural de bateria/voz
+                compressorNode.release.value = 0.25; // 250ms: recuperação natural estável de volume
                 safetyClipNode = audioCtx.createWaveShaper();
-                safetyClipNode.curve = makeSafetyClipCurve(0.9);
+                safetyClipNode.curve = makeSafetyClipCurve(0.98);
                 safetyClipNode.oversample = "4x";
 
                 masterGainNode.connect(compressorNode);
@@ -483,6 +483,8 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
         // Controle de faixas indisponíveis / restritas (+18) para evitar loops infinitos de retentativa
         const unplayableTrackIds = new Set();
         let isHandlingSkipUnplayable = false;
+        let lastSeekTimestamp = 0;
+        let isSeekingActive = false;
 
         function skipUnplayableTrack(failedTrack = null) {
             if (isHandlingSkipUnplayable) return;
@@ -581,7 +583,13 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                     updatePlayPauseButtons(false);
                 }
             });
+            audioEl.addEventListener("seeking", () => {
+                isSeekingActive = true;
+                lastSeekTimestamp = Date.now();
+            });
             audioEl.addEventListener("seeked", () => {
+                isSeekingActive = false;
+                lastSeekTimestamp = Date.now();
                 if (deckName === activeDeck && engineMode === "audio" && !isJumpingMix && !isTransitioning) {
                     if (typeof recalculateContextOnSeek === "function") {
                         recalculateContextOnSeek(audioEl.currentTime, audioEl.duration || 0);
@@ -1538,14 +1546,23 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
                 if (curTime > 0) remainingTrackSec = dur - curTime;
             }
 
-            if (canMeasureRealEnergy && energy <= 12) {
+            // Proteção contra falsos positivos durante seek, buffer ou áudio pausado
+            const isBufferingOrSeeking = isSeekingActive ||
+                (Date.now() - lastSeekTimestamp < 3500) ||
+                (curAudio && (curAudio.seeking || curAudio.paused));
+
+            if (isBufferingOrSeeking) {
+                consecutiveSilenceCount = 0;
+                consecutivePredictedDropCount = 0;
+                consecutiveLowEnergyCount = 0;
+            } else if (canMeasureRealEnergy && energy <= 12) {
                 consecutiveSilenceCount++;
             } else {
                 consecutiveSilenceCount = 0;
             }
 
             // Se a música está acabando (faltando <= 7.0s) ou entrou em silêncio real (>0.8s e já tocou ao menos 25s)
-            if (isAutoDropEnabled && !isTransitioning && !isJumpingMix) {
+            if (isAutoDropEnabled && !isTransitioning && !isJumpingMix && !isBufferingOrSeeking) {
                 if (dropActiveSeconds >= 25 && (remainingTrackSec <= 7.0 || consecutiveSilenceCount >= 8)) {
                     smartCutToNextDrop("silence_or_outro");
                     return;
@@ -5340,24 +5357,30 @@ function triggerCrossfade(nextTrack) {
         window.addCustomTrackToQueue = addCustomTrackToQueue;
 
         function recalculateContextOnSeek(targetTime, dur) {
-            const dropStartSec = (typeof getTrackDropStartTime === "function") ? getTrackDropStartTime(nowPlayingTrack) : 22.0;
+            lastSeekTimestamp = Date.now();
+            isSeekingActive = false;
             hasFadedCurrentTrack = false;
             consecutiveSilenceCount = 0;
             consecutiveLowEnergyCount = 0;
             consecutivePredictedDropCount = 0;
             dropEnergyHistory = [];
 
+            // Se o usuário voltou a música enquanto uma transição/crossfade estava em curso, cancela imediatamente
+            if (isTransitioning) {
+                cancelTransition();
+            }
+
+            const dropStartSec = (typeof getTrackDropStartTime === "function") ? getTrackDropStartTime(nowPlayingTrack) : 22.0;
+
             // Se o usuário voltou para o início (< 12s) ou antes do drop para repetir
             if (targetTime <= dropStartSec || targetTime < 12) {
                 dropActiveSeconds = 0;
                 dropTargetSeconds = (typeof dropWindowManualBase === "number") ? dropWindowManualBase : 75;
-                showToast(window.uiIcon("refresh") + " Repetindo/Início: Contexto do Drop e análise reiniciados!");
             } else {
                 // Recalcula o tempo já decorrido do drop relativo à nova posição da barra
                 dropActiveSeconds = Math.max(0, targetTime - dropStartSec);
                 const base = (typeof dropWindowManualBase === "number") ? dropWindowManualBase : 75;
                 dropTargetSeconds = Math.max(dropActiveSeconds + 35, base);
-                showToast(`${window.uiIcon("target")} Contexto sincronizado na posição ${formatTime(targetTime)}!`);
             }
 
             if (typeof updateDropHunterMetrics === "function") {
@@ -5375,57 +5398,34 @@ function triggerCrossfade(nextTrack) {
             seekToPercentage(percentage);
         }
 
-        // Sessão do micro-fade de seek pendente (permite cancelar um fade anterior se o
-        // usuário clicar várias vezes seguidas na barra de progresso, sem esperar o fallback).
-        let pendingSeekFade = null;
-
         function seekToPercentage(pct) {
             let dur = 0;
             let targetTime = 0;
+            lastSeekTimestamp = Date.now();
+            isSeekingActive = true;
+
+            // Se havia crossfade automático armando, cancela para não pular de faixa
+            if (isTransitioning) {
+                cancelTransition();
+            }
+            hasFadedCurrentTrack = false;
+
             if (engineMode === "audio") {
                 const curAudio = getActiveAudioDeck();
                 if (curAudio && curAudio.duration) {
                     dur = curAudio.duration;
-                    targetTime = pct * dur;
+                    targetTime = Math.max(0, Math.min(dur, pct * dur));
 
-                    // Micro-fade ao redor do salto (evita o clique/corte seco de trocar
-                    // currentTime com o ganho no talo - mesmo padrão do smartMixSegmentJump).
+                    // Salto instantâneo de tempo sem latência
+                    curAudio.currentTime = targetTime;
+
                     const activeGain = (activeDeck === "A") ? deckGainA : deckGainB;
-                    if (audioCtx && activeGain && !isTransitioning && !isJumpingMix) {
-                        if (pendingSeekFade) {
-                            clearTimeout(pendingSeekFade.setTimer);
-                            clearTimeout(pendingSeekFade.fallbackTimer);
-                            if (pendingSeekFade.audioEl && pendingSeekFade.listener) {
-                                pendingSeekFade.audioEl.removeEventListener("seeked", pendingSeekFade.listener);
-                            }
-                            pendingSeekFade = null;
-                        }
-
+                    if (audioCtx && activeGain) {
                         const now = audioCtx.currentTime;
                         activeGain.gain.cancelScheduledValues(now);
-                        activeGain.gain.setValueAtTime(activeGain.gain.value, now);
-                        activeGain.gain.linearRampToValueAtTime(0.0001, now + 0.025);
-
-                        const session = { setTimer: null, fallbackTimer: null, audioEl: curAudio, listener: null };
-                        const resumeVolume = () => {
-                            if (pendingSeekFade !== session) return;
-                            pendingSeekFade = null;
-                            curAudio.removeEventListener("seeked", resumeVolume);
-                            const resumeNow = audioCtx.currentTime;
-                            activeGain.gain.cancelScheduledValues(resumeNow);
-                            activeGain.gain.setValueAtTime(activeGain.gain.value, resumeNow);
-                            activeGain.gain.linearRampToValueAtTime(1.0, resumeNow + 0.03);
-                        };
-                        session.listener = resumeVolume;
-                        curAudio.addEventListener("seeked", resumeVolume, { once: true });
-                        // Fallback de segurança caso 'seeked' não dispare (ex.: fonte travou)
-                        session.fallbackTimer = setTimeout(resumeVolume, 600);
-                        session.setTimer = setTimeout(() => {
-                            curAudio.currentTime = targetTime;
-                        }, 30);
-                        pendingSeekFade = session;
-                    } else {
-                        curAudio.currentTime = targetTime;
+                        // Rampa ultrarrápida (15ms) apenas para evitar pop mecânico
+                        activeGain.gain.setValueAtTime(0.35, now);
+                        activeGain.gain.linearRampToValueAtTime(1.0, now + 0.035);
                     }
                 }
             } else {
@@ -7590,6 +7590,15 @@ function triggerCrossfade(nextTrack) {
                     }
                 }
             } else {
+                const { curr } = getCurrentPlaybackPosition();
+                // Se a música já tocou por mais de 3 segundos, o primeiro clique volta para o início da mesma música
+                if (curr > 3.0 && (!window.__lastPrevClickTime || (Date.now() - window.__lastPrevClickTime > 2000))) {
+                    window.__lastPrevClickTime = Date.now();
+                    seekToPercentage(0);
+                    showToast(window.uiIcon("prev") + " Voltando ao início da música");
+                    return;
+                }
+                window.__lastPrevClickTime = Date.now();
                 const list = nowPlayingQueue;
                 if (!list || list.length === 0) return;
                 nowPlayingIndex = (nowPlayingIndex - 1 + list.length) % list.length;
@@ -7598,7 +7607,8 @@ function triggerCrossfade(nextTrack) {
             if (nextTrack) {
                 recordTrackInRecentHistory(nextTrack.video_id);
                 djModeNextTrack = null;
-                if (crossfadeSeconds > 0) {
+                // Ao voltar manualmente, toca instantaneamente sem esperar crossfade longo
+                if (crossfadeSeconds > 0 && dir === "next") {
                     triggerCrossfade(nextTrack);
                 } else {
                     playTrackInstant(nextTrack);
@@ -11096,54 +11106,51 @@ let studioSettings = {
     // Módulo 1: Reverb
     reverbType: "hall",
     reverbPreDelay: 0.02,
-    reverbDecay: 1.8,
-    reverbMix: 22,
-    // Módulo 2: Delay (mudo por padrão - um send de 240ms com 28% de feedback
-    // é um eco repetido audível, não "masterização"; some usuários abrindo o
-    // Studio Pro pela 1a vez com esses valores reportaram "fico em eco". O
-    // módulo continua funcional para quem quiser ligar via UI/outro preset.)
+    reverbDecay: 1.2,
+    reverbMix: 6, // sutil ambiência espacial, sem embolar o áudio
+    // Módulo 2: Delay
     delayPreset: "1/4",
     delayTime: 0.24,
     delayHiCut: 3500,
     delayFeedback: 0,
     delayMix: 0,
     // Módulo 3: Compressor SSL Bus
-    compThreshold: -14,
-    compRatio: 4.0,
-    compAttack: 0.005,
-    compRelease: 0.15,
+    compThreshold: -8, // musical e transparente
+    compRatio: 2.2, // sem bombeamento ("pumping")
+    compAttack: 0.015,
+    compRelease: 0.22,
     compSidechainHpf: 80,
     // Módulo 4: Calor Valvulado & 3D Wide
     warmthColor: "tube",
-    warmthDrive: 30,
-    stereoWidth: 135,
+    warmthDrive: 8, // calor analógico musical sutil
+    stereoWidth: 115,
     // Módulo 5: Aural Exciter & Air Band
     airFreq: 12000,
-    airBoost: 4.0,
-    airSparkle: 35,
+    airBoost: 1.5,
+    airSparkle: 20,
     // Módulo 6: Sub-Bass 808 Pultec
     subFreq: 60,
-    subBoost: 4.5,
+    subBoost: 1.5,
     subRumbleCut: 30,
     // Módulo 7: De-Esser
     deEsserFreq: 6500,
-    deEsserAmount: 30,
+    deEsserAmount: 20,
     // Módulo 8: Maximizer & Limiter
-    maximizerDrive: 3.0,
-    limiterCeiling: -0.1
+    maximizerDrive: 0.5,
+    limiterCeiling: -0.5
 };
 
 const STUDIO_PRESETS = {
     mastering: {
         name: "Neve Warmth",
-        reverbType: "hall", reverbPreDelay: 0.02, reverbDecay: 1.8, reverbMix: 20,
+        reverbType: "hall", reverbPreDelay: 0.02, reverbDecay: 1.2, reverbMix: 6,
         delayPreset: "1/4", delayTime: 0.24, delayHiCut: 3500, delayFeedback: 0, delayMix: 0,
-        compThreshold: -14, compRatio: 3.5, compAttack: 0.008, compRelease: 0.15, compSidechainHpf: 80,
-        warmthColor: "tube", warmthDrive: 30, stereoWidth: 130,
-        airFreq: 12000, airBoost: 3.5, airSparkle: 30,
-        subFreq: 60, subBoost: 3.5, subRumbleCut: 30,
-        deEsserFreq: 6500, deEsserAmount: 25,
-        maximizerDrive: 2.5, limiterCeiling: -0.1
+        compThreshold: -8, compRatio: 2.2, compAttack: 0.015, compRelease: 0.22, compSidechainHpf: 80,
+        warmthColor: "tube", warmthDrive: 8, stereoWidth: 115,
+        airFreq: 12000, airBoost: 1.5, airSparkle: 20,
+        subFreq: 60, subBoost: 1.5, subRumbleCut: 30,
+        deEsserFreq: 6500, deEsserAmount: 20,
+        maximizerDrive: 0.5, limiterCeiling: -0.5
     },
     hall: {
         name: "Concert Arena",

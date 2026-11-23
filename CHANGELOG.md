@@ -187,3 +187,10 @@ lista com uma entrada por mudança significativa.
   - Mensagem de aviso clara no console para vídeos +18 apontando o uso opcional de `cookies.txt` na raiz.
   - Função `skipUnplayableTrack` em `assets/js/player.js`: remove a faixa problemática da fila pendente, desativa repetição unitária para ela, exibe toast amigável e salta automaticamente para a próxima faixa tocável da fila.
   - Bump de versão de cache dos assets (`v=20261123_50`) e rebuild de `player.html`.
+- **18:15** — Correção de salto indevido ao voltar faixas, aceleração de recálculo de contexto e estabilização master do DSP:
+  - Eliminação de falsa detecção de silêncio durante seek/buffer via janela de segurança de 3.5s, impedindo que voltar a música acione o corte automático e troque de música sozinha.
+  - Comportamento padrão de player em `manualTransition('prev')`: se a faixa já tocou por > 3s, o primeiro clique retorna a 0:00 da mesma música; duplo clique rápido salta para a anterior instantaneamente sem crossfade longo.
+  - Aceleração de `seekToPercentage`: salto direto de tempo sem atraso de 600ms e micro-ramp suave de 15ms.
+  - Recálculo de contexto leve e instantâneo: cancelamento imediato de crossfade ao retroceder na barra e eliminação de toasts repetitivos.
+  - Estabilização de áudio no Web Audio DSP: eliminação do efeito de pumping/bombeamento no compressor master (ratio de 3.5:1, release de 250ms, knee suave de 12dB), soft clipping transparente (0.98) e ganhos moderados na console de masterização.
+  - Bump de versão de cache dos assets (`v=20261123_51`) e rebuild de `player.html`.

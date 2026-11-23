@@ -151,11 +151,22 @@ Abaixo está o registro cronológico de cada evolução, implementação e corre
   - Remoção de qualquer bloqueio por `prefers-reduced-motion` no switch de abas para garantir que o efeito ocorra suavemente em qualquer navegador.
 - **21:45** — **Lançamento Oficial da Marca DropHunter Studio**: Renomeação definitiva do projeto para **DropHunter Studio**, atualizando o cabeçalho `<h1>`, a aba do navegador (`<title>`) e todos os metadados e fallbacks da aplicação.
 
-### 📅 2026-11-23: Resiliência a Conteúdos Restritos (+18) e Anti-Looping
-- **Prevenção de Loops Infinitos de Erro**: O player e o servidor agora tratam de forma resiliente faixas com restrição de idade do YouTube (vídeos com confirmação de maioridade) ou indisponíveis.
-- **Cache Negativo no Servidor (`server.py`)**: Falhas de stream por restrição de idade ou indisponibilidade são cacheadas por 10 minutos, eliminando chamadas repetitivas de 1s e evitando sobrecarga no terminal e CPU.
-- **Salto Automático Gracioso (`skipUnplayableTrack`)**: O frontend detecta a falha, ignora repetição unitária na faixa com problema, limpa da fila pendente e salta diretamente para a próxima música tocável.
-- **Suporte a Cookies Autenticados**: Suporte nativo ao arquivo `cookies.txt` na raiz para desbloquear conteúdos restritos do YouTube via sessão autenticada.
+### 📅 2026-11-23: Estabilização do DSP Master, Seek Instantâneo e Resiliência a Restrições (+18)
+- **Blindagem Contra Pumping e Flutuações Dinâmicas no DSP**:
+  - Calibração de estúdio do compressor master: threshold ajustado para -1.5 dBFS, ratio suave de 3.5:1 (substituindo o antigo 20:1 que modulava o ganho a cada kick de grave), attack de 10ms (preserva o impacto dos transientes) e release transparente de 250ms (elimina bombeamento de volume e respiração do compressor).
+  - Curva de soft clip ultra-transparente (threshold em 0.98), mantendo 100% da linearidade e dinâmica original das faixas, retendo apenas picos inter-amostra sem distorção.
+  - Ganhos calibrados no console de masterização / Estúdio Pro (maximizer drive 0.5 dB, sub/air boost 1.5 dB, comp ratio 2.2:1).
+- **Correção Definitiva de Salto de Música ao Voltar**:
+  - Implementação de janela de proteção de 3.5 segundos (`isBufferingOrSeeking`) durante seeks e retrocessos de barra.
+  - Supressão de falso positivo do detector de silêncio do Drop Hunter, que interpretava a queda momentânea de energia do buffer como fim de faixa e acionava corte prematuro para a próxima faixa.
+  - Comportamento clássico de player no botão "Anterior" (`manualTransition('prev')`): se a faixa já tocou por mais de 3 segundos, o primeiro clique retorna ao início (0:00) da mesma música; um segundo clique rápido dentro de 2 segundos retrocede para a faixa anterior na fila.
+- **Recálculo de Contexto & Scrub Instantâneo**:
+  - Eliminação de atrasos artificiais de 600ms e micro-fades desnecessários durante scrub na barra de progresso.
+  - Atualização direta de `currentTime` com micro-ramp de 15ms anti-pop e cancelamento imediato de crossfade ao retroceder no final da música.
+- **Tratamento Resiliente a Conteúdos Restritos (+18) e Anti-Looping**:
+  - Cache negativo inteligente no backend (`server.py`) com TTL de 10 minutos para vídeos bloqueados por confirmação de idade ou indisponibilidade, impedindo reexecução infinita do `yt-dlp`.
+  - Função `skipUnplayableTrack` no frontend: ignora repetição unitária na faixa com problema, remove da fila pendente e salta diretamente para a próxima música tocável.
+  - Suporte nativo ao arquivo `cookies.txt` (formato Netscape) na raiz para autenticação segura no YouTube sem depender de decriptação DPAPI do navegador.
 
 ---
 
