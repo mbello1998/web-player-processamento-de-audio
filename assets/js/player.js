@@ -480,6 +480,95 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             }
         }
 
+        // Controle de faixas indisponíveis / restritas (+18) para evitar loops infinitos de retentativa
+        const unplayableTrackIds = new Set();
+        let isHandlingSkipUnplayable = false;
+
+        function skipUnplayableTrack(failedTrack = null) {
+            if (isHandlingSkipUnplayable) return;
+            isHandlingSkipUnplayable = true;
+
+            const failed = failedTrack || nowPlayingTrack;
+            const failedId = failed ? (failed.video_id || "") : "";
+            if (failedId) {
+                unplayableTrackIds.add(failedId);
+                console.warn(`[Skip] Faixa restrita (+18) ou indisponível: ${failedId}. Ignorando e avançando para a próxima...`);
+            }
+
+            // Cancela transição se houver
+            if (typeof cancelTransition === "function") {
+                cancelTransition();
+            }
+
+            // Remove da fila pendente se estava nela
+            if (failedId && typeof pendingQueue !== "undefined" && pendingQueue && pendingQueue.length > 0) {
+                const initialLen = pendingQueue.length;
+                pendingQueue = pendingQueue.filter(t => t.video_id !== failedId);
+                if (pendingQueue.length !== initialLen) {
+                    fetch("/api/queue/remove", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ video_id: failedId })
+                    }).catch(() => {});
+                    if (typeof updateAllQueueBadges === "function") updateAllQueueBadges();
+                }
+            }
+
+            showToast(window.uiIcon("alert") + " Faixa com restrição (+18) ou indisponível. Avançando...");
+
+            setTimeout(() => {
+                let nextTrack = null;
+
+                // 1. Tenta fila pendente primeiro (pulando faixas que já falharam)
+                while (pendingQueue && pendingQueue.length > 0) {
+                    const candidate = pendingQueue.shift();
+                    fetch("/api/queue/remove", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ video_id: candidate.video_id })
+                    }).catch(() => {});
+                    if (typeof updateAllQueueBadges === "function") updateAllQueueBadges();
+                    if (!unplayableTrackIds.has(candidate.video_id) && candidate.video_id !== failedId) {
+                        nextTrack = candidate;
+                        break;
+                    }
+                }
+
+                // 2. Se não houver na fila, busca próxima faixa da lista ativa (pulando unplayable e a que falhou)
+                if (!nextTrack && typeof nowPlayingQueue !== "undefined" && nowPlayingQueue && nowPlayingQueue.length > 0) {
+                    let attempts = 0;
+                    let currIdx = typeof nowPlayingIndex === "number" ? nowPlayingIndex : 0;
+                    while (attempts < nowPlayingQueue.length) {
+                        currIdx = (currIdx + 1) % nowPlayingQueue.length;
+                        const candidate = nowPlayingQueue[currIdx];
+                        if (candidate && !unplayableTrackIds.has(candidate.video_id) && candidate.video_id !== failedId) {
+                            nextTrack = candidate;
+                            nowPlayingIndex = currIdx;
+                            break;
+                        }
+                        attempts++;
+                    }
+                }
+
+                // 3. Fallback: getUpcomingTrack se ainda não achou
+                if (!nextTrack && typeof getUpcomingTrack === "function") {
+                    const upcoming = getUpcomingTrack();
+                    if (upcoming && !unplayableTrackIds.has(upcoming.video_id) && upcoming.video_id !== failedId) {
+                        nextTrack = upcoming;
+                    }
+                }
+
+                isHandlingSkipUnplayable = false;
+
+                if (nextTrack) {
+                    console.log(`[Skip] Avançando com sucesso para: ${nextTrack.title}`);
+                    playTrackInstant(nextTrack);
+                } else {
+                    showToast(window.uiIcon("alert") + " Nenhuma outra faixa disponível na lista.");
+                }
+            }, 800);
+        }
+
         function setupAudioEvents(audioEl, deckName) {
             audioEl.addEventListener("play", () => {
                 if (deckName === activeDeck && engineMode === "audio") {
@@ -509,11 +598,8 @@ const DEFAULT_COVER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
             });
             audioEl.addEventListener("error", (e) => {
                 console.warn(`Deck ${deckName} erro de streaming.`, e);
-                if (deckName === activeDeck && !isTransitioning) {
-                    showToast(window.uiIcon("alert") + " Faixa indisponível no YouTube. Avançando para a próxima...");
-                    setTimeout(() => {
-                        autoAdvanceWithFade();
-                    }, 1200);
+                if (deckName === activeDeck) {
+                    skipUnplayableTrack(nowPlayingTrack);
                 }
             });
         }
@@ -7430,8 +7516,8 @@ function triggerCrossfade(nextTrack) {
         // Avanço automático com crossfade (Spotify Priority Queue + Modos DJ)
         function autoAdvanceWithFade() {
             let nextTrack = null;
-            // Modo de Repetição: Se 'one', repete a mesma música atual
-            if (repeatMode === "one" && nowPlayingTrack) {
+            // Modo de Repetição: Se 'one', repete a mesma música atual (desde que não esteja com erro/restrita)
+            if (repeatMode === "one" && nowPlayingTrack && !unplayableTrackIds.has(nowPlayingTrack.video_id)) {
                 nextTrack = nowPlayingTrack;
             } else if (pendingQueue && pendingQueue.length > 0) {
                 nextTrack = pendingQueue.shift();

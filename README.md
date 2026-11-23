@@ -151,6 +151,12 @@ Abaixo está o registro cronológico de cada evolução, implementação e corre
   - Remoção de qualquer bloqueio por `prefers-reduced-motion` no switch de abas para garantir que o efeito ocorra suavemente em qualquer navegador.
 - **21:45** — **Lançamento Oficial da Marca DropHunter Studio**: Renomeação definitiva do projeto para **DropHunter Studio**, atualizando o cabeçalho `<h1>`, a aba do navegador (`<title>`) e todos os metadados e fallbacks da aplicação.
 
+### 📅 2026-11-23: Resiliência a Conteúdos Restritos (+18) e Anti-Looping
+- **Prevenção de Loops Infinitos de Erro**: O player e o servidor agora tratam de forma resiliente faixas com restrição de idade do YouTube (vídeos com confirmação de maioridade) ou indisponíveis.
+- **Cache Negativo no Servidor (`server.py`)**: Falhas de stream por restrição de idade ou indisponibilidade são cacheadas por 10 minutos, eliminando chamadas repetitivas de 1s e evitando sobrecarga no terminal e CPU.
+- **Salto Automático Gracioso (`skipUnplayableTrack`)**: O frontend detecta a falha, ignora repetição unitária na faixa com problema, limpa da fila pendente e salta diretamente para a próxima música tocável.
+- **Suporte a Cookies Autenticados**: Suporte nativo ao arquivo `cookies.txt` na raiz para desbloquear conteúdos restritos do YouTube via sessão autenticada.
+
 ---
 
 ## 🛠️ Como Executar Localmente
@@ -159,6 +165,7 @@ Abaixo está o registro cronológico de cada evolução, implementação e corre
 - **Python 3.10+**
 - **FFmpeg** instalado e adicionado ao `PATH` do sistema.
 - **yt-dlp** (instalado automaticamente via requirements).
+- *(Opcional)* **cookies.txt** na raiz do projeto para liberar músicas com restrição de idade (+18) do YouTube.
 
 ### Instalação
 

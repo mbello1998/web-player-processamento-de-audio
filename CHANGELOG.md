@@ -179,3 +179,11 @@ lista com uma entrada por mudança significativa.
   remontar; logo troca de cor "pintando" o próprio traço ao chegar no
   carregamento; cor de destaque do site inteiro só muda depois que a
   transição termina, não mais no clique.
+
+## 2026-11-23
+
+- **17:58** — Tratamento de faixas restritas (+18) do YouTube e blindagem contra loops de erro:
+  - Cache negativo inteligente no backend (`server.py`) com TTL de 10 minutos para vídeos bloqueados por confirmação de idade ou indisponibilidade, impedindo reexecução infinita do `yt-dlp`.
+  - Mensagem de aviso clara no console para vídeos +18 apontando o uso opcional de `cookies.txt` na raiz.
+  - Função `skipUnplayableTrack` em `assets/js/player.js`: remove a faixa problemática da fila pendente, desativa repetição unitária para ela, exibe toast amigável e salta automaticamente para a próxima faixa tocável da fila.
+  - Bump de versão de cache dos assets (`v=20261123_50`) e rebuild de `player.html`.

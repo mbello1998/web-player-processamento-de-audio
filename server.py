@@ -34,8 +34,13 @@ def get_audio_info(video_id, force_refresh=False):
     if not video_id:
         return None
     cached = AUDIO_CACHE.get(video_id)
-    if not force_refresh and cached and (time.time() - cached.get("time", 0)) < AUDIO_CACHE_TTL:
-        return cached
+    if not force_refresh and cached:
+        # Se for erro recente (ex.: restrição de idade ou indisponível), respeita TTL para evitar loops
+        if cached.get("error"):
+            if (time.time() - cached.get("time", 0)) < 600:  # 10 min de cache de erro
+                return None
+        elif (time.time() - cached.get("time", 0)) < AUDIO_CACHE_TTL:
+            return cached
     try:
         ydl_opts = {
             "format": "bestaudio[ext=m4a]/bestaudio/best",
@@ -90,7 +95,20 @@ def get_audio_info(video_id, force_refresh=False):
             return res
     except Exception as e:
         err_str = str(e)
-        if "Video unavailable" in err_str or "This video is not available" in err_str or "Private video" in err_str:
+        is_age = "Sign in to confirm your age" in err_str or "inappropriate for some users" in err_str
+        is_unavail = "Video unavailable" in err_str or "This video is not available" in err_str or "Private video" in err_str
+
+        # Armazena em cache de erro para não travar o servidor em loop de retentativas
+        AUDIO_CACHE[video_id] = {
+            "url": None,
+            "error": "age_restricted" if is_age else "unavailable",
+            "message": err_str,
+            "time": time.time()
+        }
+
+        if is_age:
+            print(f"[Aviso] YouTube ({video_id}) requer confirmação de idade (+18). Adicione um arquivo 'cookies.txt' na raiz do projeto para desbloquear.")
+        elif is_unavail:
             print(f"[Aviso] Vídeo indisponível ou excluído no YouTube ({video_id}).")
         else:
             print(f"Erro ao extrair áudio de {video_id}: {e}")
@@ -1123,11 +1141,16 @@ class MusicServerHandler(http.server.SimpleHTTPRequestHandler):
     def handle_audio_stream(self, video_id):
         range_hdr = self.headers.get("Range")
         
+        cached = AUDIO_CACHE.get(video_id)
+        if cached and cached.get("error"):
+            self.send_error(404, f"Audio unavailable: {cached.get('error')}")
+            return
+
         for attempt in range(2):
             force_refresh = (attempt > 0)
             info = get_audio_info(video_id, force_refresh=force_refresh)
             if not info or not info.get("url"):
-                if attempt == 0:
+                if attempt == 0 and not (AUDIO_CACHE.get(video_id) and AUDIO_CACHE[video_id].get("error")):
                     continue
                 self.send_error(404, "Audio not found or unavailable")
                 return
