@@ -194,3 +194,5 @@ lista com uma entrada por mudança significativa.
   - Recálculo de contexto leve e instantâneo: cancelamento imediato de crossfade ao retroceder na barra e eliminação de toasts repetitivos.
   - Estabilização de áudio no Web Audio DSP: eliminação do efeito de pumping/bombeamento no compressor master (ratio de 3.5:1, release de 250ms, knee suave de 12dB), soft clipping transparente (0.98) e ganhos moderados na console de masterização.
   - Bump de versão de cache dos assets (`v=20261123_51`) e rebuild de `player.html`.
+- **18:32** — Criação do arquivo de inicialização e diretrizes `.claude.md`:
+  - Padronização de regras de arquitetura DSP, comandos de desenvolvimento (`server.py`, `build_full_player.py`), regras de documentação e diretrizes de interface para agentes Claude/Antigravity.
